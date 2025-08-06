@@ -1,0 +1,13 @@
+<div class="lang-selector">
+  <button class="lang-toggle" aria-haspopup="listbox" aria-expanded="false">
+    <%= lang %> ▼
+  </button>
+  <ul class="lang-options" role="listbox" hidden>
+    <% langs.forEach(code => { %>
+      <% if (code !== lang) { %>
+        <% const url = '/' + filename.replace(lang, code).replace('index.html', '') %>
+        <li><a href="<%= url %>"><%= code %></a></li>
+      <% } %>
+    <% }) %>
+  </ul>
+</div>

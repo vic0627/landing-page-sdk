@@ -1,0 +1,46 @@
+{
+  "name": "@sites/site-dev",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {},
+  "devDependencies": {
+    "@landing-page-sdk/utils-node": "*",
+    "@landing-page-sdk/vite-pages": "*"
+  },
+  "dependencies": {},
+  "nx": {
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": ".core/utils/node/src",
+    "projectType": "application",
+    "targets": {
+      "dev": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "^build"
+        ],
+        "options": {
+          "command": "cd {projectRoot} && vite"
+        }
+      },
+      "build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "^build"
+        ],
+        "options": {
+          "command": "cd {projectRoot} && vite build"
+        }
+      },
+      "preview": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "^build"
+        ],
+        "options": {
+          "command": "cd {projectRoot} && vite preview"
+        }
+      }
+    }
+  }
+}

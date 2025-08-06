@@ -1,0 +1,53 @@
+{
+  "name": "@landing-page-sdk/vite-pages",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./.out/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": [
+      "./src/index.ts",
+      "./.out/index.js"
+    ]
+  },
+  "dependencies": {
+    "@landing-page-sdk/utils-node": "*"
+  },
+  "nx": {
+    "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": ".core/vite/pages/src",
+    "projectType": "library",
+    "targets": {
+      "build": {
+        "command": "esbuild {projectRoot}/src/index.ts",
+        "outputs": [
+          "{options.outdir}"
+        ],
+        "options": {
+          "bundle": true,
+          "outdir": "{projectRoot}/.out",
+          "format": "esm",
+          "packages": "external",
+          "platform": "node",
+          "minify": true
+        }
+      },
+      "dev": {
+        "command": "esbuild {projectRoot}/src/index.ts",
+        "outputs": [
+          "{options.outdir}"
+        ],
+        "options": {
+          "bundle": true,
+          "outdir": "{projectRoot}/.out",
+          "format": "esm",
+          "packages": "external",
+          "platform": "node",
+          "watch": true
+        }
+      }
+    },
+    "tags": []
+  }
+}

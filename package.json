@@ -1,0 +1,28 @@
+{
+  "name": "@landing-page-sdk/source",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "VICTOR HSU",
+  "license": "MIT",
+  "devDependencies": {
+    "@nrwl/devkit": "^19.8.4",
+    "esbuild": "^0.19.2",
+    "jsdom": "^26.1.0",
+    "nx": "21.3.11",
+    "prettier": "^2.6.2",
+    "vite": "^7.0.4",
+    "vite-plugin-virtual-mpa": "^1.12.1"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
+  "workspaces": [
+    ".core/vite/*",
+    ".core/utils/*",
+    "sites/*"
+  ],
+  "nx": {}
+}
