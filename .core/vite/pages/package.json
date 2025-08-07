@@ -6,10 +6,11 @@
   "main": "./.out/index.js",
   "types": "./src/index.ts",
   "exports": {
-    ".": [
-      "./src/index.ts",
-      "./.out/index.js"
-    ]
+    ".": {
+      "import": "./.out/index.js",
+      "require": "./.out/index.js",
+      "types": "./src/index.ts"
+    }
   },
   "dependencies": {
     "@landing-page-sdk/utils-node": "*"
@@ -20,32 +21,26 @@
     "projectType": "library",
     "targets": {
       "build": {
-        "command": "esbuild {projectRoot}/src/index.ts",
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "esbuild ./src/index.ts {args} ",
+          "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=node --minify",
+          "cwd": "{projectRoot}"
+        },
         "outputs": [
           "{options.outdir}"
-        ],
-        "options": {
-          "bundle": true,
-          "outdir": "{projectRoot}/.out",
-          "format": "esm",
-          "packages": "external",
-          "platform": "node",
-          "minify": true
-        }
+        ]
       },
       "dev": {
-        "command": "esbuild {projectRoot}/src/index.ts",
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "esbuild ./src/index.ts {args} ",
+          "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=node --watch",
+          "cwd": "{projectRoot}"
+        },
         "outputs": [
           "{options.outdir}"
-        ],
-        "options": {
-          "bundle": true,
-          "outdir": "{projectRoot}/.out",
-          "format": "esm",
-          "packages": "external",
-          "platform": "node",
-          "watch": true
-        }
+        ]
       }
     },
     "tags": []

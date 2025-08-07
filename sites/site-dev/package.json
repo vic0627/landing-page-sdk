@@ -4,41 +4,42 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {},
-  "devDependencies": {
+  "dependencies": {
     "@landing-page-sdk/utils-node": "*",
     "@landing-page-sdk/vite-pages": "*"
   },
-  "dependencies": {},
   "nx": {
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
-    "sourceRoot": ".core/utils/node/src",
     "projectType": "application",
     "targets": {
       "dev": {
-        "executor": "nx:run-commands",
+        "executor": "@landing-page-sdk/source:vite",
         "dependsOn": [
           "^build"
         ],
         "options": {
-          "command": "cd {projectRoot} && vite"
+          "mode": "dev",
+          "cwd": "{projectRoot}"
         }
       },
       "build": {
-        "executor": "nx:run-commands",
+        "executor": "@landing-page-sdk/source:vite",
         "dependsOn": [
           "^build"
         ],
         "options": {
-          "command": "cd {projectRoot} && vite build"
+          "mode": "build",
+          "cwd": "{projectRoot}"
         }
       },
       "preview": {
-        "executor": "nx:run-commands",
+        "executor": "@landing-page-sdk/source:vite",
         "dependsOn": [
           "^build"
         ],
         "options": {
-          "command": "cd {projectRoot} && vite preview"
+          "mode": "preview",
+          "cwd": "{projectRoot}"
         }
       }
     }

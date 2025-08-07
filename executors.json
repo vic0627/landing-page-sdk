@@ -1,0 +1,9 @@
+{
+  "executors": {
+    "vite": {
+      "implementation": "./.core/vite/index",
+      "schema": "./.core/vite/schema.json",
+      "description": "vite executor"
+    }
+  }
+}
