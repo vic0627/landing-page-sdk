@@ -20,24 +20,26 @@
     "targets": {
       "build": {
         "executor": "nx:run-commands",
+        "cache": true,
         "options": {
           "command": "esbuild ./src/index.ts {args} ",
           "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=node --minify",
           "cwd": "{projectRoot}"
         },
         "outputs": [
-          "{options.outdir}"
+          "{projectRoot}/.out"
         ]
       },
       "dev": {
         "executor": "nx:run-commands",
+        "cache": true,
         "options": {
           "command": "esbuild ./src/index.ts {args} ",
           "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=node --watch",
           "cwd": "{projectRoot}"
         },
         "outputs": [
-          "{options.outdir}"
+          "{projectRoot}/.out"
         ]
       }
     },
