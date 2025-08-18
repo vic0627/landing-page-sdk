@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {},
   "dependencies": {
-    "@landing-page-sdk/utils-node": "*",
-    "@landing-page-sdk/vite-pages": "*"
+    "@landing-page-sdk/utils-node": "*"
   },
   "nx": {
     "$schema": "../../node_modules/nx/schemas/project-schema.json",

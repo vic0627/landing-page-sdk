@@ -21,6 +21,10 @@
     "port": {
       "type": "number",
       "description": "Port for Vite dev or preview server"
+    },
+    "config": {
+      "type": "string",
+      "description": "Config file of the project"
     }
   },
   "required": ["mode", "cwd"]

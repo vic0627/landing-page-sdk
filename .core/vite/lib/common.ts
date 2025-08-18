@@ -4,12 +4,12 @@ import { type RewriteRule } from 'vite-plugin-virtual-mpa';
 import { I18nInfo, I18nLangPack, SiteOptions } from './types';
 import { getPath } from '@landing-page-sdk/utils-node';
 
-async function readSiteOptions(filePath = 'config.js'): Promise<SiteOptions> {
-  try {
-    return ((await import(getPath(filePath)))?.default ?? {}) as SiteOptions;
-  } catch {
-    return {};
-  }
+export async function readSiteOptions(
+  filePath = 'config.js'
+): Promise<SiteOptions> {
+  filePath = getPath(filePath);
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) return {};
+  return ((await import(getPath(filePath)))?.default ?? {}) as SiteOptions;
 }
 
 export const REGEXP = {
