@@ -32,8 +32,9 @@
     "lodash-es": "^4.17.21"
   },
   "workspaces": [
-    ".core/vite/*",
+    ".core/assets",
     ".core/utils/*",
+    ".core/vite/*",
     "common/*",
     "sites/*"
   ],

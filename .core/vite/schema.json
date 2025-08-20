@@ -25,6 +25,10 @@
     "config": {
       "type": "string",
       "description": "Config file of the project"
+    },
+    "sites": {
+      "type": "string",
+      "description": "Determining specific sites to be generated. If representing multiple values, please separate values with ','."
     }
   },
   "required": ["mode", "cwd"]

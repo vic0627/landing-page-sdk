@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { type RewriteRule } from 'vite-plugin-virtual-mpa';
-import { I18nInfo, I18nLangPack, SiteOptions } from './types';
-import { getPath } from '@landing-page-sdk/utils-node';
+import { I18nInfo, I18nLangPack, RouteMode, SiteOptions } from './types';
+import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
+import { readJsonFile } from '@nx/devkit';
 
 export async function readSiteOptions(
   filePath = 'config.js'
@@ -20,23 +21,35 @@ export const REGEXP = {
   EJS: /\.ejs$/,
 };
 
-export const rewrites: RewriteRule = [
-  {
-    from: /^\/src\/pages.*$/, // all requests from /src/pages
-    to: '',
-  },
-  {
-    from: /^\/?$/, // '' or '/'
-    to: '/index.html',
-  },
-  {
-    from: /^\/?(.*)\/?$/, // '/about', 'about/', '/about/', etc.
-    to: ({ match }) => {
-      const path = match[1].replace(/\/$/, '');
-      return path === '' ? '/index.html' : `/${path}/index.html`;
+export const rewrites = (siteOptions: SiteOptions): RewriteRule => {
+  const { routeMode = 'tree', sourcePath = {} } = siteOptions;
+  let { pages = './src/pages' } = sourcePath;
+
+  pages = pages.replace(/\./g, '');
+
+  const rules: RewriteRule = [
+    {
+      from: /.*/,
+      to: ({ parsedUrl }) => {
+        const { pathname } = parsedUrl;
+
+        if (pathname?.includes(pages)) return '';
+        if (pathname?.endsWith('.html')) return pathname;
+
+        return `${
+          pathname?.endsWith('/') ? pathname : pathname + '/'
+        }index.html`;
+      },
     },
-  },
-];
+  ];
+
+  return rules;
+};
+
+export function isHiddenFile(filePath: string) {
+  const filename = path.parse(filePath).name;
+  return filename.startsWith('.');
+}
 
 export function shadowData(
   data: Record<string, any>,
@@ -47,28 +60,38 @@ export function shadowData(
   return result;
 }
 
-export function loadLangs(dir: string): I18nInfo {
+let langInfo: I18nInfo;
+
+export function loadLangs(dir?: string): I18nInfo {
+  if (langInfo) return langInfo;
+
+  const emptyInfo = { langs: [], langPack: {} };
+
+  if (!dir) return emptyInfo;
+
   const files = scanDir(dir, { match: REGEXP.JSON });
 
   if (!files.length) {
-    return { langs: [], langPack: {} };
+    return emptyInfo;
   }
 
   const langs: string[] = [];
   const langPack: I18nLangPack = {};
 
   for (const p of files) {
-    if (!fs.statSync(p).isFile()) {
+    if (!fs.statSync(p).isFile() || isHiddenFile(p)) {
       continue;
     }
 
     const lang = path.basename(p, '.json');
-    const content = JSON.parse(fs.readFileSync(p, 'utf-8'));
+    const content = readJsonFile(p);
     langs.push(lang);
     langPack[lang] = content;
   }
 
-  return { langs, langPack };
+  langInfo = { langs, langPack };
+
+  return langInfo;
 }
 
 export function loadSites(dir: string): string[] {
@@ -78,24 +101,9 @@ export function loadSites(dir: string): string[] {
     return [];
   }
 
-  const jsFiles: string[] = [];
-
-  for (const item of files) {
-    const fullPath = path.join(dir, item);
-    let stats: fs.Stats;
-
-    try {
-      stats = fs.statSync(fullPath);
-    } catch {
-      continue;
-    }
-
-    if (stats.isFile()) {
-      jsFiles.push(fullPath);
-    }
-  }
-
-  return jsFiles;
+  return files
+    .filter((p) => !isHiddenFile(p))
+    .map((p) => (p.startsWith('/') ? p : `/${p}`));
 }
 
 type ScanOptions = {
@@ -116,23 +124,62 @@ type ScanOptions = {
 export function scanDir(dir: string, options?: ScanOptions): string[] {
   if (!fs.existsSync(dir)) return [];
 
-  const { match, recursive = false } = options || {};
-  let res: string[] = [];
+  const { recursive = false } = options || {};
+  // 避免 g-flag 造成 .test() 受 lastIndex 影響
+  const match = options?.match
+    ? new RegExp(options.match.source, options.match.flags.replace('g', ''))
+    : undefined;
 
-  for (const name of fs.readdirSync(dir)) {
-    const full = path.join(dir, name);
-    const stat = fs.statSync(full);
+  const out: string[] = [];
+  const items = fs.readdirSync(dir, { withFileTypes: true }); // Dirent, 無需再 statSync
 
-    if (match && !match.test(name)) {
-      continue;
-    }
+  for (const ent of items) {
+    const full = path.join(dir, ent.name);
 
-    res.push(full);
-
-    if (recursive && stat.isDirectory()) {
-      res = res.concat(scanDir(full, options));
-    }
+    if (ent.isDirectory()) {
+      // **重點：無論目錄名是否匹配，都先遞迴**
+      if (recursive) out.push(...scanDir(full, options));
+      // 是否把這個「目錄本身」放進結果，再看 match
+      if (!match || match.test(ent.name)) out.push(full);
+    } else if (!match || match.test(ent.name)) out.push(full);
   }
 
-  return res;
+  return out;
+}
+
+interface ImportStatementOptions {
+  default?: string;
+  imports?: string[];
+}
+
+export function getImportStatement(
+  id: string,
+  options?: ImportStatementOptions
+) {
+  if (!id) {
+    throw new Error(`'id' is required for import statement`);
+  }
+
+  const { default: _default, imports = [] } = options ?? {};
+
+  let vars = '';
+  if (_default) {
+    vars = _default;
+  }
+  if (imports.length) {
+    vars += `{${imports.join()}`;
+  }
+  if (vars) vars += ' from ';
+
+  return `\nimport ${vars}'${id}';\n`;
+}
+
+export function useEnv(o: Record<string, any>) {
+  const env: Record<string, any> = {};
+
+  for (const key in o) {
+    env[`import.meta.env.${key}`] = JSON.stringify(o[key]);
+  }
+
+  return env;
 }

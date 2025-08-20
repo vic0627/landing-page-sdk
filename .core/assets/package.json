@@ -1,0 +1,12 @@
+{
+  "name": "@landing-page-sdk/assets",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@landing-page-sdk/utils-browser": "*",
+    "@landing-page-sdk/utils-node": "*"
+  },
+  "nx": {}
+}

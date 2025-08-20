@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {},
   "dependencies": {
+    "@landing-page-sdk/assets": "*",
+    "@landing-page-sdk/utils-browser": "*",
     "@landing-page-sdk/utils-node": "*"
   },
   "nx": {

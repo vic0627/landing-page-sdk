@@ -1,12 +1,38 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { cloneDeep } from 'lodash-es';
-import { I18nInfo, type Page } from './types';
+import {
+  I18nInfo,
+  RouteMode,
+  SiteOptions,
+  ViteExecutorSchema,
+  type Page,
+} from './types';
 import { shadowData, scanDir, REGEXP, loadLangs, loadSites } from './common';
-import { getPath } from '@landing-page-sdk/utils-node';
+import VirtualAssets from './virtual-assets';
+import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
+import { pick, merge } from 'lodash-es';
 
-export function findPages(baseDir: string) {
-  const root = getPath(); // 保留你原本取得專案根目錄的方式
+interface PagesOptions
+  extends Required<Pick<SiteOptions, 'routeMode' | 'sourcePath'>>,
+    Pick<ViteExecutorSchema, 'mode'> {}
+
+export default function createPages(
+  cliOptions: ViteExecutorSchema,
+  siteOptions: SiteOptions
+) {
+  const { sourcePath = {}, routeMode = 'tree' } = siteOptions;
+  const options = merge({ sourcePath, routeMode }, pick(cliOptions, 'mode'));
+  const pages = findPages(options);
+  localizePages(pages, options);
+  multiSitesPages(pages, options);
+  return pages;
+}
+
+function findPages(options: PagesOptions) {
+  const { routeMode, sourcePath } = options;
+  const { pages: baseDir = './src/pages' } = sourcePath;
+  const root = getPath();
   const pages: Page[] = [];
 
   // 用 scanDir 掃描出所有 index.html / index.ejs（含子目錄）
@@ -21,18 +47,24 @@ export function findPages(baseDir: string) {
 
     const currentDir = path.dirname(file);
     const relDir = path.relative(baseDir, currentDir).replace(/\\/g, '/'); // '' 或 'about/contact'
-
     const name = relDir === '' ? 'index' : relDir.split('/').join(':');
-    const filename = (relDir ? relDir + '/' : '') + 'index.html';
+
+    let filename!: string;
+    if (routeMode === 'tree') {
+      filename = (relDir ? relDir + '/' : '') + 'index.html';
+    } else if (routeMode === 'flat') {
+      filename = relDir ? relDir.replace(/\//g, '_') + '.html' : 'index.html';
+    } else throw new Error(`Unidentified route mode '${routeMode}'`);
 
     // 將絕對路徑換成相對於 root 的 template 路徑
     const template = file.replace(root, '').replace(/^[/\\]/, '');
 
     // 尋找對應 main.js 作為可選 entry
     const entryPath = path.join(currentDir, 'main.js');
-    const entry = fs.existsSync(entryPath)
+    let entry = fs.existsSync(entryPath)
       ? entryPath.replace(root, '')
       : undefined;
+    if (entry && !entry.startsWith('/')) entry = `/${entry}`;
 
     pages.push({
       name,
@@ -43,12 +75,12 @@ export function findPages(baseDir: string) {
     });
   }
 
-  // 可選的排序策略
-  pages.sort((a, b) => a.filename.localeCompare(b.filename));
   return pages;
 }
 
-export function localizePages(baseDir: string, pages: Page[]) {
+function localizePages(pages: Page[], options: PagesOptions) {
+  const { routeMode, sourcePath } = options;
+  const { i18n: baseDir = './src/i18n' } = sourcePath;
   const { langs, langPack } = loadLangs(baseDir);
 
   if (!langs.length) return;
@@ -58,12 +90,15 @@ export function localizePages(baseDir: string, pages: Page[]) {
 
   const isMultiLang = langs.length > 1;
 
-  if (isMultiLang) {
+  if (isMultiLang || routeMode === 'flat') {
     // 加上 redirect 頁（根目錄跳轉）
     pages.push({
       name: 'redirect',
       filename: 'index.html',
-      template: 'src/redirect/index.html',
+      template: getProjectPath('@landing-page-sdk/assets/redirect/index.html'),
+      entry: getProjectPath(
+        `@landing-page-sdk/assets/redirect/${routeMode}.ts`
+      ),
       data: shadowData({
         ...originalPages[0].data,
         langs,
@@ -75,7 +110,12 @@ export function localizePages(baseDir: string, pages: Page[]) {
   for (const lang of langs) {
     for (const _page of originalPages) {
       const page = cloneDeep(_page);
-      const filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
+      let filename!: string;
+      if (routeMode === 'tree') {
+        filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
+      } else if (routeMode === 'flat') {
+        filename = page.filename.replace('.html', `_${lang}.html`);
+      } else throw new Error(`Unidentified route mode '${routeMode}'`);
       page.name = isMultiLang ? `${lang}:${page.name}` : page.name;
       page.filename = filename;
       page.data = shadowData(
@@ -92,7 +132,9 @@ export function localizePages(baseDir: string, pages: Page[]) {
   }
 }
 
-export function multiSitesPages(baseDir: string, pages: Page[]) {
+function multiSitesPages(pages: Page[], options: PagesOptions) {
+  const { sourcePath } = options;
+  const { sites: baseDir = './src/sites' } = sourcePath;
   const sites = loadSites(baseDir);
 
   if (!sites.length) return;
@@ -108,7 +150,15 @@ export function multiSitesPages(baseDir: string, pages: Page[]) {
       const filename = `${siteName}/${page.filename}`;
       page.name = `${siteName}:${page.name}`;
       page.filename = filename;
-      page.siteScript = site;
+
+      const redirectPage = page.name.endsWith('redirect');
+
+      if (page.entry && !redirectPage) {
+        const entryDir = path.parse(page.entry).dir;
+        page.siteScript = path.relative(entryDir, site);
+        page.entry = page.entry + `?site=${siteName}`;
+      }
+
       page.data = shadowData(
         {
           site: siteName,
