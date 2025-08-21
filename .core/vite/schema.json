@@ -29,6 +29,10 @@
     "sites": {
       "type": "string",
       "description": "Determining specific sites to be generated. If representing multiple values, please separate values with ','."
+    },
+    "minify": {
+      "type": ["string", "boolean"],
+      "description": ""
     }
   },
   "required": ["mode", "cwd"]

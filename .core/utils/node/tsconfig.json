@@ -11,5 +11,5 @@
     "noPropertyAccessFromIndexSignature": true
   },
   "files": [],
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "index.ts"]
 }

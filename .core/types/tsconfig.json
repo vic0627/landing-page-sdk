@@ -1,6 +1,7 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "types": ["vite/client"],
     "module": "esnext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -11,5 +12,5 @@
     "noPropertyAccessFromIndexSignature": true
   },
   "files": [],
-  "include": ["./src/**/*.ts", "index.ts"]
+  "include": ["./**/*.ts"]
 }

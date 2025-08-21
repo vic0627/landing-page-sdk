@@ -1,8 +1,22 @@
 import { PluginOption } from 'vite';
 
+export type ViteMode = 'dev' | 'build' | 'preview';
+
 export type RouteMode = 'flat' | 'tree';
 
 export type ScriptAppendPosition = 'pre' | 'post';
+
+export type MinifyTargets = 'html' | 'js' | 'css';
+
+export interface ViteExecutorSchema {
+  cwd: string;
+  mode: ViteMode;
+  host?: boolean;
+  port?: number;
+  config?: string;
+  sites?: string;
+  minify?: boolean | string;
+}
 
 export interface SiteOptions {
   /** @default 'tree' */
@@ -23,15 +37,8 @@ export interface SiteOptions {
     /** @default 'pre' */
     siteScript?: ScriptAppendPosition;
   };
-}
-
-export interface ViteExecutorSchema {
-  cwd: string;
-  mode: 'dev' | 'build' | 'preview';
-  host?: boolean;
-  port?: number;
-  config?: string;
-  sites?: string[];
+  /** @default true */
+  minify?: boolean | MinifyTargets | MinifyTargets[];
 }
 
 export interface Page {
@@ -50,10 +57,4 @@ export interface I18nLangPack {
 export interface I18nInfo {
   langs: string[];
   langPack: I18nLangPack;
-}
-
-export type ComponentLayer = 'core' | 'top' | 'local';
-
-export interface TemplateAPI {
-  cmp(filePath: string, layer?: ComponentLayer): string;
 }

@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "main": "./.out/index.js",
-  "types": "./src/index.ts",
+  "types": "./index.ts",
   "exports": {
     ".": {
       "import": "./.out/index.js",
-      "types": "./src/index.ts"
+      "types": "./index.ts"
     }
   },
   "dependencies": {},
@@ -21,7 +21,7 @@
         "executor": "nx:run-commands",
         "cache": true,
         "options": {
-          "command": "esbuild ./src/index.ts {args} ",
+          "command": "esbuild ./index.ts {args} ",
           "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=browser --minify",
           "cwd": "{projectRoot}"
         },
@@ -33,7 +33,7 @@
         "executor": "nx:run-commands",
         "cache": true,
         "options": {
-          "command": "esbuild ./src/index.ts {args} ",
+          "command": "esbuild ./index.ts {args} ",
           "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=browser --watch",
           "cwd": "{projectRoot}"
         },

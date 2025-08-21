@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { type RewriteRule } from 'vite-plugin-virtual-mpa';
-import { I18nInfo, I18nLangPack, RouteMode, SiteOptions } from './types';
-import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
-import { readJsonFile } from '@nx/devkit';
+import { RewriteRule } from 'vite-plugin-virtual-mpa';
+import { MinifyTargets, SiteOptions, ViteExecutorSchema } from '@landing-page-sdk/types';
+import { getPath } from '@landing-page-sdk/utils-node';
 
 export async function readSiteOptions(
   filePath = 'config.js'
@@ -22,7 +21,7 @@ export const REGEXP = {
 };
 
 export const rewrites = (siteOptions: SiteOptions): RewriteRule => {
-  const { routeMode = 'tree', sourcePath = {} } = siteOptions;
+  const { sourcePath = {} } = siteOptions;
   let { pages = './src/pages' } = sourcePath;
 
   pages = pages.replace(/\./g, '');
@@ -33,12 +32,19 @@ export const rewrites = (siteOptions: SiteOptions): RewriteRule => {
       to: ({ parsedUrl }) => {
         const { pathname } = parsedUrl;
 
-        if (pathname?.includes(pages)) return '';
-        if (pathname?.endsWith('.html')) return pathname;
+        if (pathname?.includes(pages)) {
+          return '';
+        }
 
-        return `${
-          pathname?.endsWith('/') ? pathname : pathname + '/'
-        }index.html`;
+        if (pathname?.endsWith('.html')) {
+          return pathname;
+        }
+
+        if (!pathname?.endsWith('/')) {
+          return '';
+        }
+
+        return `${pathname}index.html`;
       },
     },
   ];
@@ -60,52 +66,6 @@ export function shadowData(
   return result;
 }
 
-let langInfo: I18nInfo;
-
-export function loadLangs(dir?: string): I18nInfo {
-  if (langInfo) return langInfo;
-
-  const emptyInfo = { langs: [], langPack: {} };
-
-  if (!dir) return emptyInfo;
-
-  const files = scanDir(dir, { match: REGEXP.JSON });
-
-  if (!files.length) {
-    return emptyInfo;
-  }
-
-  const langs: string[] = [];
-  const langPack: I18nLangPack = {};
-
-  for (const p of files) {
-    if (!fs.statSync(p).isFile() || isHiddenFile(p)) {
-      continue;
-    }
-
-    const lang = path.basename(p, '.json');
-    const content = readJsonFile(p);
-    langs.push(lang);
-    langPack[lang] = content;
-  }
-
-  langInfo = { langs, langPack };
-
-  return langInfo;
-}
-
-export function loadSites(dir: string): string[] {
-  const files = scanDir(dir, { match: REGEXP.SCRIPT });
-
-  if (!files.length) {
-    return [];
-  }
-
-  return files
-    .filter((p) => !isHiddenFile(p))
-    .map((p) => (p.startsWith('/') ? p : `/${p}`));
-}
-
 type ScanOptions = {
   /**
    * 匹配的目錄或檔案
@@ -122,7 +82,9 @@ type ScanOptions = {
  * 掃描目標目錄，返回檔案或目錄的路徑
  */
 export function scanDir(dir: string, options?: ScanOptions): string[] {
-  if (!fs.existsSync(dir)) return [];
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
 
   const { recursive = false } = options || {};
   // 避免 g-flag 造成 .test() 受 lastIndex 影響
@@ -138,10 +100,17 @@ export function scanDir(dir: string, options?: ScanOptions): string[] {
 
     if (ent.isDirectory()) {
       // **重點：無論目錄名是否匹配，都先遞迴**
-      if (recursive) out.push(...scanDir(full, options));
+      if (recursive) {
+        out.push(...scanDir(full, options));
+      }
+
       // 是否把這個「目錄本身」放進結果，再看 match
-      if (!match || match.test(ent.name)) out.push(full);
-    } else if (!match || match.test(ent.name)) out.push(full);
+      if (!match || match.test(ent.name)) {
+        out.push(full);
+      }
+    } else if (!match || match.test(ent.name)) {
+      out.push(full);
+    }
   }
 
   return out;
@@ -163,18 +132,23 @@ export function getImportStatement(
   const { default: _default, imports = [] } = options ?? {};
 
   let vars = '';
+
   if (_default) {
     vars = _default;
   }
+
   if (imports.length) {
     vars += `{${imports.join()}`;
   }
-  if (vars) vars += ' from ';
+
+  if (vars) {
+    vars += ' from ';
+  }
 
   return `\nimport ${vars}'${id}';\n`;
 }
 
-export function useEnv(o: Record<string, any>) {
+export function parseEnv(o: Record<string, any>) {
   const env: Record<string, any> = {};
 
   for (const key in o) {
@@ -182,4 +156,58 @@ export function useEnv(o: Record<string, any>) {
   }
 
   return env;
+}
+
+export function parseMinify(
+  cliOptions: ViteExecutorSchema,
+  siteOptions: SiteOptions
+) {
+  const minifyInfo: Record<MinifyTargets, boolean> = {
+    html: true,
+    js: true,
+    css: true,
+  };
+
+  const cliMinify = cliOptions.minify;
+  const sitesMinify = siteOptions.minify;
+
+  if (cliMinify === undefined && sitesMinify === undefined) {
+    return minifyInfo;
+  }
+
+  if (cliMinify !== undefined) {
+    if (typeof cliMinify === 'boolean') {
+      for (const key in minifyInfo) {
+        minifyInfo[key] = cliMinify;
+      }
+    } else if (typeof cliMinify === 'string') {
+      const minifyTargets = cliMinify.split(',');
+
+      for (const key in minifyInfo) {
+        minifyInfo[key] = minifyTargets.includes(key);
+      }
+    }
+
+    return minifyInfo;
+  }
+
+  if (sitesMinify !== undefined) {
+    if (typeof sitesMinify === 'boolean') {
+      for (const key in minifyInfo) {
+        minifyInfo[key] = sitesMinify;
+      }
+    } else if (typeof sitesMinify === 'string') {
+      for (const key in minifyInfo) {
+        minifyInfo[key] = key === sitesMinify;
+      }
+    } else if (Array.isArray(sitesMinify)) {
+      for (const key in minifyInfo) {
+        minifyInfo[key] = sitesMinify.includes(key as MinifyTargets);
+      }
+    }
+
+    return minifyInfo;
+  }
+
+  return minifyInfo;
 }

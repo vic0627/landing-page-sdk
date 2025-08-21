@@ -1,36 +1,29 @@
-import { PromiseExecutor, writeJsonFile } from '@nx/devkit';
-import {
-  createServer,
-  build,
-  preview,
-  type UserConfig,
-  type Plugin,
-} from 'vite';
 import { resolve } from 'node:path';
-import { createMpaPlugin, type Page as _Page } from 'vite-plugin-virtual-mpa';
-import createPages from './lib/pages';
+import { PromiseExecutor } from '@nx/devkit';
+import { createServer, build, preview, UserConfig, Plugin } from 'vite';
+import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
+import { merge } from 'lodash-es';
 import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
-import type { SiteOptions, ViteExecutorSchema } from './lib/types';
+import { ViteExecutorSchema } from '@landing-page-sdk/types';
 import {
-  loadLangs,
+  parseMinify,
   readSiteOptions,
   rewrites,
   shadowData,
-  useEnv,
+  parseEnv,
 } from './lib/common';
+import createPages from './lib/pages';
 import sitesInjector from './lib/plugins/sites-injector';
-import virtualAssets from './lib/plugins/virtual-assets';
-import { merge } from 'lodash-es';
+import buildHelper from './lib/build-helper';
 
 const runExecutor: PromiseExecutor<ViteExecutorSchema> = async (
   cliOptions,
   context
 ) => {
-  // switch the working dir to current project
   process.chdir(getPathFromRoot(cliOptions.cwd));
 
   const siteOptions = await readSiteOptions(cliOptions.config);
-  const pages = createPages(cliOptions, siteOptions);
+  const { pages, langInfo, sites } = createPages(cliOptions, siteOptions);
   pages.forEach(
     (page) =>
       (page.data = shadowData(
@@ -41,11 +34,14 @@ const runExecutor: PromiseExecutor<ViteExecutorSchema> = async (
         page.data
       ))
   );
-  // console.log(pages);
+  // console.trace(pages);
+
+  const minifyOptions = parseMinify(cliOptions, siteOptions);
 
   const mpaPlugin = createMpaPlugin({
     pages: pages as _Page[],
     rewrites: rewrites(siteOptions),
+    htmlMinify: minifyOptions.html,
     // verbose: false,
   }) as Plugin[];
 
@@ -54,10 +50,10 @@ const runExecutor: PromiseExecutor<ViteExecutorSchema> = async (
   };
 
   const outDir = getPathFromRoot('dist');
-  const define = useEnv(
+  const define = parseEnv(
     merge(
       {
-        langs: loadLangs().langs,
+        langs: langInfo.langs,
       },
       siteOptions.env
     )
@@ -72,15 +68,42 @@ const runExecutor: PromiseExecutor<ViteExecutorSchema> = async (
     },
     build: {
       outDir,
+      emptyOutDir: true,
+      minify: minifyOptions.js,
+      cssMinify: minifyOptions.css,
+      rollupOptions: {
+        output: {
+          entryFileNames: `assets/[name].js`,
+          chunkFileNames: `assets/[name].js`,
+          assetFileNames: `assets/[name].[ext]`,
+        },
+      },
+      // modulePreload: {
+      //   resolveDependencies(fn, deps, cxt) {
+      //     console.log(fn, deps, cxt)
+      //     return deps
+      //   }
+      // }
+    },
+    preview: {
+      host: cliOptions.host,
+      port: cliOptions.port,
     },
     resolve: {
       alias,
     },
     plugins: [
+      ...(siteOptions.plugins ?? []),
       sitesInjector(pages, siteOptions),
       // virtualAssets(pages, siteOptions),
     ],
     cacheDir: getPathFromRoot('node_modules/.vite-cache'),
+    experimental: {
+      renderBuiltUrl(filename, { hostType }) {
+        if (hostType === 'js') console.log(filename);
+        return '/' + filename + `?v=foo123`;
+      },
+    },
   };
 
   switch (cliOptions.mode) {
@@ -94,12 +117,13 @@ const runExecutor: PromiseExecutor<ViteExecutorSchema> = async (
     case 'build':
       userConfig.plugins?.push(mpaPlugin);
       await build(userConfig);
+      await buildHelper(outDir, sites);
       break;
     case 'preview':
-      // const previewServer = await preview(userConfig);
-      // previewServer.printUrls();
-      // previewServer.bindCLIShortcuts({ print: true });
-      // await new Promise<void>(() => {});
+      const previewServer = await preview(userConfig);
+      previewServer.printUrls();
+      previewServer.bindCLIShortcuts({ print: true });
+      await new Promise<void>(() => {});
       break;
   }
 

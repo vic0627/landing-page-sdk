@@ -1,5 +1,5 @@
 import { Plugin } from 'vite';
-import { Page, SiteOptions } from '../types';
+import { Page, SiteOptions } from '@landing-page-sdk/types';
 import { getImportStatement } from '../common';
 
 export default (pages: Page[], siteOptions: SiteOptions): Plugin => {
