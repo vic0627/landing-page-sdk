@@ -1,4 +1,4 @@
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
 import { workspaceRoot } from '@nx/devkit';
 
 export function getPath(...paths: string[]) {
@@ -7,4 +7,8 @@ export function getPath(...paths: string[]) {
 
 export function getPathFromRoot(...paths: string[]) {
   return resolve(workspaceRoot, ...paths);
+}
+
+export function getRelPathFromRoot(...paths: string[]) {
+  return relative(getPath(), getPathFromRoot(...paths));
 }

@@ -1,7 +1,7 @@
-import { $all } from "./dom";
-import { detectLang } from "./lang";
+import { $all } from './dom';
+import { detectLang } from './lang';
 
-const __LOADER__ = "__LOADER__";
+const __LOADER__ = '__LOADER__';
 
 type MediaElement = HTMLVideoElement | HTMLImageElement | HTMLPictureElement;
 type LoaderId = { [__LOADER__]: symbol };
@@ -9,9 +9,15 @@ type Loader<L> = (el: L) => void;
 type RegisteredLoader<L> = Loader<L> & LoaderId;
 
 let observer: IntersectionObserver;
-const loaderMap: Map<symbol, { loader: RegisteredLoader<Element>; className: string }> = new Map();
+const loaderMap: Map<
+  symbol,
+  { loader: RegisteredLoader<Element>; className: string }
+> = new Map();
 
-export const createLoader = <L>(loader: Loader<L>, id?: string): RegisteredLoader<L> => {
+export const createLoader = <L>(
+  loader: Loader<L>,
+  id?: string
+): RegisteredLoader<L> => {
   const symbolId = Symbol(id);
 
   Object.defineProperty(loader, __LOADER__, { value: symbolId });
@@ -19,54 +25,58 @@ export const createLoader = <L>(loader: Loader<L>, id?: string): RegisteredLoade
   return loader as RegisteredLoader<L>;
 };
 
-const loadVideo = createLoader<MediaElement>((video) => {
+const loadVideo = /* @__PURE__ */ createLoader<MediaElement>((video) => {
   if (!(video instanceof HTMLVideoElement)) return;
 
-  const sources = Array.from(video.getElementsByTagName("source"));
+  const sources = Array.from(video.getElementsByTagName('source'));
   sources.forEach((source) => {
-    source.srcset = source.dataset.srcset ?? "";
+    source.srcset = source.dataset['srcset'] ?? '';
   });
 
   video.load();
-}, "LAZY_VIDEO");
+}, 'LAZY_VIDEO');
 
-const loadImage = createLoader<MediaElement>((img) => {
+const loadImage = /* @__PURE__ */ createLoader<MediaElement>((img) => {
   if (!(img instanceof HTMLImageElement)) return;
 
   const lang = detectLang();
 
-  const [path, imageNameAndType] = img.dataset.src?.split("images/") ?? [];
+  const [path, imageNameAndType] = img.dataset['src']?.split('images/') ?? [];
   if (!path) return;
-  const [imageName, imgType] = imageNameAndType.split(".");
+  const [imageName, imgType] = imageNameAndType.split('.');
 
-  if (imageName === "logo") img.src = `${path}images/${imageName}_${lang}.${imgType}`;
-  else img.src = img.dataset.src ?? "";
-}, "LAZY_IMAGE");
+  if (imageName === 'logo')
+    img.src = `${path}images/${imageName}_${lang}.${imgType}`;
+  else img.src = img.dataset['src'] ?? '';
+}, 'LAZY_IMAGE');
 
-const loadPicture = createLoader<MediaElement>((pic) => {
+const loadPicture = /* @__PURE__ */ createLoader<MediaElement>((pic) => {
   if (!(pic instanceof HTMLPictureElement)) return;
 
-  const sources = Array.from(pic.getElementsByTagName("source"));
+  const sources = Array.from(pic.getElementsByTagName('source'));
   sources.forEach((source) => {
-    source.srcset = source.dataset.srcset ?? "";
+    source.srcset = source.dataset['srcset'] ?? '';
   });
 
-  const img = pic.querySelector("img");
+  const img = pic.querySelector('img');
   if (img) loadImage(img);
-}, "LAZY_PICTURE");
+}, 'LAZY_PICTURE');
 
-const loadBackgroundImage = createLoader<HTMLElement>((el) => {
-  const url = el.getAttribute("data-bg");
+const loadBackgroundImage = /* @__PURE__ */ createLoader<HTMLElement>((el) => {
+  const url = el.getAttribute('data-bg');
   if (url) el.style.backgroundImage = `url('${url}')`;
-}, "LAZY_BACKGROUND_IMAGE");
+}, 'LAZY_BACKGROUND_IMAGE');
 
-export const lazyWrap = <E extends Element>(className: string, loader: RegisteredLoader<E>) => {
+export const lazyWrap = <E extends Element>(
+  className: string,
+  loader: RegisteredLoader<E>
+) => {
   const lazyTargets = $all(className) as NodeListOf<E>;
 
-  if (!("IntersectionObserver" in window)) return lazyTargets.forEach(loader);
+  if (!('IntersectionObserver' in window)) return lazyTargets.forEach(loader);
   if (!loader.__LOADER__) return;
 
-  className = className.split(".")[1];
+  className = className.split('.')[1];
   loaderMap.has(loader.__LOADER__) ||
     loaderMap.set(loader.__LOADER__, {
       loader: loader as RegisteredLoader<Element>,
@@ -103,7 +113,7 @@ export const lazyWrap = <E extends Element>(className: string, loader: Registere
  * // 對含有 lazyVideo class 名稱的 video 元素進行懶加載
  * document.addEventListener("DOMContentLoaded", () => lazyLoadVideos("lazyVideo"));
  */
-export function lazyLoadVideos(className: string = "lazy") {
+export function lazyLoadVideos(className: string = 'lazy') {
   lazyWrap(`video.${className}`, loadVideo);
 }
 
@@ -117,7 +127,7 @@ export function lazyLoadVideos(className: string = "lazy") {
  * // 對含有 lazyImage class 名稱的圖片元素進行懶加載
  * document.addEventListener("DOMContentLoaded", () => lazyLoadImages("lazyImage"));
  */
-export function lazyLoadImages(className: string = "lazy") {
+export function lazyLoadImages(className: string = 'lazy') {
   lazyWrap(`img.${className}`, loadImage);
 }
 
@@ -134,7 +144,7 @@ export function lazyLoadImages(className: string = "lazy") {
  * // 對含有 lazyPicture class 名稱的 <picture> 元素進行懶加載
  * document.addEventListener("DOMContentLoaded", () => lazyLoadPictures("lazyPicture"));
  */
-export function lazyLoadPictures(className: string = "lazy") {
+export function lazyLoadPictures(className: string = 'lazy') {
   lazyWrap(`picture.${className}`, loadPicture);
 }
 
@@ -167,6 +177,6 @@ document.addEventListener("DOMContentLoaded", () => lazyLoadBackgroundImage());
 <div class="lazyBg" data-bg="/assets/images/<%= lang =>/bg_01.png"></div>
 ```
  */
-export function lazyLoadBackgroundImage(className: string = "lazyBg") {
+export function lazyLoadBackgroundImage(className: string = 'lazyBg') {
   lazyWrap(`.${className}`, loadBackgroundImage);
 }

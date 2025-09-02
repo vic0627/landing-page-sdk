@@ -2,28 +2,18 @@
 <html lang="<%= lang %>">
   <head>
     <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/vite.svg"
-    />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
   </head>
   <body>
     <div id="app">
-      <%- include(useCmp('lang-selector'), _data) %>
+      <%- include($cmp('lang-selector'), _data) %>
       <div>
-        <%- include(useCmp('logo')) %>
+        <%- include($cmp('logo')) %>
         <h1><%= i18n.aboutName %></h1>
         <div class="card">
-          <button
-            id="counter"
-            type="button"
-          ></button>
+          <button id="counter" type="button"></button>
         </div>
         <a class="read-the-docs" href="../">To About</a>
       </div>

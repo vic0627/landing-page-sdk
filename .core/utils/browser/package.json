@@ -3,45 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "main": "./.out/index.js",
-  "types": "./index.ts",
-  "exports": {
-    ".": {
-      "import": "./.out/index.js",
-      "types": "./index.ts"
-    }
-  },
+  "main": "./index.ts",
   "dependencies": {},
-  "nx": {
-    "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-    "sourceRoot": ".core/utils/node/src",
-    "projectType": "library",
-    "targets": {
-      "build": {
-        "executor": "nx:run-commands",
-        "cache": true,
-        "options": {
-          "command": "esbuild ./index.ts {args} ",
-          "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=browser --minify",
-          "cwd": "{projectRoot}"
-        },
-        "outputs": [
-          "{projectRoot}/.out"
-        ]
-      },
-      "dev": {
-        "executor": "nx:run-commands",
-        "cache": true,
-        "options": {
-          "command": "esbuild ./index.ts {args} ",
-          "args": "--bundle --outdir=./.out --format=esm --packages=external --platform=browser --watch",
-          "cwd": "{projectRoot}"
-        },
-        "outputs": [
-          "{projectRoot}/.out"
-        ]
-      }
-    },
-    "tags": []
-  }
+  "nx": {}
 }

@@ -1,135 +1,81 @@
-import { resolve } from 'node:path';
-import { PromiseExecutor } from '@nx/devkit';
-import { createServer, build, preview, UserConfig, Plugin } from 'vite';
-import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
-import { merge } from 'lodash-es';
-import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
-import { ViteExecutorSchema } from '@landing-page-sdk/types';
+import { AsyncIteratorExecutor, PromiseExecutor } from '@nx/devkit';
+import chokidar from 'chokidar';
 import {
-  parseMinify,
-  readSiteOptions,
-  rewrites,
-  shadowData,
-  parseEnv,
-} from './lib/common';
-import createPages from './lib/pages';
-import sitesInjector from './lib/plugins/sites-injector';
-import buildHelper from './lib/build-helper';
+  getPathFromRoot,
+  getProjectPath,
+  timestampHash,
+} from '@landing-page-sdk/utils-node';
+import { ViteExecutorSchema } from '@landing-page-sdk/types';
+import path from 'node:path';
+import fs from 'node:fs';
+import url from 'node:url';
 
-const runExecutor: PromiseExecutor<ViteExecutorSchema> = async (
-  cliOptions,
-  context
-) => {
-  process.chdir(getPathFromRoot(cliOptions.cwd));
+const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
+  async function* (cliOptions, context) {
+    // switch working dir
+    process.chdir(getPathFromRoot(cliOptions.cwd));
 
-  const siteOptions = await readSiteOptions(cliOptions.config);
-  const { pages, langInfo, sites } = createPages(cliOptions, siteOptions);
-  pages.forEach(
-    (page) =>
-      (page.data = shadowData(
-        {
-          useCmp: (...paths: string[]) => resolve('/src/components', ...paths),
-          env: siteOptions.env,
-        },
-        page.data
-      ))
-  );
-  // console.trace(pages);
+    let main!: (...args: any[]) => Promise<boolean>;
+    let teardown!: () => Promise<void>;
 
-  const minifyOptions = parseMinify(cliOptions, siteOptions);
+    const initMainMod = async () => {
+      // const fileUrl = getProjectPath(
+      //   `@landing-page-sdk/vite-executor/index.ts`
+      // );
+      // const base = url.pathToFileURL(fileUrl);
+      // const u = new URL(base.href);
+      // u.searchParams.set('t', String(fs.statSync(fileUrl).mtimeMs | 0));
+      const mod = await import('@landing-page-sdk/vite-executor');
+      ({ main, teardown } = mod);
+    };
 
-  const mpaPlugin = createMpaPlugin({
-    pages: pages as _Page[],
-    rewrites: rewrites(siteOptions),
-    htmlMinify: minifyOptions.html,
-    // verbose: false,
-  }) as Plugin[];
+    // 先跑一次
+    await initMainMod();
+    yield { success: await main(cliOptions, context) };
 
-  const alias = {
-    '@': getPath('src'),
+    // build 模式單次就結束
+    if (cliOptions.mode === 'build') return;
+
+    // ** 在沒找到怎麼清掉 import cache 問題之前，先卡住城市流 **
+    await new Promise(() => {});
+
+    const watchGlobs = [
+      getProjectPath('@landing-page-sdk/vite-executor'),
+      getProjectPath('@landing-page-sdk/utils-node'),
+    ];
+
+    const watcher = chokidar.watch(watchGlobs, {
+      ignoreInitial: true,
+    });
+
+    let resolve!: (value?: unknown) => void;
+    let plug!: Promise<any>;
+
+    const initPlug = () => {
+      plug = new Promise((r) => {
+        resolve = r;
+      });
+    };
+
+    initPlug();
+
+    // 監看事件只負責「發訊號」
+    watcher.on('all', (evt, file) => {
+      file = path.relative(getPathFromRoot(), file);
+      console.log(
+        `[executor] change detected (${evt}: ${file}) → reload program`
+      );
+      resolve();
+      initPlug();
+    });
+
+    // --- 主迴圈：在 generator 本體中等待訊號、執行 main 並 yield ---
+    while (true) {
+      await plug; // 等待檔案變更訊號
+      await teardown();
+      await initMainMod();
+      yield { success: await main(cliOptions, context) }; // ← 只能在這裡 yield
+    }
   };
 
-  const outDir = getPathFromRoot('dist');
-  const define = parseEnv(
-    merge(
-      {
-        langs: langInfo.langs,
-      },
-      siteOptions.env
-    )
-  );
-
-  const userConfig: UserConfig = {
-    define,
-    mode: cliOptions.mode,
-    server: {
-      host: cliOptions.host,
-      port: cliOptions.port,
-    },
-    build: {
-      outDir,
-      emptyOutDir: true,
-      minify: minifyOptions.js,
-      cssMinify: minifyOptions.css,
-      rollupOptions: {
-        output: {
-          entryFileNames: `assets/[name].js`,
-          chunkFileNames: `assets/[name].js`,
-          assetFileNames: `assets/[name].[ext]`,
-        },
-      },
-      // modulePreload: {
-      //   resolveDependencies(fn, deps, cxt) {
-      //     console.log(fn, deps, cxt)
-      //     return deps
-      //   }
-      // }
-    },
-    preview: {
-      host: cliOptions.host,
-      port: cliOptions.port,
-    },
-    resolve: {
-      alias,
-    },
-    plugins: [
-      ...(siteOptions.plugins ?? []),
-      sitesInjector(pages, siteOptions),
-      // virtualAssets(pages, siteOptions),
-    ],
-    cacheDir: getPathFromRoot('node_modules/.vite-cache'),
-    experimental: {
-      renderBuiltUrl(filename, { hostType }) {
-        if (hostType === 'js') console.log(filename);
-        return '/' + filename + `?v=foo123`;
-      },
-    },
-  };
-
-  switch (cliOptions.mode) {
-    case 'dev':
-      userConfig.plugins?.push(mpaPlugin);
-      const devServer = await createServer(userConfig);
-      await devServer.listen();
-      devServer.printUrls();
-      devServer.bindCLIShortcuts({ print: true });
-      await new Promise<void>(() => {});
-    case 'build':
-      userConfig.plugins?.push(mpaPlugin);
-      await build(userConfig);
-      await buildHelper(outDir, sites);
-      break;
-    case 'preview':
-      const previewServer = await preview(userConfig);
-      previewServer.printUrls();
-      previewServer.bindCLIShortcuts({ print: true });
-      await new Promise<void>(() => {});
-      break;
-  }
-
-  return {
-    success: true,
-  };
-};
-
-export default runExecutor;
+export default viteExecutor;
