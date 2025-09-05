@@ -12,6 +12,7 @@ export default (({ pagesInfo, cliOptions, siteOptions }) => {
   const versioning = parseOption(siteOptions, cliOptions, 'versioning', 'hard');
   const baseType = parseOption(siteOptions, cliOptions, 'assets', 'abs');
   const routeMode = siteOptions.routeMode ?? 'tree';
+  const sites = Object.keys(pagesInfo.sites);
 
   const outputFilenames: Record<string, string> = {
     hard: {
@@ -35,7 +36,7 @@ export default (({ pagesInfo, cliOptions, siteOptions }) => {
       depth--;
     }
 
-    if (pagesInfo.sites.length) {
+    if (sites.length) {
       depth--;
     }
 

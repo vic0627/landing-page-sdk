@@ -4,7 +4,7 @@ import * as path from 'node:path';
 
 type Options = {
   outDir: string;
-  sites: string[];
+  sites: Record<string, string>;
   publicDir?: string; // default: 'public'
   thresholdBytes?: number; // default: 256 * 1024 (256 KB)
 };
@@ -119,11 +119,12 @@ export default async function (opts: Options): Promise<void> {
     return;
   }
 
+  const sites = Object.keys(opts.sites);
   // 決定目的根目錄們
   const siteRoots =
-    opts.sites.length === 0
+    sites.length === 0
       ? [opts.outDir]
-      : opts.sites.map((site) => path.join(opts.outDir, site));
+      : sites.map((site) => path.join(opts.outDir, site));
 
   for (const root of siteRoots) {
     await copyPublicIntoRoot(publicDir, root, opts.thresholdBytes);

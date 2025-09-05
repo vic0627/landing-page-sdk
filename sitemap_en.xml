@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset>
+    <url>
+        <loc>https://wwww.example.com/en</loc>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://wwww.example.com/zh" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://wwww.example.com/en" />
+        <xhtml:link rel="alternate" hreflang="ko" href="https://wwww.example.com/ko" />
+        <xhtml:link rel="alternate" hreflang="ja" href="https://wwww.example.com/ja" />
+        <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://wwww.example.com/cn" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://wwww.example.com/zh" />
+    </url>
+    <url>
+        <loc>https://wwww.example.com/en/brand-guidelines</loc>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://wwww.example.com/zh/brand-guidelines" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://wwww.example.com/en/brand-guidelines" />
+        <xhtml:link rel="alternate" hreflang="ko" href="https://wwww.example.com/ko/brand-guidelines" />
+        <xhtml:link rel="alternate" hreflang="ja" href="https://wwww.example.com/ja/brand-guidelines" />
+        <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://wwww.example.com/cn/brand-guidelines" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://wwww.example.com/zh/brand-guidelines" />
+    </url>
+    <url>
+        <loc>https://wwww.example.com/en/contact-us</loc>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://wwww.example.com/zh/contact-us" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://wwww.example.com/en/contact-us" />
+        <xhtml:link rel="alternate" hreflang="ko" href="https://wwww.example.com/ko/contact-us" />
+        <xhtml:link rel="alternate" hreflang="ja" href="https://wwww.example.com/ja/contact-us" />
+        <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://wwww.example.com/cn/contact-us" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://wwww.example.com/zh/contact-us" />
+    </url>
+    <url>
+        <loc>https://wwww.example.com/en/privacy-policy</loc>
+        <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://wwww.example.com/zh/privacy-policy" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://wwww.example.com/en/privacy-policy" />
+        <xhtml:link rel="alternate" hreflang="ko" href="https://wwww.example.com/ko/privacy-policy" />
+        <xhtml:link rel="alternate" hreflang="ja" href="https://wwww.example.com/ja/privacy-policy" />
+        <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://wwww.example.com/cn/privacy-policy" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://wwww.example.com/zh/privacy-policy" />
+    </url>
+</urlset>

@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "dev": "npx nx watch --p=@landing-page-sdk/vite-executor --d -- npx nx dev"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "VICTOR HSU",
   "license": "MIT",
@@ -30,7 +28,6 @@
     "tslib": "^2.3.0",
     "typescript": "~5.8.2",
     "vite": "^7.0.4",
-    "vite-plugin-restart": "^1.0.0",
     "vite-plugin-virtual-mpa": "^1.12.1"
   },
   "dependencies": {

@@ -68,6 +68,22 @@ export interface StandardControllerOption {
   injection: Required<ControllerInjection>;
 }
 
+export interface SitemapOptions {
+  /** 每個 site 的 baseUrl */
+  baseUrl: string | Record<string, string>;
+  /**
+   * 是否輸出 sitemap
+   * @default true
+   */
+  enable?: boolean;
+  /**
+   * 排除規則（route 匹配）
+   */
+  exclude?: Array<string>;
+  /** 預設欄位（可被 page.data.sitemap 覆寫） */
+  defaults?: { changefreq?: 'daily' | 'weekly' | 'monthly'; priority?: number };
+}
+
 export interface SiteOptions {
   /**
    * 輸出的路由結構呈現
@@ -138,7 +154,10 @@ export interface SiteOptions {
    * @param page 當前處理的頁面資訊
    * @this DOMWindow JSDOM 的 window 物件，可用來直接操作頁面 DOM
    */
-  transformRedirect?(this: DOMWindow, page: readonly Page): void | Promise<void>;
+  transformRedirect?(
+    this: DOMWindow,
+    page: readonly Page
+  ): void | Promise<void>;
   /**
    * 輸出檔案的版本化方式
    * - `'hard'`：檔名帶雜湊，例如 `[name].[hash].[ext]`。
@@ -184,6 +203,7 @@ export interface SiteOptions {
    * 可設定單一控制器或多個控制器。
    */
   controller?: ControllerOption | ControllerOption[];
+  sitemap?: string | SitemapOptions;
 }
 
 export interface Page {
@@ -199,7 +219,7 @@ export interface Page {
 export interface PagesInfo {
   pages: Page[];
   langInfo: I18nInfo;
-  sites: string[];
+  sites: Record<string, string>;
 }
 
 export interface I18nLangPack {

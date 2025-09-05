@@ -3,10 +3,10 @@ import {
   createServer,
   build,
   preview,
-  UserConfig,
   Plugin,
   ViteDevServer,
   PreviewServer,
+  InlineConfig,
 } from 'vite';
 import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
 // import viteRestart from 'vite-plugin-restart';
@@ -49,17 +49,21 @@ export async function main(
   const pagesInfo = createPages(cliOptions, siteOptions);
   const siteContext: SiteContext = { pagesInfo, cliOptions, siteOptions };
 
+  // configs
+  const userConfig: InlineConfig = {};
+
   const minifyOptions = parseMinify(cliOptions, siteOptions);
-
-  const userConfig: UserConfig = {};
-
-  // shared
-  set(userConfig, 'mode', cliOptions.mode);
   const define = parseEnv(
     merge(pick(pagesInfo.langInfo, 'langs'), siteOptions.env)
   );
-  set(userConfig, 'define', define);
   const cacheDir = getPathFromRoot('node_modules/.vite-cache');
+  const alias = { '@': getPath('src') };
+  const openTarget = pagesInfo.pages[0]!.filename as string;
+  const outDir = getPathFromRoot('dist');
+
+  // shared
+  set(userConfig, 'mode', cliOptions.mode);
+  set(userConfig, 'define', define);
   set(userConfig, 'cacheDir', cacheDir);
   set(userConfig, 'publicDir', siteOptions.sourcePath?.public);
   set(userConfig, 'plugins', [
@@ -71,13 +75,11 @@ export async function main(
   ]);
 
   // resolve
-  const alias = { '@': getPath('src') };
   set(userConfig, 'resolve.alias', alias);
 
   // server
   set(userConfig, 'server.host', cliOptions.host);
   set(userConfig, 'server.port', cliOptions.port);
-  const openTarget = pagesInfo.pages[0]!.filename as string;
   set(userConfig, 'server.open', openTarget);
 
   // preview
@@ -86,7 +88,6 @@ export async function main(
   set(userConfig, 'preview.open', openTarget);
 
   // build
-  const outDir = getPathFromRoot('dist');
   set(userConfig, 'build.outDir', outDir);
   set(userConfig, 'build.emptyOutDir', true);
   set(userConfig, 'build.copyPublicDir', false);

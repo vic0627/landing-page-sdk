@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readJsonFile } from '@nx/devkit';
-import { cloneDeep, pick, merge } from 'lodash-es';
+import { cloneDeep, pick, merge, fromPairs } from 'lodash-es';
 import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
 import {
   I18nInfo,
@@ -234,7 +234,7 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
   const files = scanDir(baseDir, { match: REGEXP.SCRIPT });
 
   if (!files.length) {
-    return [];
+    return {};
   }
 
   const requiredSites = _requiredSites?.split(',');
@@ -242,20 +242,22 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
     .filter((p) => !isHiddenFile(p))
     .map((p) => {
       const _path = p.startsWith('/') ? p : `/${p}`;
-      return { path: _path, name: path.parse(_path).name };
+      const [name, alias = ''] = path.parse(_path).name.split('.');
+
+      return { path: _path, name, alias };
     })
     .filter(({ name }) =>
       requiredSites?.length ? requiredSites.includes(name) : true
     );
 
   if (!sites.length) {
-    return [];
+    return {};
   }
 
   const originalPages = [...pages];
   pages.length = 0; // in-place 清空
 
-  for (const { path: sitePath, name } of sites) {
+  for (const { path: sitePath, name, alias } of sites) {
     for (const _page of originalPages) {
       const page = cloneDeep(_page);
       const filename = `${name}/${page.filename}`;
@@ -279,6 +281,7 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
       page.data = shadowData(
         {
           site: name,
+          alias,
         },
         page.data
       );
@@ -286,5 +289,7 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
     }
   }
 
-  return sites.map((item) => item.name);
+  const siteInfo = fromPairs(sites.map((item) => [item.name, item.alias]));
+
+  return siteInfo;
 }

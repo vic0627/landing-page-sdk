@@ -10,7 +10,9 @@ type DistInfo = {
   isFile: boolean;
 };
 
-export default async (outDir: string, sites: string[]) => {
+export default async (outDir: string, _sites: Record<string, string>) => {
+  const sites = Object.keys(_sites);
+
   // 若沒有指定任何目的地，則無事可做，直接返回
   if (sites.length === 0) {
     console.warn(
