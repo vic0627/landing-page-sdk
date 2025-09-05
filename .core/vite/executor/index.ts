@@ -9,6 +9,7 @@ import {
   PreviewServer,
 } from 'vite';
 import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
+// import viteRestart from 'vite-plugin-restart';
 import { merge, pick, set } from 'lodash-es';
 import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
 import { SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
@@ -103,6 +104,11 @@ export async function main(
   switch (cliOptions.mode) {
     case 'dev':
       userConfig.plugins?.push(mpaPlugin);
+      // userConfig.plugins?.push(
+      //   viteRestart({
+      //     restart: [cliOptions.config ?? 'site.config.js'],
+      //   })
+      // );
       devServer = await createServer(userConfig);
       await devServer.listen();
       devServer.printUrls();

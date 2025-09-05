@@ -5,8 +5,12 @@ import { REGEXP } from '../common';
 export default (({ pagesInfo, siteOptions }) => {
   const { transformRedirect } = siteOptions;
 
-  const redirectPages = pagesInfo.pages.filter((page) =>
-    REGEXP.REDIRECT.test(page.name)
+  if (!transformRedirect) {
+    return;
+  }
+
+  const redirectPages = pagesInfo.pages.filter(
+    (page) => REGEXP.REDIRECT.test(page.name) || REGEXP.STUB.test(page.name)
   );
   const findRedirectPage = (path: string) =>
     redirectPages.find((page) => page.filename === path.replace('/', ''));
@@ -14,10 +18,6 @@ export default (({ pagesInfo, siteOptions }) => {
   return {
     name: 'vite-plugin-transform-redirect',
     async transformIndexHtml(code, { path }) {
-      if (!transformRedirect) {
-        return;
-      }
-
       const page = findRedirectPage(path);
 
       if (!page) {

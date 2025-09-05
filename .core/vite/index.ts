@@ -36,7 +36,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
     // build 模式單次就結束
     if (cliOptions.mode === 'build') return;
 
-    // ** 在沒找到怎麼清掉 import cache 問題之前，先卡住城市流 **
+    // ** 在沒找到怎麼清掉 import cache 問題之前，先卡住程式流 **
     await new Promise(() => {});
 
     const watchGlobs = [

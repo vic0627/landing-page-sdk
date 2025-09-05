@@ -93,7 +93,7 @@ export default (({ pagesInfo, cliOptions, siteOptions }) => {
           // js doesn't support path transformation
           const asset = bundle[filename] as OutputChunk;
           const rel = baseType === 'rel' ? './' : '/';
-          asset.code = asset.code.replaceAll(BASE, rel);
+          asset.code = asset.code.replace(new RegExp(BASE, 'g'), rel);
 
           continue;
         }

@@ -2,7 +2,6 @@ import { SDKPlugin } from '@landing-page-sdk/types';
 import { getImportStatement } from '../common';
 
 export default (({ pagesInfo, siteOptions }) => {
-  const append = siteOptions.append?.siteScript ?? 'pre';
 
   return {
     name: 'vite-plugin-sites-injector',
@@ -15,11 +14,7 @@ export default (({ pagesInfo, siteOptions }) => {
 
       const importStatement = getImportStatement(page.siteScript);
 
-      return append === 'pre'
-        ? (code = importStatement + code)
-        : append === 'post'
-        ? (code += importStatement)
-        : null;
+      return code += importStatement
     },
   };
 }) satisfies SDKPlugin;

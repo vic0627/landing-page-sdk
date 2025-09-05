@@ -23,6 +23,7 @@ export const REGEXP = {
   HTML: /\.html$/,
   EJS: /\.ejs$/,
   REDIRECT: /^(?:.*:)?redirect$/,
+  STUB: /^(?:.*:)?stub$/,
   HTML_PUBLIC: /(?:src|srcset|href)=(["'])(.*?)\1/g,
   CSS_PUBLIC: /url\((["']?)(.*?)\1\)/g,
 };
@@ -185,13 +186,13 @@ export function parseMinify(
   if (cliMinify !== undefined) {
     if (typeof cliMinify === 'boolean') {
       for (const key in minifyInfo) {
-        minifyInfo[key] = cliMinify;
+        minifyInfo[key as MinifyTargets] = cliMinify;
       }
     } else if (typeof cliMinify === 'string') {
       const minifyTargets = cliMinify.split(',');
 
       for (const key in minifyInfo) {
-        minifyInfo[key] = minifyTargets.includes(key);
+        minifyInfo[key as MinifyTargets] = minifyTargets.includes(key);
       }
     }
 
@@ -201,15 +202,17 @@ export function parseMinify(
   if (sitesMinify !== undefined) {
     if (typeof sitesMinify === 'boolean') {
       for (const key in minifyInfo) {
-        minifyInfo[key] = sitesMinify;
+        minifyInfo[key as MinifyTargets] = sitesMinify;
       }
     } else if (typeof sitesMinify === 'string') {
       for (const key in minifyInfo) {
-        minifyInfo[key] = key === sitesMinify;
+        minifyInfo[key as MinifyTargets] = key === sitesMinify;
       }
     } else if (Array.isArray(sitesMinify)) {
       for (const key in minifyInfo) {
-        minifyInfo[key] = sitesMinify.includes(key as MinifyTargets);
+        minifyInfo[key as MinifyTargets] = sitesMinify.includes(
+          key as MinifyTargets
+        );
       }
     }
 
@@ -217,4 +220,9 @@ export function parseMinify(
   }
 
   return minifyInfo;
+}
+
+export function pluginLog(name: string, ...messages: any[]) {
+  const colored = `[\x1b[32m${name}\x1b[0m]`;
+  console.log(colored, ...messages);
 }

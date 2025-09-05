@@ -2,6 +2,7 @@
 export default {
   routeMode: 'tree',
   enableStubRedirect: true,
+  assets: 'rel',
   env: {
     defaultLang: 'zh-TW',
   },
@@ -16,6 +17,12 @@ export default {
     head?.append(metaRobots, title);
   },
   controller: {
-    name: 'mount-download-urls',
+    name: 'mount-download-urls.ts',
+    targets: {
+      routes: '/',
+      lang: 'zh-TW',
+      site: 'site-a',
+    },
+    injection: 'inline',
   },
 };

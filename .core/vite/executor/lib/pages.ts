@@ -103,6 +103,7 @@ function findPages(options: PagesOptions) {
 
     pages.push({
       name,
+      route: relDir ? '/' + relDir : '/',
       filename,
       template,
       ...(entry && { entry }),
@@ -182,6 +183,13 @@ function localizePages(pages: Page[], options: PagesOptions) {
 
       page.name = isMultiLang ? `${lang}:${page.name}` : page.name;
       page.filename = filename;
+
+      if (page.entry) {
+        page.entry += page.entry?.includes('?')
+          ? `&lang=${lang}`
+          : `?lang=${lang}`;
+      }
+
       page.data = shadowData(
         {
           filename: filename,
@@ -193,7 +201,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
       );
       pages.push(page);
 
-      const notIndexPage = !_page.name.endsWith('index')
+      const notIndexPage = !_page.name.endsWith('index');
 
       if (!stubbed && isMultiLang && enableStubRedirect && notIndexPage) {
         pages.push({
@@ -260,7 +268,12 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
       if (page.entry && !redirectPage && !stubPage) {
         const entryDir = path.parse(page.entry).dir;
         page.siteScript = path.relative(entryDir, sitePath);
-        page.entry = page.entry + `?site=${name}`;
+
+        if (page.entry) {
+          page.entry += page.entry?.includes('?')
+            ? `&site=${name}`
+            : `?site=${name}`;
+        }
       }
 
       page.data = shadowData(
