@@ -22,11 +22,13 @@ import {
   SDKPlugin,
   StandardControllerOption,
 } from '@landing-page-sdk/types';
-import { getImportStatement, pluginLog } from '../common';
+import { getImportStatement, Logger, namedLogger } from '../common';
+import chalk from 'chalk';
 
 const name = 'vite-plugin-auto-controller';
+let log!: Logger;
 
-export default (({ siteOptions, pagesInfo }) => {
+export default (({ siteOptions, pagesInfo, cliOptions }) => {
   let { controller } = siteOptions;
 
   if (!controller) {
@@ -34,6 +36,10 @@ export default (({ siteOptions, pagesInfo }) => {
   }
 
   let controllers!: StandardControllerOption[];
+  log = namedLogger({
+    name,
+    verbose: cliOptions.verbose,
+  });
 
   if (isPlainObject(controller)) {
     controllers = [standardizeOption(controller as ControllerOption)];
@@ -53,7 +59,7 @@ export default (({ siteOptions, pagesInfo }) => {
         return;
       }
 
-      log(id, opts);
+      log(logMsg(id, opts));
 
       return bundleTransform(code, opts);
     },
@@ -65,16 +71,27 @@ export default (({ siteOptions, pagesInfo }) => {
         return;
       }
 
-      log(path, opts);
+      log(logMsg(path, opts));
 
       return inlineTransform(code, opts, entry);
     },
   };
 }) satisfies SDKPlugin;
 
-function log(id: string, opts: StandardControllerOption[]) {
-  const names = opts.map((o) => o.name).join(', ');
-  pluginLog(name, `"${names}" inject into "${id}"`);
+function logMsg(id: string, opts: StandardControllerOption[]) {
+  const names = opts
+    .map((o) => chalk.green(o.name))
+    .reduce((str, name, i, arr) => {
+      if (!i) {
+        return name;
+      }
+
+      const conj = i && arr.length - 1 === i ? 'and ' : '';
+      return (str += `, ${conj}${name}`);
+    }, '');
+  return `Injected controller${
+    opts.length > 1 ? 's' : ''
+  } ${names} into ${chalk.green(id)}`;
 }
 
 function toControllerName(name: string) {

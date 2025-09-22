@@ -1,7 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readJsonFile } from '@nx/devkit';
-import { cloneDeep, pick, merge, fromPairs } from 'lodash-es';
+import {
+  cloneDeep,
+  pick,
+  merge,
+  fromPairs,
+  isBoolean,
+  isObject,
+  omit,
+} from 'lodash-es';
 import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
 import {
   I18nInfo,
@@ -9,15 +17,13 @@ import {
   ViteExecutorSchema,
   Page,
   PagesInfo,
+  RedirectOptions,
 } from '@landing-page-sdk/types';
 import { shadowData, scanDir, REGEXP, isHiddenFile } from './common';
 
 interface PagesOptions
   extends Required<
-      Pick<
-        SiteOptions,
-        'routeMode' | 'sourcePath' | 'env' | 'enableStubRedirect'
-      >
+      Pick<SiteOptions, 'routeMode' | 'sourcePath' | 'env' | 'redirect'>
     >,
     Pick<ViteExecutorSchema, 'mode' | 'sites'> {}
 
@@ -29,11 +35,11 @@ export default function createPages(
     sourcePath = {},
     routeMode = 'tree',
     env = {},
-    enableStubRedirect = false,
+    redirect = false,
   } = siteOptions;
 
   const options = merge(
-    { sourcePath, routeMode, env, enableStubRedirect },
+    { sourcePath, routeMode, env, redirect },
     pick(cliOptions, 'mode', 'sites')
   );
 
@@ -115,9 +121,9 @@ function findPages(options: PagesOptions) {
 }
 
 function localizePages(pages: Page[], options: PagesOptions) {
-  const { routeMode, sourcePath, enableStubRedirect } = options;
+  const { routeMode, sourcePath } = options;
   const { i18n: baseDir = './src/i18n' } = sourcePath;
-
+  const redirect = normalizeRedirect(options.redirect);
   const files = scanDir(baseDir, { match: REGEXP.JSON });
 
   const langInfo: I18nInfo = {
@@ -149,7 +155,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
 
   const isMultiLang = langInfo.langs.length > 1;
 
-  if (isMultiLang || routeMode === 'flat') {
+  if (isMultiLang && redirect.enable) {
     // 加上 redirect 頁（根目錄跳轉）
     pages.push({
       name: 'redirect',
@@ -176,7 +182,9 @@ function localizePages(pages: Page[], options: PagesOptions) {
       if (routeMode === 'tree') {
         filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
       } else if (routeMode === 'flat') {
-        filename = page.filename.replace('.html', `_${lang}.html`);
+        filename = isMultiLang
+          ? page.filename.replace('.html', `_${lang}.html`)
+          : page.filename;
       } else {
         throw new Error(`Unidentified route mode '${routeMode}'`);
       }
@@ -203,7 +211,13 @@ function localizePages(pages: Page[], options: PagesOptions) {
 
       const notIndexPage = !_page.name.endsWith('index');
 
-      if (!stubbed && isMultiLang && enableStubRedirect && notIndexPage) {
+      if (
+        !stubbed &&
+        isMultiLang &&
+        redirect.enable &&
+        redirect.stub &&
+        notIndexPage
+      ) {
         pages.push({
           name: `${_page.name}:stub`,
           filename: _page.filename,
@@ -228,7 +242,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
 }
 
 function multiSitesPages(pages: Page[], options: PagesOptions) {
-  const { sourcePath, sites: _requiredSites } = options;
+  const { sourcePath, sites: _requiredSites, mode } = options;
   const { sites: baseDir = './src/sites' } = sourcePath;
 
   const files = scanDir(baseDir, { match: REGEXP.SCRIPT });
@@ -260,7 +274,9 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
   for (const { path: sitePath, name, alias } of sites) {
     for (const _page of originalPages) {
       const page = cloneDeep(_page);
-      const filename = `${name}/${page.filename}`;
+      const filename = `${mode === 'dev' && alias ? alias : name}/${
+        page.filename
+      }`;
       page.name = `${name}:${page.name}`;
       page.filename = filename;
 
@@ -292,4 +308,22 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
   const siteInfo = fromPairs(sites.map((item) => [item.name, item.alias]));
 
   return siteInfo;
+}
+
+function normalizeRedirect(
+  redirect: boolean | RedirectOptions
+): Omit<Required<RedirectOptions>, 'transform' | 'defaultLang'> {
+  const opts: Omit<Required<RedirectOptions>, 'transform' | 'defaultLang'> = {
+    enable: true,
+    stub: false,
+  };
+
+  if (isBoolean(redirect)) {
+    opts.enable = redirect;
+    opts.stub = redirect;
+  } else if (isObject(redirect)) {
+    merge(opts, omit(redirect, 'transform'));
+  }
+
+  return opts;
 }

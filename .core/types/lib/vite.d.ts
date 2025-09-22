@@ -18,6 +18,7 @@ export type ScriptSourceType = 'inline' | 'bundle';
 export interface ViteExecutorSchema {
   cwd: string;
   mode: ViteMode;
+  verbose?: boolean;
   host?: boolean;
   port?: number;
   /**
@@ -77,11 +78,77 @@ export interface SitemapOptions {
    */
   enable?: boolean;
   /**
-   * 排除規則（route 匹配）
+   * 控制 sitemap 內連結是要用「檔名顯式」還是「目錄式」的 URL 格式
+   * @default 'file'
    */
-  exclude?: Array<string>;
+  orientation?: 'file' | 'dir';
+  /** 排除規則（route 匹配）*/
+  exclude?: Array<string | RegExp>;
   /** 預設欄位（可被 page.data.sitemap 覆寫） */
   defaults?: { changefreq?: 'daily' | 'weekly' | 'monthly'; priority?: number };
+  /**
+   * @default true
+   */
+  useAliasAsPath?: boolean;
+}
+
+export interface RedirectOptions {
+  /**
+   * @default true
+   */
+  enable?: boolean;
+  /**
+   * 在沒有語系前綴的路由 (例如 `/about/me`) 自動生成一個空白頁，
+   * 用來偵測使用者語系並立即轉向到對應的語系路由 (例如 `/en/about/me`)。
+   * @default false
+   */
+  stub?: boolean;
+  defaultLang?: string;
+  /**
+   * 用來操作轉向頁的 DOM
+   * @description
+   * 注意：轉向邏輯本身不可修改，只能針對頁面結構做調整，
+   * 例如新增 `<meta>` 標籤、修改 `<title>`、插入其他元素等。
+   * @param page 當前處理的頁面資訊
+   * @this DOMWindow JSDOM 的 window 物件，可用來直接操作頁面 DOM
+   */
+  transform?(this: DOMWindow, page: readonly Page): void | Promise<void>;
+}
+
+export interface OutputOptions {
+  /**
+   * 是否壓縮輸出的檔案
+   * - `true`：壓縮所有類型（HTML、JS、CSS）。
+   * - `false`：不壓縮。
+   * - 指定字串：只壓縮該類型，例如 `'js'`。
+   * - 陣列：壓縮多個類型，例如 `['html', 'css']`。
+   * @default true
+   */
+  minify?: boolean | MinifyTargets | MinifyTargets[];
+  /**
+   * 輸出檔案的版本化方式
+   * - `'hard'`：檔名帶雜湊，例如 `[name].[hash].[ext]`。
+   * - `'soft'`：檔名不變，透過查詢參數附加雜湊，例如 `[name].[ext]?v=[hash]`。
+   * @default 'hard'
+   */
+  versioning?: Versioning;
+  /**
+   * 輸出資源的路徑型態
+   * - `'abs'`：使用絕對路徑，例如 `/__ASSETS__/main.hash.js`。
+   * - `'rel'`：使用相對路徑，例如在 `/en/about/me/index.html` 會轉換成
+   *   `../../../__ASSETS__/main.hash.js`。
+   * @description
+   * 自動轉換會套用在 HTML 與 CSS 的資源路徑。
+   * JS 檔因技術限制，僅支援在 `/` 與 `./` 兩種前綴間互換。
+   * @default 'abs'
+   */
+  assets?: AssetsBaseType;
+  /**
+   * 多媒體資產大小警示閥值 (單位：Byte)
+   * @description
+   * 在 build 時檢查資產大小，若超過此值會輸出警告訊息。
+   */
+  threshold?: number;
 }
 
 export interface SiteOptions {
@@ -92,16 +159,9 @@ export interface SiteOptions {
    * @default 'tree'
    */
   routeMode?: RouteMode;
-  /**
-   * 是否生成「語言轉向頁」
-   * @description
-   * 語言轉向頁：在沒有語系前綴的路由 (例如 `/about/me`) 自動生成一個空白頁，
-   * 用來偵測使用者語系並立即轉向到對應的語系路由 (例如 `/en/about/me`)。
-   * - 僅在 `routeMode: 'tree'` 時生效。
-   * - 多語系下，根目錄的語言轉向頁必定生成
-   * @default false
-   */
-  enableStubRedirect?: boolean;
+  output?: OutputOptions;
+  /** */
+  redirect?: boolean | RedirectOptions;
   /**
    * 專案中各類資源的來源路徑設定。
    */
@@ -137,51 +197,6 @@ export interface SiteOptions {
    */
   plugins?: PluginOption[];
   env?: Record<string, any>;
-  /**
-   * 是否壓縮輸出的檔案
-   * - `true`：壓縮所有類型（HTML、JS、CSS）。
-   * - `false`：不壓縮。
-   * - 指定字串：只壓縮該類型，例如 `'js'`。
-   * - 陣列：壓縮多個類型，例如 `['html', 'css']`。
-   * @default true
-   */
-  minify?: boolean | MinifyTargets | MinifyTargets[];
-  /**
-   * 用來操作「語言轉向頁」的 DOM
-   * @description
-   * 注意：轉向邏輯本身不可修改，只能針對頁面結構做調整，
-   * 例如新增 `<meta>` 標籤、修改 `<title>`、插入其他元素等。
-   * @param page 當前處理的頁面資訊
-   * @this DOMWindow JSDOM 的 window 物件，可用來直接操作頁面 DOM
-   */
-  transformRedirect?(
-    this: DOMWindow,
-    page: readonly Page
-  ): void | Promise<void>;
-  /**
-   * 輸出檔案的版本化方式
-   * - `'hard'`：檔名帶雜湊，例如 `[name].[hash].[ext]`。
-   * - `'soft'`：檔名不變，透過查詢參數附加雜湊，例如 `[name].[ext]?v=[hash]`。
-   * @default 'hard'
-   */
-  versioning?: Versioning;
-  /**
-   * 輸出資源的路徑型態
-   * - `'abs'`：使用絕對路徑，例如 `/__ASSETS__/main.hash.js`。
-   * - `'rel'`：使用相對路徑，例如在 `/en/about/me/index.html` 會轉換成
-   *   `../../../__ASSETS__/main.hash.js`。
-   * @description
-   * 自動轉換會套用在 HTML 與 CSS 的資源路徑。
-   * JS 檔因技術限制，僅支援在 `/` 與 `./` 兩種前綴間互換。
-   * @default 'abs'
-   */
-  assets?: AssetsBaseType;
-  /**
-   * 多媒體資產大小警示閥值 (單位：Byte)
-   * @description
-   * 在 build 時檢查資產大小，若超過此值會輸出警告訊息。
-   */
-  threshold?: number;
   /**
    * 控制器注入設定
    * - **name**：控制器名稱，必須對應到

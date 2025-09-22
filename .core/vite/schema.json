@@ -22,6 +22,10 @@
       "type": "number",
       "description": "Port for Vite dev or preview server"
     },
+    "verbose": {
+      "type": "boolean",
+      "description": ""
+    },
     "config": {
       "type": "string",
       "description": "Config file of the project"

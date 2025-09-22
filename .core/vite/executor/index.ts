@@ -21,6 +21,10 @@ import transformRedirect from './lib/plugins/transform-redirect';
 import renderBuiltUrl from './lib/plugins/render-built-url';
 import publicPorter from './lib/public-porter';
 import autoController from './lib/plugins/auto-controller';
+import redirect from './lib/plugins/redirect';
+import sitemapGenerator from './lib/sitemap-generator';
+import { execSync } from 'node:child_process';
+import chalk from 'chalk';
 
 let devServer: ViteDevServer | null = null;
 let previewServer: PreviewServer | null = null;
@@ -72,6 +76,7 @@ export async function main(
     transformRedirect(siteContext),
     renderBuiltUrl(siteContext),
     autoController(siteContext),
+    redirect(siteContext),
   ]);
 
   // resolve
@@ -99,7 +104,7 @@ export async function main(
     pages: pagesInfo.pages as _Page[],
     rewrites: rewrites(siteOptions),
     htmlMinify: minifyOptions.html,
-    // verbose: false,
+    verbose: cliOptions.verbose ?? false,
   }) as Plugin[];
 
   switch (cliOptions.mode) {
@@ -114,24 +119,37 @@ export async function main(
       await devServer.listen();
       devServer.printUrls();
       devServer.bindCLIShortcuts({ print: true });
+      printVerboseHint(cliOptions.verbose);
       break;
     case 'build':
-      userConfig.plugins?.push(mpaPlugin);
-      await build(userConfig);
-      await buildHelper(outDir, pagesInfo.sites);
-      await publicPorter({
-        outDir,
-        sites: pagesInfo.sites,
-        publicDir: siteOptions.sourcePath?.public,
-        thresholdBytes: siteOptions.threshold,
-      });
+      // userConfig.plugins?.push(mpaPlugin);
+      // await build(userConfig);
+      // await buildHelper(outDir, pagesInfo.sites);
+      // await publicPorter({
+      //   outDir,
+      //   sites: pagesInfo.sites,
+      //   publicDir: siteOptions.sourcePath?.public,
+      //   thresholdBytes: siteOptions.threshold,
+      // });
+      execSync(`rm -r ${context.cwd}/dist`);
+      await sitemapGenerator(siteContext, outDir);
       break;
     case 'preview':
       previewServer = await preview(userConfig);
       previewServer.printUrls();
       previewServer.bindCLIShortcuts({ print: true });
+      printVerboseHint(cliOptions.verbose);
       break;
   }
 
   return true;
+}
+
+function printVerboseHint(verbose?: boolean) {
+  verbose ??
+    console.log(
+      `  ${chalk.dim.green('➜')}  ${chalk.dim.white('use')} ${chalk.bold(
+        '--verbose'
+      )} ${chalk.dim.white('to print log')}`
+    );
 }

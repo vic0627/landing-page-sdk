@@ -1,10 +1,18 @@
+import { getPath } from '@landing-page-sdk/utils-node';
 import { SDKPlugin } from '@landing-page-sdk/types';
-import { getImportStatement } from '../common';
+import { getImportStatement, namedLogger } from '../common';
+import chalk from 'chalk';
 
-export default (({ pagesInfo, siteOptions }) => {
+const name = 'vite-plugin-sites-injector';
+
+export default (({ pagesInfo, cliOptions }) => {
+  const log = namedLogger({
+    name,
+    verbose: cliOptions.verbose,
+  });
 
   return {
-    name: 'vite-plugin-sites-injector',
+    name,
     transform(code, id) {
       const page = pagesInfo.pages.find((p) => p.entry && id.includes(p.entry));
 
@@ -12,9 +20,12 @@ export default (({ pagesInfo, siteOptions }) => {
         return;
       }
 
+      const siteName = page.data['site'] ?? page.siteScript;
+      log(`Injected site-specific script ${chalk.green(siteName)}`);
+
       const importStatement = getImportStatement(page.siteScript);
 
-      return code += importStatement
+      return (code += importStatement);
     },
   };
 }) satisfies SDKPlugin;

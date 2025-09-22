@@ -1,8 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import {
   MinifyTargets,
+  Page,
+  PagesInfo,
   SiteOptions,
   ViteExecutorSchema,
 } from '@landing-page-sdk/types';
@@ -177,7 +180,7 @@ export function parseMinify(
   };
 
   const cliMinify = cliOptions.minify;
-  const sitesMinify = siteOptions.minify;
+  const sitesMinify = siteOptions.output?.minify;
 
   if (cliMinify === undefined && sitesMinify === undefined) {
     return minifyInfo;
@@ -222,7 +225,19 @@ export function parseMinify(
   return minifyInfo;
 }
 
-export function pluginLog(name: string, ...messages: any[]) {
-  const colored = `[\x1b[32m${name}\x1b[0m]`;
-  console.log(colored, ...messages);
+interface NamedLoggerOptions {
+  name: string;
+  verbose?: boolean;
 }
+
+export function namedLogger(options: NamedLoggerOptions) {
+  const name = chalk.cyanBright(options.name);
+  return function (...messages: any[]) {
+    if (!options.verbose) {
+      return;
+    }
+    console.log(`[${name}]:`, ...messages);
+  };
+}
+
+export type Logger = ReturnType<typeof namedLogger>;

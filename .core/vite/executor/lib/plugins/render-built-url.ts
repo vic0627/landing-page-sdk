@@ -2,15 +2,25 @@ import { set } from 'lodash-es';
 import { OutputAsset, OutputChunk } from 'rollup';
 import { SDKPlugin } from '@landing-page-sdk/types';
 import { timestampHash } from '@landing-page-sdk/utils-node';
+import { namedLogger } from '../common';
+import chalk from 'chalk';
 
 const BASE = '/__BASE__/';
 const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
 const CSS_URL_RE = /url\(\s*(?:["'])?\/__BASE__\/([^)"']+)(?:["'])?\s*\)/g;
 const ASSETS = '__ASSETS__';
 
+const name = 'vite-plugin-render-build-url';
+
 export default (({ pagesInfo, cliOptions, siteOptions }) => {
-  const versioning = parseOption(siteOptions, cliOptions, 'versioning', 'hard');
-  const baseType = parseOption(siteOptions, cliOptions, 'assets', 'abs');
+  const outputOptions = siteOptions.output ?? {};
+  const versioning = parseOption(
+    outputOptions,
+    cliOptions,
+    'versioning',
+    'hard'
+  );
+  const baseType = parseOption(outputOptions, cliOptions, 'assets', 'abs');
   const routeMode = siteOptions.routeMode ?? 'tree';
   const sites = Object.keys(pagesInfo.sites);
 
@@ -73,8 +83,19 @@ export default (({ pagesInfo, cliOptions, siteOptions }) => {
     return renderFilename;
   };
 
+  const log = namedLogger({
+    name,
+    verbose: cliOptions.verbose,
+  });
+
+  log(
+    `Static asset path mode: ${chalk.green(
+      baseType === 'rel' ? 'relative' : 'absolute'
+    )}`
+  );
+
   return {
-    name: 'vite-plugin-render-build-url',
+    name,
     enforce: 'post',
     apply: 'build',
     config(uc) {

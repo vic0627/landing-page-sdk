@@ -1,11 +1,12 @@
 import { JSDOM } from 'jsdom';
 import { SDKPlugin } from '@landing-page-sdk/types';
 import { REGEXP } from '../common';
+import { isObject } from 'lodash-es';
 
 export default (({ pagesInfo, siteOptions }) => {
-  const { transformRedirect } = siteOptions;
+  const { redirect } = siteOptions;
 
-  if (!transformRedirect) {
+  if (!isObject(redirect) || redirect.enable === false || !redirect.transform) {
     return;
   }
 
@@ -26,7 +27,7 @@ export default (({ pagesInfo, siteOptions }) => {
 
       const vm = new JSDOM(code);
 
-      await transformRedirect.apply(vm.window, [page]);
+      await redirect.transform!.apply(vm.window, [page]);
 
       return vm.serialize();
     },
