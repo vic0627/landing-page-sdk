@@ -11,9 +11,19 @@ import {
 import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
 // import viteRestart from 'vite-plugin-restart';
 import { merge, pick, set } from 'lodash-es';
-import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
+import {
+  getPath,
+  getPathFromRoot,
+  getProjectPath,
+} from '@landing-page-sdk/utils-node';
 import { SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
-import { parseMinify, readSiteOptions, rewrites, parseEnv } from './lib/common';
+import {
+  parseMinify,
+  readSiteOptions,
+  rewrites,
+  parseEnv,
+  mockOptions,
+} from './lib/common';
 import createPages from './lib/pages';
 import buildHelper from './lib/build-helper';
 import sitesInjector from './lib/plugins/sites-injector';
@@ -25,6 +35,7 @@ import redirect from './lib/plugins/redirect';
 import sitemapGenerator from './lib/sitemap-generator';
 import { execSync } from 'node:child_process';
 import chalk from 'chalk';
+import { viteMockServe } from 'vite-plugin-mock';
 
 let devServer: ViteDevServer | null = null;
 let previewServer: PreviewServer | null = null;
@@ -77,6 +88,7 @@ export async function main(
     renderBuiltUrl(siteContext),
     autoController(siteContext),
     redirect(siteContext),
+    viteMockServe(mockOptions(siteContext)),
   ]);
 
   // resolve

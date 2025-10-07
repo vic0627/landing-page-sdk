@@ -7,10 +7,13 @@ import {
   Page,
   PageData,
   PagesInfo,
+  SiteContext,
   SiteOptions,
   ViteExecutorSchema,
 } from '@landing-page-sdk/types';
-import { getPath } from '@landing-page-sdk/utils-node';
+import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
+import { ViteMockOptions } from 'vite-plugin-mock';
+import { isString } from 'lodash-es';
 
 export async function readSiteOptions(
   filePath = 'site.config.js'
@@ -242,3 +245,25 @@ export function namedLogger(options: NamedLoggerOptions) {
 }
 
 export type Logger = ReturnType<typeof namedLogger>;
+
+export function mockOptions(siteContext: SiteContext): ViteMockOptions {
+  const { cliOptions, siteOptions } = siteContext;
+
+  const options: ViteMockOptions = {
+    mockPath: getProjectPath('@landing-page-sdk/assets/mock'),
+    watchFiles: true,
+    logger: cliOptions.verbose ?? false,
+  };
+
+  if (siteOptions.mock === false) {
+    options.enable = false;
+  }
+
+  if (isString(siteOptions.mock)) {
+    options.mockPath = siteOptions.mock.startsWith('@')
+      ? getProjectPath(siteOptions.mock)
+      : siteOptions.mock;
+  }
+
+  return options;
+}

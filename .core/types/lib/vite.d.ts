@@ -219,6 +219,13 @@ export interface SiteOptions {
    */
   controller?: ControllerOption | ControllerOption[];
   sitemap?: string | SitemapOptions;
+  /**
+   * API 模擬
+   * - 為 `false` 時關閉模擬功能
+   * - 為字串時可指定 handlers 存放路徑
+   * @default '@landing-page-sdk/assets/mock'
+   */
+  mock?: boolean | string;
 }
 
 /**
@@ -284,7 +291,7 @@ export interface Page {
   /** 多站腳本在入口中的相對路徑（由 sites-injector 計算） */
   siteScript?: string;
   /** EJS 可用資料，詳見 PageData */
-  data: PageData;
+  data?: PageData;
 }
 
 export interface PagesInfo {
