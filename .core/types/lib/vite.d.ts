@@ -221,14 +221,70 @@ export interface SiteOptions {
   sitemap?: string | SitemapOptions;
 }
 
+/**
+ * EJS 可用的頁面資料（Page.data）規格彙整
+ *
+ * 來源與時機（由 .core/vite/executor 組裝）：
+ * - findPages(): 注入基礎欄位 `filename`、`env`、`$cmp`，並建立 `_data` 指向自身（shadowData）。
+ * - localizePages(): 多語時注入 `lang`、`langs`、`i18n`，並覆寫 `filename` 為語系化後路徑。
+ * - multiSitesPages(): 多站時注入 `site`、`alias`。
+ * - redirect/stub 頁：與一般頁面相同，依需求帶入 `lang`、`langs`、`i18n`、`filename`。
+ *
+ * 使用場景：
+ * - 模板（EJS）中直接使用，如 `<%= lang %>`、`<%= i18n.key %>`、`<%- include($cmp('logo'), _data) %>`。
+ * - 控制器注入（auto-controller）會嘗試 JSON.stringify 每個值，無法序列化的值（例如 `$cmp` 函式）會被過濾。
+ */
+export interface PageDataCommon {
+  /** 此頁輸出的檔名（相對於站點輸出根） */
+  filename: string;
+  /** 任意環境變數：由 `site.config.js.env` 注入，模板端以 `import.meta.env.KEY` 可讀 */
+  env?: Record<string, any>;
+  /**
+   * 供 EJS 模板 include 元件時取得元件路徑
+   * - 支援以 `@` 作為 monorepo 內部別名（由執行器解析）
+   * - 僅供模板使用；控制器注入時會被過濾（不可序列化）
+   */
+  $cmp?: (path: string) => string;
+  /** shadowData 產生的自我參照，避免模板中資料遮蔽 */
+  _data?: any;
+}
+
+export interface PageDataI18n {
+  /** 此頁語系（多語時存在） */
+  lang?: string;
+  /** 可用語系列表（多語時存在） */
+  langs?: string[];
+  /** 對應語系的字典物件（由 `src/i18n/*.json` 載入） */
+  i18n?: I18nLangPack;
+}
+
+export interface PageDataSite {
+  /** 此頁所屬站點名稱（多站時存在） */
+  site?: string;
+  /** 站點別名（多站腳本檔名的後綴，如 `site-a.alias.js` 的 alias） */
+  alias?: string;
+}
+
+/** Page.data 的型別彙整（保留擴充彈性） */
+export type PageData = PageDataCommon & PageDataI18n & PageDataSite & Record<string, any>;
+
 export interface Page {
   name: string;
+  /** 目前頁面的輸出檔名（含語系與多站前綴後的相對路徑） */
   filename: string;
+  /** 對應的模板實體檔案路徑（相對於專案根） */
   template: string;
+  /**
+   * 基於 `src/pages` 的路由（不含語系與多站），例如：`/`、`/about/me`
+   * - 用於控制器目標匹配與 sitemap 同內容頁分組（跨語互指）。
+   */
   route?: string;
+  /** 若存在，為此頁的客製入口（`main.js`），相對於專案根 */
   entry?: string;
+  /** 多站腳本在入口中的相對路徑（由 sites-injector 計算） */
   siteScript?: string;
-  data: Record<string, any>;
+  /** EJS 可用資料，詳見 PageData */
+  data: PageData;
 }
 
 export interface PagesInfo {

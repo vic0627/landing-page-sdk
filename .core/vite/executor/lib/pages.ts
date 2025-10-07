@@ -18,6 +18,7 @@ import {
   Page,
   PagesInfo,
   RedirectOptions,
+  I18nLangPack,
 } from '@landing-page-sdk/types';
 import { shadowData, scanDir, REGEXP, isHiddenFile } from './common';
 
@@ -203,7 +204,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
           filename: filename,
           lang: lang,
           langs: langInfo.langs,
-          i18n: langInfo.langPack[lang],
+          i18n: langInfo.langPack[lang] as I18nLangPack,
         },
         page.data
       );
@@ -229,7 +230,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
             filename: _page.filename,
             lang,
             langs: langInfo.langs,
-            i18n: langInfo.langPack[lang],
+            i18n: langInfo.langPack[lang] as I18nLangPack,
           }),
         });
       }

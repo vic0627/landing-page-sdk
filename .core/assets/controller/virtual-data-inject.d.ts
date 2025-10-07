@@ -1,4 +1,4 @@
 declare module 'virtual:data-inject' {
-  const _default: Record<string, any>;
+  const _default: import('@landing-page-sdk/types').PageData;
   export = _default;
 }

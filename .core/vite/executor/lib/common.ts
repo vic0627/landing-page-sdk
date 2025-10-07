@@ -5,6 +5,7 @@ import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import {
   MinifyTargets,
   Page,
+  PageData,
   PagesInfo,
   SiteOptions,
   ViteExecutorSchema,
@@ -69,12 +70,12 @@ export function isHiddenFile(filePath: string) {
 }
 
 export function shadowData(
-  data: Record<string, any>,
-  base: Record<string, any> = {}
+  data: Partial<PageData>,
+  base: Partial<PageData> = {}
 ) {
   const result = { ...base, ...data };
   result['_data'] = result;
-  return result;
+  return result as PageData;
 }
 
 type ScanOptions = {
