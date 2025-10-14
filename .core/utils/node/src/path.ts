@@ -1,5 +1,22 @@
-import { relative, resolve } from 'node:path';
-import { workspaceRoot } from '@nx/devkit';
+import {
+  relative as _relative,
+  resolve as _resolve,
+  join as _join,
+} from 'node:path';
+import { normalizePath } from 'vite';
+import { workspaceRoot, readCachedProjectGraph } from '@nx/devkit';
+
+export function resolve(...paths: string[]) {
+  return normalizePath(_resolve(...paths));
+}
+
+export function join(...paths: string[]) {
+  return normalizePath(_join(...paths));
+}
+
+export function relative(from: string, to: string) {
+  return normalizePath(_relative(from, to));
+}
 
 export function getPath(...paths: string[]) {
   return resolve(process.cwd(), ...paths);
@@ -11,4 +28,26 @@ export function getPathFromRoot(...paths: string[]) {
 
 export function getRelPathFromRoot(...paths: string[]) {
   return relative(getPath(), getPathFromRoot(...paths));
+}
+
+export function getProjectPath(projPath: string): string {
+  const slashIdx = projPath.indexOf(
+    '/',
+    projPath.startsWith('@') ? projPath.indexOf('/') + 1 : undefined
+  );
+  const name = projPath.slice(0, slashIdx);
+  const sub = projPath.slice(slashIdx + 1);
+
+  if (!name) {
+    throw new Error(`failed to parse project path ${projPath}`);
+  }
+
+  const graph = readCachedProjectGraph();
+  const node = graph.nodes[name];
+
+  if (!node) {
+    throw new Error(`cannot find project ${projPath}`);
+  }
+
+  return join(workspaceRoot, node.data.root, sub);
 }

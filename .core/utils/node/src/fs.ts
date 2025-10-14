@@ -1,5 +1,5 @@
 import fs, { writeFileSync } from 'node:fs';
-import { getProjectPath } from './nx';
+import { getProjectPath } from './path';
 
 type StringOptions = {
   /** @default 'utf-8' */
