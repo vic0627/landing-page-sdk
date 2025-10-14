@@ -1,7 +1,7 @@
 import { set } from 'lodash-es';
 import { OutputAsset, OutputChunk } from 'rollup';
 import { SDKPlugin } from '@landing-page-sdk/types';
-import { timestampHash } from '@landing-page-sdk/utils-node';
+import { base62Hash } from '@landing-page-sdk/utils-node';
 import { namedLogger } from '../common';
 import chalk from 'chalk';
 
@@ -30,7 +30,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     },
   }[versioning];
 
-  const hash = timestampHash();
+  const hash = base62Hash(Date.now().toString(), 6);
 
   const rootRel = (hostId: string) => {
     let depth = hostId.split('/').length - 1;
