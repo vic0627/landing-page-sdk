@@ -9,33 +9,29 @@ import {
   InlineConfig,
 } from 'vite';
 import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
+import { viteMockServe } from 'vite-plugin-mock';
 // import viteRestart from 'vite-plugin-restart';
+import chalk from 'chalk';
 import { merge, pick, set } from 'lodash-es';
-import {
-  getPath,
-  getPathFromRoot,
-  getProjectPath,
-} from '@landing-page-sdk/utils-node';
+import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
 import { SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
 import {
-  parseMinify,
-  readSiteOptions,
+  readRawSiteConfig,
   rewrites,
   parseEnv,
   mockOptions,
 } from './lib/common';
+import configNormalizer from './lib/config-normalizer';
 import createPages from './lib/pages';
 import buildHelper from './lib/build-helper';
+import publicPorter from './lib/public-porter';
+import sitemapGenerator from './lib/sitemap-generator';
 import sitesInjector from './lib/plugins/sites-injector';
 import transformRedirect from './lib/plugins/transform-redirect';
 import renderBuiltUrl from './lib/plugins/render-built-url';
-import publicPorter from './lib/public-porter';
 import autoController from './lib/plugins/auto-controller';
 import redirect from './lib/plugins/redirect';
-import sitemapGenerator from './lib/sitemap-generator';
-import { execSync } from 'node:child_process';
-import chalk from 'chalk';
-import { viteMockServe } from 'vite-plugin-mock';
+import routerLink from './lib/plugins/router-link';
 
 let devServer: ViteDevServer | null = null;
 let previewServer: PreviewServer | null = null;
@@ -56,20 +52,20 @@ export async function teardown() {
 }
 
 export async function main(
-  cliOptions: ViteExecutorSchema,
+  cliOption: ViteExecutorSchema,
   context: ExecutorContext
 ) {
   // create site context
-  const siteOptions = await readSiteOptions(cliOptions.config);
-  const pagesInfo = createPages(cliOptions, siteOptions);
-  const siteContext: SiteContext = { pagesInfo, cliOptions, siteOptions };
+  const rawSiteConfig = await readRawSiteConfig(cliOption.config);
+  const siteConfig = configNormalizer(rawSiteConfig);
+  const pagesInfo = createPages(cliOption, siteConfig);
+  const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
 
   // configs
-  const userConfig: InlineConfig = {};
+  const config: InlineConfig = {};
 
-  const minifyOptions = parseMinify(cliOptions, siteOptions);
   const define = parseEnv(
-    merge(pick(pagesInfo.langInfo, 'langs'), siteOptions.env)
+    merge(pick(pagesInfo.langInfo, 'langs'), siteConfig.env)
   );
   const cacheDir = getPathFromRoot('node_modules/.vite-cache');
   const alias = { '@': getPath('src') };
@@ -77,80 +73,80 @@ export async function main(
   const outDir = getPathFromRoot('dist');
 
   // shared
-  set(userConfig, 'mode', cliOptions.mode);
-  set(userConfig, 'define', define);
-  set(userConfig, 'cacheDir', cacheDir);
-  set(userConfig, 'publicDir', siteOptions.sourcePath?.public);
-  set(userConfig, 'plugins', [
-    ...(siteOptions.plugins ?? []),
+  set(config, 'mode', cliOption.mode);
+  set(config, 'define', define);
+  set(config, 'cacheDir', cacheDir);
+  set(config, 'publicDir', siteConfig.sourcePath.public);
+  set(config, 'plugins', [
+    ...siteConfig.plugins,
     sitesInjector(siteContext),
     transformRedirect(siteContext),
     renderBuiltUrl(siteContext),
     autoController(siteContext),
     redirect(siteContext),
     viteMockServe(mockOptions(siteContext)),
+    routerLink(siteContext),
   ]);
 
   // resolve
-  set(userConfig, 'resolve.alias', alias);
+  set(config, 'resolve.alias', alias);
 
   // server
-  set(userConfig, 'server.host', cliOptions.host);
-  set(userConfig, 'server.port', cliOptions.port);
-  set(userConfig, 'server.open', openTarget);
+  set(config, 'server.host', cliOption.host);
+  set(config, 'server.port', cliOption.port);
+  set(config, 'server.open', openTarget);
 
   // preview
-  set(userConfig, 'preview.host', cliOptions.host);
-  set(userConfig, 'preview.port', cliOptions.port);
-  set(userConfig, 'preview.open', openTarget);
+  set(config, 'preview.host', cliOption.host);
+  set(config, 'preview.port', cliOption.port);
+  set(config, 'preview.open', openTarget);
 
   // build
-  set(userConfig, 'build.outDir', outDir);
-  set(userConfig, 'build.emptyOutDir', true);
-  set(userConfig, 'build.copyPublicDir', false);
-  set(userConfig, 'build.minify', minifyOptions.js);
-  set(userConfig, 'build.cssMinify', minifyOptions.css);
+  set(config, 'build.outDir', outDir);
+  set(config, 'build.emptyOutDir', true);
+  set(config, 'build.copyPublicDir', false);
+  set(config, 'build.minify', siteConfig.output.minify.js);
+  set(config, 'build.cssMinify', siteConfig.output.minify.css);
 
   // mpa
   const mpaPlugin = createMpaPlugin({
     pages: pagesInfo.pages as _Page[],
-    rewrites: rewrites(siteOptions),
-    htmlMinify: minifyOptions.html,
-    verbose: cliOptions.verbose ?? false,
+    rewrites: rewrites(siteConfig),
+    htmlMinify: siteConfig.output.minify.html,
+    verbose: cliOption.verbose ?? false,
   }) as Plugin[];
 
-  switch (cliOptions.mode) {
+  switch (cliOption.mode) {
     case 'dev':
-      userConfig.plugins?.push(mpaPlugin);
-      // userConfig.plugins?.push(
+      config.plugins?.push(mpaPlugin);
+      // config.plugins?.push(
       //   viteRestart({
-      //     restart: [cliOptions.config ?? 'site.config.js'],
+      //     restart: [cliOption.config ?? 'site.config.js'],
       //   })
       // );
-      devServer = await createServer(userConfig);
+      devServer = await createServer(config);
       await devServer.listen();
       devServer.printUrls();
       devServer.bindCLIShortcuts({ print: true });
-      printVerboseHint(cliOptions.verbose);
+      printVerboseHint(cliOption.verbose);
       break;
     case 'build':
-      // userConfig.plugins?.push(mpaPlugin);
-      // await build(userConfig);
-      // await buildHelper(outDir, pagesInfo.sites);
-      // await publicPorter({
-      //   outDir,
-      //   sites: pagesInfo.sites,
-      //   publicDir: siteOptions.sourcePath?.public,
-      //   thresholdBytes: siteOptions.threshold,
-      // });
-      execSync(`rm -r ${context.cwd}/dist`);
+      config.plugins?.push(mpaPlugin);
+      await build(config);
+      await buildHelper(outDir, pagesInfo.sites);
+      await publicPorter({
+        outDir,
+        sites: pagesInfo.sites,
+        publicDir: siteConfig.sourcePath.public,
+        thresholdBytes: siteConfig.output.threshold,
+      });
       await sitemapGenerator(siteContext, outDir);
       break;
     case 'preview':
-      previewServer = await preview(userConfig);
+      previewServer = await preview(config);
       previewServer.printUrls();
       previewServer.bindCLIShortcuts({ print: true });
-      printVerboseHint(cliOptions.verbose);
+      printVerboseHint(cliOption.verbose);
       break;
   }
 

@@ -3,8 +3,8 @@ import { SDKPlugin } from '@landing-page-sdk/types';
 import { REGEXP } from '../common';
 import { isObject } from 'lodash-es';
 
-export default (({ pagesInfo, siteOptions }) => {
-  const { redirect } = siteOptions;
+export default (({ pagesInfo, siteConfig }) => {
+  const { redirect } = siteConfig;
 
   if (!isObject(redirect) || redirect.enable === false || !redirect.transform) {
     return;

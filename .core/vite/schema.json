@@ -33,20 +33,6 @@
     "sites": {
       "type": "string",
       "description": "Determining specific sites to be generated. If representing multiple values, please separate values with ','."
-    },
-    "minify": {
-      "type": ["string", "boolean"],
-      "description": ""
-    },
-    "versioning": {
-      "type": "string",
-      "enum": ["hard", "soft"],
-      "description": ""
-    },
-    "assets": {
-      "type": "string",
-      "enum": ["abs", "rel"],
-      "description": ""
     }
   },
   "required": ["mode", "cwd"]

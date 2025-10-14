@@ -1,11 +1,4 @@
-import {
-  isArray,
-  isBoolean,
-  isPlainObject,
-  isString,
-  isUndefined,
-  omitBy,
-} from 'lodash-es';
+import { isString, omitBy } from 'lodash-es';
 import { JSDOM } from 'jsdom';
 import {
   bundleInlineSync,
@@ -14,13 +7,10 @@ import {
   readFileAsString,
 } from '@landing-page-sdk/utils-node';
 import {
-  ControllerInjection,
-  ControllerOption,
-  ControllerTarget,
+  NormalizedControllerOption,
   Page,
   ScriptSourceType,
   SDKPlugin,
-  StandardControllerOption,
 } from '@landing-page-sdk/types';
 import { getImportStatement, Logger, namedLogger } from '../common';
 import chalk from 'chalk';
@@ -28,32 +18,23 @@ import chalk from 'chalk';
 const name = 'vite-plugin-auto-controller';
 let log!: Logger;
 
-export default (({ siteOptions, pagesInfo, cliOptions }) => {
-  let { controller } = siteOptions;
+export default (({ siteConfig, pagesInfo, cliOption }) => {
+  let { controller } = siteConfig;
 
-  if (!controller) {
+  if (!controller.length) {
     return;
   }
 
-  let controllers!: StandardControllerOption[];
   log = namedLogger({
     name,
-    verbose: cliOptions.verbose,
+    verbose: cliOption.verbose,
   });
-
-  if (isPlainObject(controller)) {
-    controllers = [standardizeOption(controller as ControllerOption)];
-  } else if (isArray(controller)) {
-    controllers = controller.map(standardizeOption);
-  } else {
-    throw new TypeError(`'controller' only accept plain object or array`);
-  }
 
   return {
     name,
     transform(code, id) {
       const entry = findEntryById(pagesInfo.pages, id);
-      const opts = matchOptions(controllers, 'bundle', entry);
+      const opts = matchOptions(controller, 'bundle', entry);
 
       if (!opts || !entry) {
         return;
@@ -65,7 +46,7 @@ export default (({ siteOptions, pagesInfo, cliOptions }) => {
     },
     transformIndexHtml(code, { path }) {
       const entry = findEntryById(pagesInfo.pages, path);
-      const opts = matchOptions(controllers, 'inline', entry);
+      const opts = matchOptions(controller, 'inline', entry);
 
       if (!opts || !entry) {
         return;
@@ -78,7 +59,7 @@ export default (({ siteOptions, pagesInfo, cliOptions }) => {
   };
 }) satisfies SDKPlugin;
 
-function logMsg(id: string, opts: StandardControllerOption[]) {
+function logMsg(id: string, opts: NormalizedControllerOption[]) {
   const names = opts
     .map((o) => chalk.green(o.name))
     .reduce((str, name, i, arr) => {
@@ -98,7 +79,7 @@ function toControllerName(name: string) {
   return `@landing-page-sdk/assets/controller/${name}`;
 }
 
-function bundleTransform(code: string, opts: StandardControllerOption[]) {
+function bundleTransform(code: string, opts: NormalizedControllerOption[]) {
   for (const { name, injection } of opts) {
     const { placement } = injection;
     const importStatement = getImportStatement(toControllerName(name));
@@ -117,7 +98,7 @@ const scriptMap = new Map<string, string>();
 
 async function inlineTransform(
   code: string,
-  opts: StandardControllerOption[],
+  opts: NormalizedControllerOption[],
   entry: Page
 ) {
   const vm = new JSDOM(code);
@@ -180,7 +161,7 @@ function findEntryById(pages: Page[], id: string) {
 }
 
 function matchOptions(
-  stdOpts: StandardControllerOption[],
+  stdOpts: NormalizedControllerOption[],
   type: ScriptSourceType,
   entry?: Page
 ) {
@@ -203,78 +184,4 @@ function matchOptions(
   });
 
   return matches.length ? matches : undefined;
-}
-
-function standardizeOption(opt: ControllerOption) {
-  const stdOpt: StandardControllerOption = {
-    name: opt.name,
-    targets: {
-      routes: [],
-      lang: [],
-      site: [],
-    },
-    injection: {
-      type: 'bundle',
-      appendTo: 'head',
-      placement: 'post',
-      bundle: true,
-    },
-  };
-
-  // targets
-  if (isUndefined(opt.targets)) {
-    stdOpt.targets.routes.push('/');
-  } else if (isString(opt.targets)) {
-    stdOpt.targets.routes.push(opt.targets);
-  } else if (isArray(opt.targets)) {
-    stdOpt.targets.routes.push(...opt.targets);
-  } else if (isPlainObject(opt.targets)) {
-    const optTargets = opt.targets as ControllerTarget;
-
-    // targets.routes
-    if (isString(optTargets.routes)) {
-      stdOpt.targets.routes.push(optTargets.routes);
-    } else if (isArray(optTargets.routes)) {
-      stdOpt.targets.routes.push(...optTargets.routes);
-    }
-
-    // targets.lang
-    if (isString(optTargets.lang)) {
-      stdOpt.targets.lang.push(optTargets.lang);
-    } else if (isArray(optTargets.lang)) {
-      stdOpt.targets.lang.push(...optTargets.lang);
-    }
-
-    // targets.site
-    if (isString(optTargets.site)) {
-      stdOpt.targets.site.push(optTargets.site);
-    } else if (isArray(optTargets.site)) {
-      stdOpt.targets.site.push(...optTargets.site);
-    }
-  }
-
-  // injection
-  if (isString(opt.injection)) {
-    stdOpt.injection.type = opt.injection;
-  } else if (isPlainObject(opt.injection)) {
-    const optInjection = opt.injection as ControllerInjection;
-
-    if (isString(optInjection.type)) {
-      stdOpt.injection.type = optInjection.type;
-    }
-
-    if (isString(optInjection.appendTo)) {
-      stdOpt.injection.appendTo = optInjection.appendTo;
-    }
-
-    if (isString(optInjection.placement)) {
-      stdOpt.injection.placement = optInjection.placement;
-    }
-
-    if (isBoolean(optInjection.bundle)) {
-      stdOpt.injection.bundle = optInjection.bundle;
-    }
-  }
-
-  return stdOpt;
 }

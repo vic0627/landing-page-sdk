@@ -1,14 +1,13 @@
-import { getPath } from '@landing-page-sdk/utils-node';
 import { SDKPlugin } from '@landing-page-sdk/types';
 import { getImportStatement, namedLogger } from '../common';
 import chalk from 'chalk';
 
 const name = 'vite-plugin-sites-injector';
 
-export default (({ pagesInfo, cliOptions }) => {
+export default (({ pagesInfo, cliOption }) => {
   const log = namedLogger({
     name,
-    verbose: cliOptions.verbose,
+    verbose: cliOption.verbose,
   });
 
   return {
@@ -20,7 +19,7 @@ export default (({ pagesInfo, cliOptions }) => {
         return;
       }
 
-      const siteName = page.data['site'] ?? page.siteScript;
+      const siteName = page.data?.site ?? page.siteScript;
       log(`Injected site-specific script ${chalk.green(siteName)}`);
 
       const importStatement = getImportStatement(page.siteScript);

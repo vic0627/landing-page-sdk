@@ -1,6 +1,8 @@
-/** @type {import('@landing-page-sdk/types').SiteOptions} */
+/** @type {import('@landing-page-sdk/types').SiteConfig} */
 export default {
-  routeMode: 'tree',
+  route: {
+    mode: 'tree'
+  },
   output: {
     minify: false,
     assets: 'rel',
@@ -12,6 +14,7 @@ export default {
   },
   redirect: {
     enable: false,
+    defaultLang: 'zh-TW',
     transform() {
       const metaRobots = this.document.createElement('meta');
       metaRobots.setAttribute('name', 'robots');
@@ -37,7 +40,7 @@ export default {
       'site-a': 'https://www.example2.com',
     },
     orientation: 'dir',
-    exclude: [/^\/en\/.*$/],
+    // exclude: [/^\/en\/.*$/],
     defaults: {
       changefreq: 'monthly',
       priority: 0.8,

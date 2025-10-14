@@ -1,6 +1,7 @@
-// copy-public.ts
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { namedLogger } from './common';
+import chalk from 'chalk';
 
 type Options = {
   outDir: string;
@@ -42,6 +43,11 @@ const MEDIA_EXTS = new Set([
   '.otf',
 ]);
 
+const log = namedLogger({
+  name: 'public-porter',
+  verbose: true,
+});
+
 /** 判斷是否為多媒體資產 */
 function isMediaAsset(filePath: string): boolean {
   const ext = path.extname(filePath).toLowerCase();
@@ -80,12 +86,13 @@ async function copyPublicIntoRoot(
           const st = await fs.stat(src); // Node fs.stat 可取得 size (bytes)
 
           if (typeof thresholdBytes === 'number' && st.size > thresholdBytes) {
+            const ceil = Math.round(thresholdBytes / 1024);
             const kb = (st.size / 1024).toFixed(1);
             const relUnix = rel.split(path.sep).join('/'); // 日誌用一致分隔符
-            console.warn(
-              `[public] Large media asset: ${relUnix} — ${kb} KB (> ${Math.round(
-                thresholdBytes / 1024
-              )} KB)`
+            log(
+              `Large media asset: ${chalk.redBright(
+                relUnix
+              )} — ${chalk.redBright(kb)} KB (> ${ceil} KB)`
             );
           }
         }

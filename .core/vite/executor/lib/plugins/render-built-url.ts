@@ -12,16 +12,9 @@ const ASSETS = '__ASSETS__';
 
 const name = 'vite-plugin-render-build-url';
 
-export default (({ pagesInfo, cliOptions, siteOptions }) => {
-  const outputOptions = siteOptions.output ?? {};
-  const versioning = parseOption(
-    outputOptions,
-    cliOptions,
-    'versioning',
-    'hard'
-  );
-  const baseType = parseOption(outputOptions, cliOptions, 'assets', 'abs');
-  const routeMode = siteOptions.routeMode ?? 'tree';
+export default (({ pagesInfo, cliOption, siteConfig }) => {
+  const { versioning, assets: baseType } = siteConfig.output;
+  const routeMode = siteConfig.route.mode;
   const sites = Object.keys(pagesInfo.sites);
 
   const outputFilenames: Record<string, string> = {
@@ -85,7 +78,7 @@ export default (({ pagesInfo, cliOptions, siteOptions }) => {
 
   const log = namedLogger({
     name,
-    verbose: cliOptions.verbose,
+    verbose: cliOption.verbose,
   });
 
   log(

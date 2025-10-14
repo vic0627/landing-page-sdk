@@ -1,11 +1,15 @@
+import chalk from 'chalk';
+import { isPlainObject, isString, merge, pick } from 'lodash-es';
+import { SitemapStream, SitemapIndexStream, streamToPromise } from 'sitemap';
 import { Readable } from 'node:stream';
 import { createWriteStream } from 'node:fs';
 import { promises as fsp } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join } from 'node:path';
 import { Page, SiteContext, SitemapOptions } from '@landing-page-sdk/types';
-import { isPlainObject, isString, merge, pick } from 'lodash-es';
-import { SitemapStream, SitemapIndexStream, streamToPromise } from 'sitemap';
-import { REGEXP } from './common';
+import { getPathFromRoot } from '@landing-page-sdk/utils-node';
+import { namedLogger, REGEXP } from './common';
+
+const log = namedLogger({ name: 'sitemap-generator', verbose: true });
 
 export default async function (siteContext: SiteContext, outDir: string) {
   const { siteOptions, pagesInfo } = siteContext;
@@ -83,8 +87,8 @@ function pagesToRoutes(
   const routes = pages.map((page) => {
     let { filename, data } = page;
 
-    if (data['site']) {
-      filename = filename.replace(data['site'], '');
+    if (data?.site) {
+      filename = filename.replace(data.site, '');
     }
 
     filename = leadingSlash(filename);
@@ -97,7 +101,7 @@ function pagesToRoutes(
       path: filename,
       key: page.route || undefined,
       ...pick(data, 'site', 'lang'),
-      siteAlias: siteAliasMap[data['site']],
+      siteAlias: siteAliasMap[data?.site as string],
     };
   }) as RouteInfo[];
 
@@ -150,6 +154,7 @@ async function generateSitemap(option: GeneratorOptions) {
     );
 
     const file = join(dir, 'sitemap.xml');
+    log(`generate sitemap ${outputSitemapPath(file)}`);
     await fsp.writeFile(file, xml, 'utf8');
   }
 }
@@ -229,6 +234,7 @@ async function generateSitemapIndex(option: MultiLangGeneratorOptions) {
       const diskPath = join(subDir, `${lang}.xml`);
       const ws = createWriteStream(diskPath);
       sm.pipe(ws);
+      log(`generate sitemap ${outputSitemapPath(diskPath)}`);
 
       for (const [k, items] of byKey.entries()) {
         // 當前語系的主要路由（理論上單一）
@@ -276,6 +282,7 @@ async function generateSitemapIndex(option: MultiLangGeneratorOptions) {
       const smis = new SitemapIndexStream();
       const wsIndex = createWriteStream(indexPath);
       smis.pipe(wsIndex);
+      log(`generate sitemap_index ${outputSitemapPath(indexPath)}`);
 
       for (const lang of writtenLangs) {
         const urlPath = leadingSlash(
@@ -364,4 +371,8 @@ function groupBySite(routes: RouteInfo[]) {
 
 function ensureDir(dir: string) {
   return fsp.mkdir(dir, { recursive: true });
+}
+
+function outputSitemapPath(path: string) {
+  return chalk.green(path.replace(getPathFromRoot(), ''));
 }

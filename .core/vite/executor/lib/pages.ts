@@ -1,47 +1,33 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readJsonFile } from '@nx/devkit';
-import {
-  cloneDeep,
-  pick,
-  merge,
-  fromPairs,
-  isBoolean,
-  isObject,
-  omit,
-} from 'lodash-es';
+import { cloneDeep, pick, merge, fromPairs } from 'lodash-es';
 import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
 import {
   I18nInfo,
-  SiteOptions,
   ViteExecutorSchema,
   Page,
   PagesInfo,
-  RedirectOptions,
   I18nLangPack,
+  NormalizedSiteConfig,
 } from '@landing-page-sdk/types';
 import { shadowData, scanDir, REGEXP, isHiddenFile } from './common';
 
 interface PagesOptions
   extends Required<
-      Pick<SiteOptions, 'routeMode' | 'sourcePath' | 'env' | 'redirect'>
+      Pick<NormalizedSiteConfig, 'route' | 'sourcePath' | 'env' | 'redirect'>
     >,
     Pick<ViteExecutorSchema, 'mode' | 'sites'> {}
 
 export default function createPages(
-  cliOptions: ViteExecutorSchema,
-  siteOptions: SiteOptions
+  cliOption: ViteExecutorSchema,
+  siteConfig: NormalizedSiteConfig
 ): PagesInfo {
-  const {
-    sourcePath = {},
-    routeMode = 'tree',
-    env = {},
-    redirect = false,
-  } = siteOptions;
+  const { sourcePath, route, env, redirect } = siteConfig;
 
   const options = merge(
-    { sourcePath, routeMode, env, redirect },
-    pick(cliOptions, 'mode', 'sites')
+    { sourcePath, route, env, redirect },
+    pick(cliOption, 'mode', 'sites')
   );
 
   const pages = findPages(options);
@@ -52,9 +38,8 @@ export default function createPages(
 }
 
 function findPages(options: PagesOptions) {
-  const { routeMode, sourcePath, env } = options;
-  const { pages: baseDir = './src/pages', components = './src/components' } =
-    sourcePath;
+  const { route, sourcePath, env } = options;
+  const { pages: baseDir, components } = sourcePath;
 
   const root = getPath();
   const pages: Page[] = [];
@@ -77,12 +62,12 @@ function findPages(options: PagesOptions) {
 
     let filename!: string;
 
-    if (routeMode === 'tree') {
+    if (route.mode === 'tree') {
       filename = (relDir ? relDir + '/' : '') + 'index.html';
-    } else if (routeMode === 'flat') {
+    } else if (route.mode === 'flat') {
       filename = relDir ? relDir.replace(/\//g, '_') + '.html' : 'index.html';
     } else {
-      throw new Error(`Unidentified route mode '${routeMode}'`);
+      throw new Error(`Unidentified route mode '${route.mode}'`);
     }
 
     // 將絕對路徑換成相對於 root 的 template 路徑
@@ -122,9 +107,8 @@ function findPages(options: PagesOptions) {
 }
 
 function localizePages(pages: Page[], options: PagesOptions) {
-  const { routeMode, sourcePath } = options;
-  const { i18n: baseDir = './src/i18n' } = sourcePath;
-  const redirect = normalizeRedirect(options.redirect);
+  const { route, sourcePath, redirect } = options;
+  const { i18n: baseDir } = sourcePath;
   const files = scanDir(baseDir, { match: REGEXP.JSON });
 
   const langInfo: I18nInfo = {
@@ -163,7 +147,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
       filename: 'index.html',
       template: getProjectPath('@landing-page-sdk/assets/redirect/index.html'),
       entry: getProjectPath(
-        `@landing-page-sdk/assets/redirect/${routeMode}.ts`
+        `@landing-page-sdk/assets/redirect/${route.mode}.ts`
       ),
       data: shadowData({
         ...originalPages[0].data,
@@ -180,14 +164,14 @@ function localizePages(pages: Page[], options: PagesOptions) {
 
       let filename!: string;
 
-      if (routeMode === 'tree') {
+      if (route.mode === 'tree') {
         filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
-      } else if (routeMode === 'flat') {
+      } else if (route.mode === 'flat') {
         filename = isMultiLang
           ? page.filename.replace('.html', `_${lang}.html`)
           : page.filename;
       } else {
-        throw new Error(`Unidentified route mode '${routeMode}'`);
+        throw new Error(`Unidentified route mode '${route.mode}'`);
       }
 
       page.name = isMultiLang ? `${lang}:${page.name}` : page.name;
@@ -244,7 +228,7 @@ function localizePages(pages: Page[], options: PagesOptions) {
 
 function multiSitesPages(pages: Page[], options: PagesOptions) {
   const { sourcePath, sites: _requiredSites, mode } = options;
-  const { sites: baseDir = './src/sites' } = sourcePath;
+  const { sites: baseDir } = sourcePath;
 
   const files = scanDir(baseDir, { match: REGEXP.SCRIPT });
 
@@ -309,22 +293,4 @@ function multiSitesPages(pages: Page[], options: PagesOptions) {
   const siteInfo = fromPairs(sites.map((item) => [item.name, item.alias]));
 
   return siteInfo;
-}
-
-function normalizeRedirect(
-  redirect: boolean | RedirectOptions
-): Omit<Required<RedirectOptions>, 'transform' | 'defaultLang'> {
-  const opts: Omit<Required<RedirectOptions>, 'transform' | 'defaultLang'> = {
-    enable: true,
-    stub: false,
-  };
-
-  if (isBoolean(redirect)) {
-    opts.enable = redirect;
-    opts.stub = redirect;
-  } else if (isObject(redirect)) {
-    merge(opts, omit(redirect, 'transform'));
-  }
-
-  return opts;
 }

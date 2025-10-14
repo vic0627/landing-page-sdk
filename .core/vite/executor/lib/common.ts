@@ -3,24 +3,22 @@ import path from 'node:path';
 import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import {
-  MinifyTargets,
-  Page,
+  NormalizedSiteConfig,
   PageData,
-  PagesInfo,
+  PageDataCommon,
   SiteContext,
-  SiteOptions,
-  ViteExecutorSchema,
+  SiteConfig,
 } from '@landing-page-sdk/types';
 import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
 import { ViteMockOptions } from 'vite-plugin-mock';
 import { isString } from 'lodash-es';
 
-export async function readSiteOptions(
+export async function readRawSiteConfig(
   filePath = 'site.config.js'
-): Promise<SiteOptions> {
+): Promise<SiteConfig> {
   // filePath = getPath(filePath);
   if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) return {};
-  return ((await import(getPath(filePath)))?.default ?? {}) as SiteOptions;
+  return ((await import(getPath(filePath)))?.default ?? {}) as SiteConfig;
 }
 
 export const REGEXP = {
@@ -35,9 +33,9 @@ export const REGEXP = {
   CSS_PUBLIC: /url\((["']?)(.*?)\1\)/g,
 };
 
-export const rewrites = (siteOptions: SiteOptions): RewriteRule => {
-  const { sourcePath = {} } = siteOptions;
-  let { pages = './src/pages' } = sourcePath;
+export const rewrites = (cfg: NormalizedSiteConfig): RewriteRule => {
+  const { sourcePath } = cfg;
+  let { pages } = sourcePath;
 
   pages = pages.replace(/\./g, '');
 
@@ -77,7 +75,7 @@ export function shadowData(
   base: Partial<PageData> = {}
 ) {
   const result = { ...base, ...data };
-  result['_data'] = result;
+  result._data = result as PageDataCommon;
   return result as PageData;
 }
 
@@ -173,64 +171,9 @@ export function parseEnv(o: Record<string, any>) {
   return env;
 }
 
-export function parseMinify(
-  cliOptions: ViteExecutorSchema,
-  siteOptions: SiteOptions
-) {
-  const minifyInfo: Record<MinifyTargets, boolean> = {
-    html: true,
-    js: true,
-    css: true,
-  };
-
-  const cliMinify = cliOptions.minify;
-  const sitesMinify = siteOptions.output?.minify;
-
-  if (cliMinify === undefined && sitesMinify === undefined) {
-    return minifyInfo;
-  }
-
-  if (cliMinify !== undefined) {
-    if (typeof cliMinify === 'boolean') {
-      for (const key in minifyInfo) {
-        minifyInfo[key as MinifyTargets] = cliMinify;
-      }
-    } else if (typeof cliMinify === 'string') {
-      const minifyTargets = cliMinify.split(',');
-
-      for (const key in minifyInfo) {
-        minifyInfo[key as MinifyTargets] = minifyTargets.includes(key);
-      }
-    }
-
-    return minifyInfo;
-  }
-
-  if (sitesMinify !== undefined) {
-    if (typeof sitesMinify === 'boolean') {
-      for (const key in minifyInfo) {
-        minifyInfo[key as MinifyTargets] = sitesMinify;
-      }
-    } else if (typeof sitesMinify === 'string') {
-      for (const key in minifyInfo) {
-        minifyInfo[key as MinifyTargets] = key === sitesMinify;
-      }
-    } else if (Array.isArray(sitesMinify)) {
-      for (const key in minifyInfo) {
-        minifyInfo[key as MinifyTargets] = sitesMinify.includes(
-          key as MinifyTargets
-        );
-      }
-    }
-
-    return minifyInfo;
-  }
-
-  return minifyInfo;
-}
-
 interface NamedLoggerOptions {
   name: string;
+  type?: 'log' | 'table';
   verbose?: boolean;
 }
 
@@ -240,29 +183,33 @@ export function namedLogger(options: NamedLoggerOptions) {
     if (!options.verbose) {
       return;
     }
-    console.log(`[${name}]:`, ...messages);
+    if (options.type === 'table') {
+      const [title, data, props] = messages;
+      console.log(`[${name}]:`, title);
+      console.table(data, props);
+    } else {
+      console.log(`[${name}]:`, ...messages);
+    }
   };
 }
 
 export type Logger = ReturnType<typeof namedLogger>;
 
-export function mockOptions(siteContext: SiteContext): ViteMockOptions {
-  const { cliOptions, siteOptions } = siteContext;
+export function mockOptions(ctx: SiteContext): ViteMockOptions {
+  const { cliOption, siteConfig } = ctx;
 
   const options: ViteMockOptions = {
-    mockPath: getProjectPath('@landing-page-sdk/assets/mock'),
+    mockPath: '',
     watchFiles: true,
-    logger: cliOptions.verbose ?? false,
+    logger: cliOption.verbose ?? false,
   };
 
-  if (siteOptions.mock === false) {
+  if (siteConfig.mock === false) {
     options.enable = false;
-  }
-
-  if (isString(siteOptions.mock)) {
-    options.mockPath = siteOptions.mock.startsWith('@')
-      ? getProjectPath(siteOptions.mock)
-      : siteOptions.mock;
+  } else if (isString(siteConfig.mock)) {
+    options.mockPath = siteConfig.mock.startsWith('@')
+      ? getProjectPath(siteConfig.mock)
+      : siteConfig.mock;
   }
 
   return options;

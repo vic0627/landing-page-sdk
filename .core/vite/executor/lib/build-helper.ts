@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import { scanDir } from './common';
+import { namedLogger, scanDir } from './common';
 
 type DistInfo = {
   path: string;
@@ -10,14 +10,20 @@ type DistInfo = {
   isFile: boolean;
 };
 
-export default async (outDir: string, _sites: Record<string, string>) => {
+export default async (
+  outDir: string,
+  _sites: Record<string, string>
+) => {
   const sites = Object.keys(_sites);
+
+  const log = namedLogger({
+    name: 'build-helper',
+    verbose: true,
+  });
 
   // 若沒有指定任何目的地，則無事可做，直接返回
   if (sites.length === 0) {
-    console.warn(
-      '[copy & clean] no destination dirs resolved from "sites". skip.'
-    );
+    log('no destination dirs resolved from sites. skip.');
     return;
   }
 

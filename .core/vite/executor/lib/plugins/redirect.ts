@@ -1,5 +1,5 @@
 import { Page, SDKPlugin } from '@landing-page-sdk/types';
-import { isBoolean, isObject, pick } from 'lodash-es';
+import { isBoolean, isObject } from 'lodash-es';
 import { Connect } from 'vite';
 import {
   IncomingHttpHeaders,
@@ -12,8 +12,8 @@ import chalk from 'chalk';
 
 const name = 'vite-plugin-redirect';
 
-export default (({ pagesInfo, siteOptions, cliOptions }) => {
-  const { redirect } = siteOptions;
+export default (({ pagesInfo, siteConfig, cliOption }) => {
+  const { redirect } = siteConfig;
   const { pages, langInfo } = pagesInfo;
   const { langs } = langInfo;
 
@@ -27,13 +27,13 @@ export default (({ pagesInfo, siteOptions, cliOptions }) => {
 
   const routeMap = getRouteMap(pages);
   const pageData = pages[0].data;
-  const defaultLang = pageData['env']?.['defaultLang'] as string | undefined;
+  const defaultLang = pageData?.env?.['defaultLang'] as string | undefined;
   const getUserLang = (headers?: IncomingHttpHeaders) =>
     detectLang(langs, defaultLang, headers);
 
   const log = namedLogger({
     name,
-    verbose: cliOptions.verbose,
+    verbose: cliOption.verbose,
   });
 
   return {
@@ -63,7 +63,7 @@ export default (({ pagesInfo, siteOptions, cliOptions }) => {
 function getRouteMap(pages: Page[]) {
   const map = new Map<string, (lang?: string) => string | undefined>();
   pages.forEach(({ data, route }) => {
-    const { site, alias } = data;
+    const { site, alias } = data ?? {};
     const sitePrefix = '/' + (alias || site || '');
     const pos1 = join(sitePrefix, route!);
     const pos2 = join(sitePrefix, route!, '/');
