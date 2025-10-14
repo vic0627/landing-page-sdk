@@ -5,21 +5,21 @@ import { Readable } from 'node:stream';
 import { createWriteStream } from 'node:fs';
 import { promises as fsp } from 'node:fs';
 import { join } from 'node:path';
-import { Page, SiteContext, SitemapOptions } from '@landing-page-sdk/types';
+import { Page, SiteContext, SitemapOption } from '@landing-page-sdk/types';
 import { getPathFromRoot } from '@landing-page-sdk/utils-node';
-import { namedLogger, REGEXP } from './common';
+import { namedLogger, REGEXP } from '../common';
 
 const log = namedLogger({ name: 'sitemap-generator', verbose: true });
 
-export default async function (siteContext: SiteContext, outDir: string) {
-  const { siteOptions, pagesInfo } = siteContext;
+export default async function (ctx: SiteContext, outDir: string) {
+  const { siteConfig, pagesInfo } = ctx;
 
-  if (!siteOptions.sitemap) {
+  if (!siteConfig.sitemap) {
     // if baseUrl or config doesn't exist, close this plugin
     return;
   }
 
-  const sitemapOption: Required<SitemapOptions> = {
+  const sitemapOption: Required<SitemapOption> = {
     baseUrl: '',
     enable: true,
     orientation: 'file',
@@ -29,15 +29,15 @@ export default async function (siteContext: SiteContext, outDir: string) {
   };
 
   // normalize options
-  if (isString(siteOptions.sitemap)) {
-    sitemapOption.baseUrl = siteOptions.sitemap;
-  } else if (isPlainObject(siteOptions.sitemap)) {
-    if (siteOptions.sitemap.enable === false) {
+  if (isString(siteConfig.sitemap)) {
+    sitemapOption.baseUrl = siteConfig.sitemap;
+  } else if (isPlainObject(siteConfig.sitemap)) {
+    if (siteConfig.sitemap.enable === false) {
       // if not enable, close this plugin
       return;
     }
 
-    merge(sitemapOption, siteOptions.sitemap);
+    merge(sitemapOption, siteConfig.sitemap);
   }
 
   const { sites, langInfo, pages } = pagesInfo;
@@ -58,7 +58,7 @@ export default async function (siteContext: SiteContext, outDir: string) {
         ...generatorOption,
         langs,
         defaultLang:
-          (siteOptions.env && (siteOptions.env as any)['defaultLang']) ||
+          (siteConfig.env && (siteConfig.env as any)['defaultLang']) ||
           langs[0],
       }));
 }
@@ -78,7 +78,7 @@ type RouteInfo = {
 function pagesToRoutes(
   pages: Page[],
   siteAliasMap: Record<string, string>,
-  options: Required<SitemapOptions>
+  options: Required<SitemapOption>
 ) {
   pages = pages.filter(
     (page) => !(REGEXP.REDIRECT.test(page.name) || REGEXP.STUB.test(page.name))
@@ -114,7 +114,7 @@ type GeneratorOptions = {
   sites: Record<string, string>;
   /** build 輸出資料夾 */
   outDir: string;
-  option: Required<SitemapOptions>;
+  option: Required<SitemapOption>;
 };
 
 /**
@@ -176,7 +176,7 @@ type MultiLangGeneratorOptions = GeneratorOptions & {
  * - 語系偵測：以實際 routes 中出現的語系為準（siteLangs），避免產生空檔。
  * - URL 與 hreflang：
  *   - 以 Page.route（或回退 path）作為「同一內容頁」的 key 來跨語對應。
- *   - x-default 指向 siteOptions.env.defaultLang，若未設定則回退第一語系。
+ *   - x-default 指向 siteConfig.env.defaultLang，若未設定則回退第一語系。
  * - baseUrl 支援：字串或 Record（多站映射）；同時考慮 sites[site] 的路徑前綴。
  * - XML 輸出：完全交由 sitemap 套件（SitemapStream、SitemapIndexStream）生成。
  * - 串流落盤：務必先取得 streamToPromise，再 end 流，避免 EmptyStream 例外。

@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { namedLogger } from './common';
+import { namedLogger } from '../common';
 import chalk from 'chalk';
+import { SiteContext } from '.core/types';
 
 type Options = {
   outDir: string;
@@ -85,7 +86,11 @@ async function copyPublicIntoRoot(
         if (isMediaAsset(src)) {
           const st = await fs.stat(src); // Node fs.stat 可取得 size (bytes)
 
-          if (typeof thresholdBytes === 'number' && st.size > thresholdBytes) {
+          if (
+            typeof thresholdBytes === 'number' &&
+            thresholdBytes !== 0 &&
+            st.size > thresholdBytes
+          ) {
             const ceil = Math.round(thresholdBytes / 1024);
             const kb = (st.size / 1024).toFixed(1);
             const relUnix = rel.split(path.sep).join('/'); // 日誌用一致分隔符
@@ -112,8 +117,11 @@ async function copyPublicIntoRoot(
 /**
  * 主要入口：把 publicDir 搬到 outDir（單站）或 outDir/<site>（多站）
  */
-export default async function (opts: Options): Promise<void> {
-  const publicDir = opts.publicDir ?? DEFAULT_PUBLIC;
+export default async function (
+  ctx: SiteContext,
+  outDir: string
+): Promise<void> {
+  const publicDir = ctx.siteConfig.sourcePath.public;
 
   // 若 publicDir 不存在，視為無事可做
   try {
@@ -126,14 +134,14 @@ export default async function (opts: Options): Promise<void> {
     return;
   }
 
-  const sites = Object.keys(opts.sites);
+  const sites = Object.keys(ctx.pagesInfo.sites);
   // 決定目的根目錄們
   const siteRoots =
     sites.length === 0
-      ? [opts.outDir]
-      : sites.map((site) => path.join(opts.outDir, site));
+      ? [outDir]
+      : sites.map((site) => path.join(outDir, site));
 
   for (const root of siteRoots) {
-    await copyPublicIntoRoot(publicDir, root, opts.thresholdBytes);
+    await copyPublicIntoRoot(publicDir, root, ctx.siteConfig.output.threshold);
   }
 }

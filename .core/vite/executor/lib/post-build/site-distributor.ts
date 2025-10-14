@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import { namedLogger, scanDir } from './common';
+import { namedLogger, scanDir } from '../common';
+import { SiteContext } from '.core/types';
 
 type DistInfo = {
   path: string;
@@ -10,11 +11,8 @@ type DistInfo = {
   isFile: boolean;
 };
 
-export default async (
-  outDir: string,
-  _sites: Record<string, string>
-) => {
-  const sites = Object.keys(_sites);
+export default async (ctx: SiteContext, outDir: string) => {
+  const sites = Object.keys(ctx.pagesInfo.sites);
 
   const log = namedLogger({
     name: 'build-helper',

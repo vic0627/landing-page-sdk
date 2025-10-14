@@ -8,8 +8,6 @@ import {
   PreviewServer,
   InlineConfig,
 } from 'vite';
-import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
-import { viteMockServe } from 'vite-plugin-mock';
 // import viteRestart from 'vite-plugin-restart';
 import chalk from 'chalk';
 import { merge, pick, set } from 'lodash-es';
@@ -23,9 +21,13 @@ import {
 } from './lib/common';
 import configNormalizer from './lib/config-normalizer';
 import createPages from './lib/pages';
-import buildHelper from './lib/build-helper';
-import publicPorter from './lib/public-porter';
-import sitemapGenerator from './lib/sitemap-generator';
+// post build
+import siteDistributor from './lib/post-build/site-distributor';
+import publicPorter from './lib/post-build/public-porter';
+import sitemapGenerator from './lib/post-build/sitemap-generator';
+// plugins
+import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
+import { viteMockServe } from 'vite-plugin-mock';
 import sitesInjector from './lib/plugins/sites-injector';
 import transformRedirect from './lib/plugins/transform-redirect';
 import renderBuiltUrl from './lib/plugins/render-built-url';
@@ -133,13 +135,8 @@ export async function main(
     case 'build':
       config.plugins?.push(mpaPlugin);
       await build(config);
-      await buildHelper(outDir, pagesInfo.sites);
-      await publicPorter({
-        outDir,
-        sites: pagesInfo.sites,
-        publicDir: siteConfig.sourcePath.public,
-        thresholdBytes: siteConfig.output.threshold,
-      });
+      await siteDistributor(siteContext, outDir);
+      await publicPorter(siteContext, outDir);
       await sitemapGenerator(siteContext, outDir);
       break;
     case 'preview':
