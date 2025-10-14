@@ -1,5 +1,5 @@
 import { OptionNormalizer, RouteOption } from '@landing-page-sdk/types';
-import { isPlainObject } from 'lodash-es';
+import { isFunction, isPlainObject } from 'lodash-es';
 
 export default (function (opt, cfg) {
   if (cfg.route === 'flat') {
@@ -13,6 +13,10 @@ export default (function (opt, cfg) {
 
     if (route.orientation === 'file') {
       opt.route.orientation = 'file';
+    }
+
+    if (isFunction(route.flatFileNaming)) {
+      opt.route.flatFileNaming = route.flatFileNaming;
     }
   }
 } satisfies OptionNormalizer);

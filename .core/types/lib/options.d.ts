@@ -166,6 +166,7 @@ export interface OutputOption {
 export interface RouteOption {
   mode?: RouteMode;
   orientation?: DestOrientation;
+  flatFileNaming?: (relDir: string) => string
 }
 
 export interface SourcePathOption {

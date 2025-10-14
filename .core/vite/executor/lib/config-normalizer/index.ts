@@ -15,6 +15,7 @@ const normalizer: SiteConfigNormalizer = (cfg) => {
     route: {
       mode: 'tree',
       orientation: 'dir',
+      flatFileNaming: (relDir) => relDir.replace(/\//g, '_') + '.html',
     },
     output: {
       minify: {

@@ -1,10 +1,6 @@
 import { AsyncIteratorExecutor, PromiseExecutor } from '@nx/devkit';
 import chokidar from 'chokidar';
-import {
-  getPathFromRoot,
-  getProjectPath,
-  timestampHash,
-} from '@landing-page-sdk/utils-node';
+import { getPathFromRoot, getProjectPath } from '@landing-page-sdk/utils-node';
 import { ViteExecutorSchema } from '@landing-page-sdk/types';
 import path from 'node:path';
 import fs from 'node:fs';

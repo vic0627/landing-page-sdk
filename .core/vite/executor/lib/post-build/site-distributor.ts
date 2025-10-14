@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import { namedLogger, scanDir } from '../common';
+import { scanDir } from '@landing-page-sdk/utils-node';
+import { namedLogger } from '../common';
 import { SiteContext } from '.core/types';
 
 type DistInfo = {

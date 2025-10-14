@@ -60,7 +60,7 @@ export async function main(
   // create site context
   const rawSiteConfig = await readRawSiteConfig(cliOption.config);
   const siteConfig = configNormalizer(rawSiteConfig);
-  const pagesInfo = createPages(cliOption, siteConfig);
+  const pagesInfo = createPages({ cli: cliOption, cfg: siteConfig });
   const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
 
   // configs

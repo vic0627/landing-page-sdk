@@ -1,4 +1,7 @@
 import { I18nInfo, I18nLangPack } from './langs';
+import { NormalizedSiteConfig } from './normalized';
+import { RouteMode } from './types';
+import { ViteExecutorSchema } from './vite';
 
 export interface PageDataCommon {
   /**
@@ -87,4 +90,9 @@ export interface PagesInfo {
   pages: Page[];
   langInfo: I18nInfo;
   sites: Record<string, string>;
+}
+
+export interface BuildPageOption {
+  cli: ViteExecutorSchema;
+  cfg: NormalizedSiteConfig;
 }

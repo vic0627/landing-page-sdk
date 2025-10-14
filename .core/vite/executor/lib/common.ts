@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import {
@@ -8,6 +7,7 @@ import {
   PageDataCommon,
   SiteContext,
   SiteConfig,
+  RouteOption,
 } from '@landing-page-sdk/types';
 import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
 import { ViteMockOptions } from 'vite-plugin-mock';
@@ -65,11 +65,6 @@ export const rewrites = (cfg: NormalizedSiteConfig): RewriteRule => {
   return rules;
 };
 
-export function isHiddenFile(filePath: string) {
-  const filename = path.parse(filePath).name;
-  return filename.startsWith('.');
-}
-
 export function shadowData(
   data: Partial<PageData>,
   base: Partial<PageData> = {}
@@ -77,56 +72,6 @@ export function shadowData(
   const result = { ...base, ...data };
   result._data = result as PageDataCommon;
   return result as PageData;
-}
-
-type ScanOptions = {
-  /**
-   * 匹配的目錄或檔案
-   */
-  match?: RegExp;
-  /**
-   * 遞迴掃描
-   * @default false
-   */
-  recursive?: boolean;
-};
-
-/**
- * 掃描目標目錄，返回檔案或目錄的路徑
- */
-export function scanDir(dir: string, options?: ScanOptions): string[] {
-  if (!fs.existsSync(dir)) {
-    return [];
-  }
-
-  const { recursive = false } = options || {};
-  // 避免 g-flag 造成 .test() 受 lastIndex 影響
-  const match = options?.match
-    ? new RegExp(options.match.source, options.match.flags.replace('g', ''))
-    : undefined;
-
-  const out: string[] = [];
-  const items = fs.readdirSync(dir, { withFileTypes: true }); // Dirent, 無需再 statSync
-
-  for (const ent of items) {
-    const full = path.join(dir, ent.name);
-
-    if (ent.isDirectory()) {
-      // **重點：無論目錄名是否匹配，都先遞迴**
-      if (recursive) {
-        out.push(...scanDir(full, options));
-      }
-
-      // 是否把這個「目錄本身」放進結果，再看 match
-      if (!match || match.test(ent.name)) {
-        out.push(full);
-      }
-    } else if (!match || match.test(ent.name)) {
-      out.push(full);
-    }
-  }
-
-  return out;
 }
 
 interface ImportStatementOptions {

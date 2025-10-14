@@ -2,6 +2,8 @@ import {
   relative as _relative,
   resolve as _resolve,
   join as _join,
+  dirname as _dirname,
+  basename as _basename,
 } from 'node:path';
 import { normalizePath } from 'vite';
 import { workspaceRoot, readCachedProjectGraph } from '@nx/devkit';
@@ -16,6 +18,14 @@ export function join(...paths: string[]) {
 
 export function relative(from: string, to: string) {
   return normalizePath(_relative(from, to));
+}
+
+export function dirname(path: string) {
+  return normalizePath(_dirname(path));
+}
+
+export function basename(path: string, suffix?: string) {
+  return normalizePath(_basename(path, suffix));
 }
 
 export function getPath(...paths: string[]) {
