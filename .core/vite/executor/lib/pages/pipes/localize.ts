@@ -10,6 +10,7 @@ import {
   basename,
   getProjectPath,
   isHiddenFile,
+  join,
   scanDir,
 } from '@landing-page-sdk/utils-node';
 import { REGEXP, shadowData } from '../../common';
@@ -59,6 +60,7 @@ export default async function (
     pages.push({
       name: 'redirect',
       filename: 'index.html',
+      rootFilename: '/index.html',
       template: getProjectPath('@landing-page-sdk/assets/redirect/index.html'),
       entry: getProjectPath(
         `@landing-page-sdk/assets/redirect/${route.mode}.ts`
@@ -81,10 +83,12 @@ export default async function (
 
       if (route.mode === 'tree') {
         filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
+        page.rootFilename = join('/', lang, page.rootFilename);
       } else if (route.mode === 'flat') {
         filename = isMultiLang
           ? page.filename.replace('.html', `_${lang}.html`)
           : page.filename;
+        page.rootFilename = join('/', filename);
       }
 
       page.name = isMultiLang ? `${lang}:${page.name}` : page.name;
@@ -118,6 +122,7 @@ export default async function (
         pages.push({
           name: `${_page.name}:stub`,
           filename: _page.filename,
+          rootFilename: join('/', _page.filename),
           template: getProjectPath(
             '@landing-page-sdk/assets/redirect/stub.html'
           ),

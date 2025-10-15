@@ -47,6 +47,7 @@ export default async function (
       filename = relDir ? routeOpt.flatFileNaming(relDir) : 'index.html';
     }
 
+    const rootFilename = join('/', filename);
     // 將絕對路徑換成相對於 root 的 template 路徑
     const template = file.replace(root, '').replace(/^[/\\]/, '');
     // 尋找對應入口作為可選 entry
@@ -84,6 +85,7 @@ export default async function (
       name,
       route,
       filename,
+      rootFilename,
       template,
       ...(entry && { entry }),
       data: shadowData(data),

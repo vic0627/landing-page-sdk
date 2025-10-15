@@ -65,6 +65,10 @@ export interface Page {
    */
   filename: string;
   /**
+   * 頁面的輸出檔名（根）
+   */
+  rootFilename: string;
+  /**
    * 對應的模板實體檔案路徑（相對於專案根）
    */
   template: string;

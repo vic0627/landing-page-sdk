@@ -15,7 +15,7 @@ const ASSETS = '__ASSETS__';
 const name = 'vite-plugin-render-build-url';
 
 export default (({ pagesInfo, cliOption, siteConfig }) => {
-  const { versioning, assetsResolution: baseType } = siteConfig.output;
+  const { versioning, assetsResolution: resolution } = siteConfig.output;
   const routeMode = siteConfig.route.mode;
   const sites = Object.keys(pagesInfo.sites);
 
@@ -57,7 +57,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
   ): string => {
     let render = path;
 
-    if (baseType === 'rel') {
+    if (resolution === 'rel') {
       switch (type) {
         case 'html':
           const rel = rootRel(filename);
@@ -90,7 +90,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
 
   log(
     `Static asset path mode: ${chalk.green(
-      baseType === 'rel' ? 'relative' : 'absolute'
+      resolution === 'rel' ? 'relative' : 'absolute'
     )}`
   );
 
