@@ -1,24 +1,27 @@
-import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
+import { ViteMockOptions } from 'vite-plugin-mock';
+import { isString } from 'lodash-es';
 import {
   NormalizedSiteConfig,
   PageData,
   PageDataCommon,
   SiteContext,
   SiteConfig,
-  RouteOption,
 } from '@landing-page-sdk/types';
 import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
-import { ViteMockOptions } from 'vite-plugin-mock';
-import { isString } from 'lodash-es';
 
 export async function readRawSiteConfig(
   filePath = 'site.config.js'
 ): Promise<SiteConfig> {
-  // filePath = getPath(filePath);
-  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) return {};
-  return ((await import(getPath(filePath)))?.default ?? {}) as SiteConfig;
+  const isFile = (await fsp.stat(filePath)).isFile();
+
+  if (!isFile) return {};
+
+  const mod = await import(getPath(filePath));
+
+  return (mod?.default ?? {}) as SiteConfig;
 }
 
 export const REGEXP = {

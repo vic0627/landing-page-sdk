@@ -8,6 +8,8 @@ import chalk from 'chalk';
 const BASE = '/__BASE__/';
 const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
 const CSS_URL_RE = /url\(\s*(?:["'])?\/__BASE__\/([^)"']+)(?:["'])?\s*\)/g;
+const JS_IMPORT_RE =
+  /(import\s+(?:[\s\S]*?\s+from\s+)?)["']([^"']+)["'](.*?;?)/g;
 const ASSETS = '__ASSETS__';
 
 const name = 'vite-plugin-render-build-url';
@@ -19,9 +21,9 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
 
   const outputFilenames: Record<string, string> = {
     hard: {
-      entryFileNames: `${ASSETS}/[name].[hash].js`,
-      chunkFileNames: `${ASSETS}/[name].[hash].js`,
-      assetFileNames: `${ASSETS}/[name].[hash].[ext]`,
+      entryFileNames: `${ASSETS}/[name]-[hash].js`,
+      chunkFileNames: `${ASSETS}/[name]-[hash].js`,
+      assetFileNames: `${ASSETS}/[name]-[hash].[ext]`,
     },
     soft: {
       entryFileNames: `${ASSETS}/[name].js`,
@@ -53,27 +55,32 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     path: string,
     type: string
   ): string => {
-    const rel = rootRel(filename);
-    let renderFilename = '/' + path;
+    let render = path;
 
     if (baseType === 'rel') {
       switch (type) {
         case 'html':
-          renderFilename = (routeMode === 'flat' ? '.' : rel) + renderFilename;
-
+          const rel = rootRel(filename);
+          render = (routeMode === 'flat' ? '.' : rel) + '/' + render;
           break;
         case 'css':
-          renderFilename = '..' + renderFilename;
-
+          render = '../' + render;
+          break;
+      }
+    } else {
+      switch (type) {
+        case 'js':
+          const [, path] = render.split('/');
+          render = `/${ASSETS}/` + path;
           break;
       }
     }
 
     if (versioning === 'soft') {
-      renderFilename += `?v=${hash}`;
+      render += `?v=${hash}`;
     }
 
-    return renderFilename;
+    return render;
   };
 
   const log = namedLogger({
@@ -105,10 +112,11 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
           !asset ||
           (typeof asset.source !== 'string' && !Buffer.isBuffer(asset.source))
         ) {
-          // js doesn't support path transformation
           const asset = bundle[filename] as OutputChunk;
-          const rel = baseType === 'rel' ? './' : '/';
-          asset.code = asset.code.replace(new RegExp(BASE, 'g'), rel);
+          asset.code = asset.code.replace(JS_IMPORT_RE, (_, pre, rel, post) => {
+            rel = JSON.stringify(transformPath(filename, rel, 'js'));
+            return pre + rel + post;
+          });
 
           continue;
         }
@@ -122,8 +130,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
           });
         } else if (filename.endsWith('.html')) {
           content = content.replace(HTML_BASE_RE, (_, rel) => {
-            rel = transformPath(filename, rel, 'html');
-            return rel;
+            return transformPath(filename, rel, 'html');
           });
         }
 
@@ -132,18 +139,3 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     },
   };
 }) satisfies SDKPlugin;
-
-function parseOption<T1, T2, K extends keyof T1 & keyof T2>(
-  o1: T1,
-  o2: T2,
-  k: K,
-  defaultVal: T1[K] | T2[K]
-) {
-  let value = o1[k] ?? defaultVal;
-
-  if (o2[k]) {
-    value = o2[k];
-  }
-
-  return value!;
-}
