@@ -1,12 +1,11 @@
+import { createWriteStream } from 'node:fs';
+import fsp from 'node:fs/promises';
+import { Readable } from 'node:stream';
 import chalk from 'chalk';
 import { isPlainObject, isString, merge, pick } from 'lodash-es';
 import { SitemapStream, SitemapIndexStream, streamToPromise } from 'sitemap';
-import { Readable } from 'node:stream';
-import { createWriteStream } from 'node:fs';
-import { promises as fsp } from 'node:fs';
-import { join } from 'node:path';
 import { Page, SiteContext, SitemapOption } from '@landing-page-sdk/types';
-import { getPathFromRoot } from '@landing-page-sdk/utils-node';
+import { getPathFromRoot, join } from '@landing-page-sdk/utils-node';
 import { namedLogger, REGEXP } from '../common';
 
 const log = namedLogger({ name: 'sitemap-generator', verbose: true });

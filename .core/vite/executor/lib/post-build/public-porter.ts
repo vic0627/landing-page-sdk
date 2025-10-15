@@ -1,17 +1,8 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { namedLogger } from '../common';
+import * as fs from 'node:fs/promises';
 import chalk from 'chalk';
-import { SiteContext } from '.core/types';
-
-type Options = {
-  outDir: string;
-  sites: Record<string, string>;
-  publicDir?: string; // default: 'public'
-  thresholdBytes?: number; // default: 256 * 1024 (256 KB)
-};
-
-const DEFAULT_PUBLIC = 'public';
+import { SiteContext } from '@landing-page-sdk/types';
+import { namedLogger } from '../common';
 
 // 依你的需求調整：常見「多媒體資產」副檔名（大小寫不敏感）
 const MEDIA_EXTS = new Set([

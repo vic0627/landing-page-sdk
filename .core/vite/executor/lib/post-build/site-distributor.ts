@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import { SiteContext } from '@landing-page-sdk/types';
 import { scanDir } from '@landing-page-sdk/utils-node';
 import { namedLogger } from '../common';
-import { SiteContext } from '.core/types';
 
 type DistInfo = {
   path: string;
@@ -26,7 +26,7 @@ export default async (ctx: SiteContext, outDir: string) => {
     return;
   }
 
-  const dist = scanDir(outDir);
+  const dist = await scanDir(outDir);
   const distInfo: DistInfo[] = dist.map((d) => {
     const stat = fs.statSync(d);
     const isDir = stat.isDirectory();
