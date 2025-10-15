@@ -8,14 +8,14 @@ import {
   SitemapOption,
   SiteConfig,
 } from './options';
-import { AssetsBaseType, MinifyTargets, Versioning } from './types';
+import { Resolution, MinifyTargets, Versioning } from './types';
 
 export type NormalizedRouteOption = Required<RouteOption>;
 
 export interface NormalizedOutputOption {
   minify: Record<MinifyTargets, boolean>;
   versioning: Versioning;
-  assets: AssetsBaseType;
+  assetsResolution: Resolution;
   threshold: number;
 }
 

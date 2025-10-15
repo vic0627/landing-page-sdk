@@ -28,8 +28,8 @@ export default (function (opt, cfg) {
       opt.output.versioning = 'soft';
     }
 
-    if (output.assets === 'rel') {
-      opt.output.assets = 'rel';
+    if (output.assetsResolution === 'rel') {
+      opt.output.assetsResolution = 'rel';
     }
 
     if (isNumber(output.threshold)) {

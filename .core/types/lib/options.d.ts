@@ -5,7 +5,7 @@ import {
   Phase,
   HTMLAppendTarget,
   Versioning,
-  AssetsBaseType,
+  Resolution,
   MinifyTargets,
   RouteMode,
   DestOrientation,
@@ -154,7 +154,7 @@ export interface OutputOption {
    * JS 檔因技術限制，僅支援在 `/` 與 `./` 兩種前綴間互換。
    * @default 'abs'
    */
-  assets?: AssetsBaseType;
+  assetsResolution?: Resolution;
   /**
    * 多媒體資產大小警示閥值 (單位：Byte)
    * @description
@@ -165,6 +165,7 @@ export interface OutputOption {
 
 export interface RouteOption {
   mode?: RouteMode;
+  resolution?: Resolution;
   orientation?: DestOrientation;
   flatFileNaming?: (relDir: string) => string
 }

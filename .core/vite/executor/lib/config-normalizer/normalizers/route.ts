@@ -11,6 +11,10 @@ export default (function (opt, cfg) {
       opt.route.mode = 'flat';
     }
 
+    if (route.resolution === 'abs') {
+      opt.route.resolution = 'abs';
+    }
+
     if (route.orientation === 'file') {
       opt.route.orientation = 'file';
     }

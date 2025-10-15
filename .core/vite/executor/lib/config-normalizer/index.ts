@@ -14,6 +14,7 @@ const normalizer: SiteConfigNormalizer = (cfg) => {
   const opt: NormalizedSiteConfig = {
     route: {
       mode: 'tree',
+      resolution: 'rel',
       orientation: 'dir',
       flatFileNaming: (relDir) => relDir.replace(/\//g, '_') + '.html',
     },
@@ -24,7 +25,7 @@ const normalizer: SiteConfigNormalizer = (cfg) => {
         css: true,
       },
       versioning: 'hard',
-      assets: 'abs',
+      assetsResolution: 'abs',
       threshold: 0,
     },
     redirect: {

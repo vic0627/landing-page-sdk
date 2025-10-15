@@ -15,7 +15,7 @@ const ASSETS = '__ASSETS__';
 const name = 'vite-plugin-render-build-url';
 
 export default (({ pagesInfo, cliOption, siteConfig }) => {
-  const { versioning, assets: baseType } = siteConfig.output;
+  const { versioning, assetsResolution: baseType } = siteConfig.output;
   const routeMode = siteConfig.route.mode;
   const sites = Object.keys(pagesInfo.sites);
 

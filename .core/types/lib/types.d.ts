@@ -8,7 +8,7 @@ export type MinifyTargets = 'html' | 'js' | 'css';
 
 export type Versioning = 'hard' | 'soft';
 
-export type AssetsBaseType = 'abs' | 'rel';
+export type Resolution = 'abs' | 'rel';
 
 export type DestOrientation = 'file' | 'dir';
 
