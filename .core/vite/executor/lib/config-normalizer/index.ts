@@ -16,7 +16,14 @@ const normalizer: SiteConfigNormalizer = (cfg) => {
       mode: 'tree',
       resolution: 'rel',
       orientation: 'dir',
-      flatFileNaming: (relDir) => relDir.replace(/\//g, '_') + '.html',
+      flatFileNaming(phase, nameOrDir, lang) {
+        if (phase === 'init') {
+          nameOrDir = nameOrDir.replace(/\//g, '_');
+        } else if (phase === 'localize') {
+          nameOrDir = nameOrDir + '_' + lang;
+        }
+        return nameOrDir;
+      },
     },
     output: {
       minify: {

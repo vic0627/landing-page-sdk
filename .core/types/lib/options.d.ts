@@ -167,7 +167,11 @@ export interface RouteOption {
   mode?: RouteMode;
   resolution?: Resolution;
   orientation?: DestOrientation;
-  flatFileNaming?: (relDir: string) => string
+  flatFileNaming?(
+    phase: 'init' | 'localize',
+    dirOrName: string,
+    lang?: string
+  ): string;
 }
 
 export interface SourcePathOption {
