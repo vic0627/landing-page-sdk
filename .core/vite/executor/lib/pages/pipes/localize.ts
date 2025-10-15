@@ -1,6 +1,5 @@
-import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import { readJsonFile } from '@nx/devkit';
-import { cloneDeep } from 'lodash-es';
 import {
   BuildPageOption,
   I18nInfo,
@@ -15,13 +14,19 @@ import {
 } from '@landing-page-sdk/utils-node';
 import { REGEXP, shadowData } from '../../common';
 
-export default function (
+export default async function (
   buildPageOption: BuildPageOption,
   pages: Page[]
-): I18nInfo {
+): Promise<I18nInfo> {
   const { route, sourcePath, redirect } = buildPageOption.cfg;
 
-  const files = scanDir(sourcePath.i18n, { match: REGEXP.JSON });
+  const rawFiles = await scanDir(sourcePath.i18n, { match: REGEXP.JSON });
+  const predicates = await Promise.all(
+    rawFiles.map(
+      async (raw) => (await fsp.stat(raw)).isFile() && !isHiddenFile(raw)
+    )
+  );
+  const files = rawFiles.filter((_, i) => predicates[i]);
 
   const langInfo: I18nInfo = {
     langs: [],
@@ -34,10 +39,6 @@ export default function (
 
   // 語言包資訊初始化
   for (const file of files) {
-    if (!fs.statSync(file).isFile() || isHiddenFile(file)) {
-      continue;
-    }
-
     const lang = basename(file, '.json');
     const content = readJsonFile(file);
     langInfo.langs.push(lang);
@@ -73,7 +74,8 @@ export default function (
   let stubbed = false;
   for (const lang of langInfo.langs) {
     for (const _page of originalPages) {
-      const page = cloneDeep(_page);
+      // const page = cloneDeep(_page);
+      const page = { ..._page };
 
       let filename!: string;
 

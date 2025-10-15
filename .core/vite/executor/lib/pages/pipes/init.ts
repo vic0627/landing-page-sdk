@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import { BuildPageOption, Page } from '@landing-page-sdk/types';
 import {
   getPath,
@@ -10,30 +10,33 @@ import {
 } from '@landing-page-sdk/utils-node';
 import { REGEXP, shadowData } from '../../common';
 
-export default function (buildPageOption: BuildPageOption): Page[] {
+export default async function (
+  buildPageOption: BuildPageOption
+): Promise<Page[]> {
   const { route: routeOpt, sourcePath, env } = buildPageOption.cfg;
 
   const root = getPath();
-  const pages: Page[] = [];
 
   // 用 scanDir 掃描出所有 index.html / index.ejs（含子目錄）
-  const files = scanDir(sourcePath.pages, {
+  const files = await scanDir(sourcePath.pages, {
     match: REGEXP.TEMPLATE,
     recursive: true,
   });
 
-  for (const file of files) {
-    // scanDir 只比對 name，保險起見仍確認「是檔案」
-    if (!fs.statSync(file).isFile()) {
-      continue;
-    }
+  const pagePromises = files.map(async (file) => {
+    if (!(await fsp.stat(file)).isFile()) return;
 
     const currentDir = dirname(file);
-    const relDir = relative(sourcePath.pages, currentDir); // '' 或 'about/contact'
-    const name =
-      relDir === ''
-        ? 'index' // 主頁
-        : relDir.split('/').join(':'); // 其餘頁面
+    let relDir = relative(sourcePath.pages, currentDir); // '.' 或 'about/contact'
+
+    // 主頁特規處理
+    if (relDir === '.') {
+      relDir = '';
+    }
+
+    const name = relDir
+      ? relDir.split('/').join(':') // 其餘頁面
+      : 'index'; // 主頁
     const route = relDir ? '/' + relDir : '/';
 
     let filename!: string;
@@ -46,15 +49,19 @@ export default function (buildPageOption: BuildPageOption): Page[] {
 
     // 將絕對路徑換成相對於 root 的 template 路徑
     const template = file.replace(root, '').replace(/^[/\\]/, '');
-
     // 尋找對應入口作為可選 entry
     const entryJs = join(currentDir, 'main.js');
     const entryTs = join(currentDir, 'main.ts');
-    let entry = fs.existsSync(entryJs)
-      ? entryJs.replace(root, '')
-      : fs.existsSync(entryTs)
-      ? entryTs.replace(root, '')
-      : undefined;
+    let entry: string | undefined;
+    try {
+      await fsp.access(entryJs);
+      entry = entryJs;
+    } catch {
+      try {
+        await fsp.access(entryTs);
+        entry = entryTs;
+      } catch {}
+    }
 
     if (entry && !entry.startsWith('/')) {
       entry = `/${entry}`;
@@ -73,15 +80,15 @@ export default function (buildPageOption: BuildPageOption): Page[] {
       },
     };
 
-    pages.push({
+    return {
       name,
       route,
       filename,
       template,
       ...(entry && { entry }),
       data: shadowData(data),
-    });
-  }
+    } as Page;
+  });
 
-  return pages;
+  return (await Promise.all(pagePromises)).filter((page) => !!page);
 }

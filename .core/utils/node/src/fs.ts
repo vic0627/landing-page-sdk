@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { promises as fsp } from 'node:fs';
 import { parse } from 'node:path';
 import { getProjectPath, join } from './path';
 
@@ -20,41 +21,46 @@ type ScanOptions = {
 };
 
 /**
- * 掃描目標目錄，返回檔案或目錄的路徑
+ * 非同步掃描目標目錄，返回檔案或目錄的路徑
  */
-export function scanDir(dir: string, options?: ScanOptions): string[] {
-  if (!existsSync(dir)) {
+export async function scanDir(
+  dir: string,
+  options?: ScanOptions
+): Promise<string[]> {
+  try {
+    const { recursive = false } = options || {};
+    // 避免 g-flag 造成 .test() 受 lastIndex 影響
+    const match = options?.match
+      ? new RegExp(options.match.source, options.match.flags.replace('g', ''))
+      : undefined;
+
+    const items = await fsp.readdir(dir, { withFileTypes: true });
+
+    const promises = items.map(async (ent) => {
+      const full = join(dir, ent.name);
+      const results: string[] = [];
+
+      if (ent.isDirectory()) {
+        // **重點：無論目錄名是否匹配，都先遞迴**
+        if (recursive) {
+          results.push(...(await scanDir(full, options)));
+        }
+
+        // 是否把這個「目錄本身」放進結果，再看 match
+        if (!match || match.test(ent.name)) {
+          results.push(full);
+        }
+      } else if (!match || match.test(ent.name)) {
+        results.push(full);
+      }
+      return results;
+    });
+
+    return (await Promise.all(promises)).flat();
+  } catch (error) {
+    // 當目錄不存在或無權限時，readdir 會拋出錯誤，此時回傳空陣列，行為與同步版本一致
     return [];
   }
-
-  const { recursive = false } = options || {};
-  // 避免 g-flag 造成 .test() 受 lastIndex 影響
-  const match = options?.match
-    ? new RegExp(options.match.source, options.match.flags.replace('g', ''))
-    : undefined;
-
-  const out: string[] = [];
-  const items = readdirSync(dir, { withFileTypes: true }); // Dirent, 無需再 statSync
-
-  for (const ent of items) {
-    const full = join(dir, ent.name);
-
-    if (ent.isDirectory()) {
-      // **重點：無論目錄名是否匹配，都先遞迴**
-      if (recursive) {
-        out.push(...scanDir(full, options));
-      }
-
-      // 是否把這個「目錄本身」放進結果，再看 match
-      if (!match || match.test(ent.name)) {
-        out.push(full);
-      }
-    } else if (!match || match.test(ent.name)) {
-      out.push(full);
-    }
-  }
-
-  return out;
 }
 
 type StringOptions = {

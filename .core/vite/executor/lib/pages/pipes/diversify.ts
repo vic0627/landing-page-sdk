@@ -1,17 +1,17 @@
 import path from 'node:path';
+import { fromPairs } from 'lodash-es';
 import { BuildPageOption, Page } from '@landing-page-sdk/types';
-import { cloneDeep, fromPairs } from 'lodash-es';
-import { REGEXP, shadowData } from '../../common';
 import { isHiddenFile, scanDir, relative } from '@landing-page-sdk/utils-node';
+import { REGEXP, shadowData } from '../../common';
 
-export default function (
+export default async function (
   buildPageOption: BuildPageOption,
   pages: Page[]
-): Record<string, string> {
+): Promise<Record<string, string>> {
   const { sites: _requiredSites, mode } = buildPageOption.cli;
   const { sourcePath } = buildPageOption.cfg;
 
-  const files = scanDir(sourcePath.sites, { match: REGEXP.SCRIPT });
+  const files = await scanDir(sourcePath.sites, { match: REGEXP.SCRIPT });
 
   if (!files.length) {
     return {};
@@ -19,16 +19,16 @@ export default function (
 
   const requiredSites = _requiredSites?.split(',');
   const sites = files
-    .filter((p) => !isHiddenFile(p))
     .map((p) => {
       const _path = p.startsWith('/') ? p : `/${p}`;
       const [name, alias = ''] = path.parse(_path).name.split('.');
+      const keep =
+        !isHiddenFile(p) &&
+        (requiredSites?.length ? requiredSites.includes(name) : true);
 
-      return { path: _path, name, alias };
+      return keep && { path: _path, name, alias };
     })
-    .filter(({ name }) =>
-      requiredSites?.length ? requiredSites.includes(name) : true
-    );
+    .filter((x) => !!x);
 
   if (!sites.length) {
     return {};
@@ -39,7 +39,8 @@ export default function (
 
   for (const { path: sitePath, name, alias } of sites) {
     for (const _page of originalPages) {
-      const page = cloneDeep(_page);
+      // const page = cloneDeep(_page);
+      const page = { ..._page };
       const filename = `${mode === 'dev' && alias ? alias : name}/${
         page.filename
       }`;
