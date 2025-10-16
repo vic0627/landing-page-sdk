@@ -1,7 +1,23 @@
-import { readFileSync, writeFileSync } from 'node:fs';
-import { promises as fsp } from 'node:fs';
+import { readFileSync, writeFileSync, statSync } from 'node:fs';
+import fsp from 'node:fs/promises';
 import { parse } from 'node:path';
 import { resolveProj, join } from './path';
+
+export async function isDir(path: string) {
+  try {
+    return (await fsp.stat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+export function isDirSync(path: string) {
+  try {
+    return statSync(path).isDirectory();
+  } catch {
+    return false;
+  }
+}
 
 export function isHiddenFile(filePath: string) {
   const filename = parse(filePath).name;

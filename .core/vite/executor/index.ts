@@ -59,6 +59,7 @@ export async function teardown() {
       previewServer = null;
     }
   } catch {}
+  siteConfig = null;
 }
 
 export async function main(
@@ -79,7 +80,7 @@ export async function main(
   );
   const cacheDir = resolveRoot('node_modules/.vite-cache');
   const alias = { '@': resolve('src') };
-  const openTarget = pagesInfo.pages[0]!.filename as string;
+  // const openTarget = pagesInfo.pages[0]!.filename as string;
   const outDir = resolveRoot('dist');
 
   // shared
@@ -94,7 +95,7 @@ export async function main(
     renderBuiltUrl(siteContext),
     autoController(siteContext),
     redirect(siteContext),
-    viteMockServe(mockOptions(siteContext)),
+    viteMockServe(await mockOptions(siteContext)),
     routerLink(siteContext),
   ]);
 
