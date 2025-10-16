@@ -1,9 +1,9 @@
-import { set } from 'lodash-es';
+import { findIndex, set } from 'lodash-es';
 import { OutputAsset, OutputChunk } from 'rollup';
-import { SDKPlugin } from '@landing-page-sdk/types';
-import { base62Hash } from '@landing-page-sdk/utils-node';
-import { namedLogger } from '../common';
 import chalk from 'chalk';
+import { MinifyTargets, Page, SDKPlugin } from '@landing-page-sdk/types';
+import { base62Hash, join } from '@landing-page-sdk/utils-node';
+import { namedLogger } from '../common';
 
 const BASE = '/__BASE__/';
 const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
@@ -53,7 +53,8 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
   const transformPath = (
     filename: string,
     path: string,
-    type: string
+    type: MinifyTargets,
+    page?: Page
   ): string => {
     let render = path;
 
@@ -61,17 +62,19 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
       switch (type) {
         case 'html':
           const rel = rootRel(filename);
-          render = (routeMode === 'flat' ? '.' : rel) + '/' + render;
+          render = join(`${routeMode === 'flat' ? '.' : rel}/`, render);
           break;
         case 'css':
-          render = '../' + render;
+          render = join('../', render);
           break;
       }
     } else {
       switch (type) {
-        case 'js':
-          const [, path] = render.split('/');
-          render = `/${ASSETS}/` + path;
+        case 'html':
+          render = join('/', page?.data?.alias ?? '', render);
+          break;
+        case 'css':
+          render = join('../', render);
           break;
       }
     }
@@ -129,8 +132,9 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
             return `url(${JSON.stringify(rel)})`;
           });
         } else if (filename.endsWith('.html')) {
+          const page = pagesInfo.pages.find((p) => p.filename === filename);
           content = content.replace(HTML_BASE_RE, (_, rel) => {
-            return transformPath(filename, rel, 'html');
+            return transformPath(filename, rel, 'html', page);
           });
         }
 

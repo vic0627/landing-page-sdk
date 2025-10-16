@@ -10,7 +10,7 @@ import {
   SiteContext,
   SiteConfig,
 } from '@landing-page-sdk/types';
-import { getPath, getProjectPath } from '@landing-page-sdk/utils-node';
+import { getPath, getProjectPath, loadHMR } from '@landing-page-sdk/utils-node';
 
 export async function readRawSiteConfig(
   filePath = 'site.config.js'
@@ -19,14 +19,14 @@ export async function readRawSiteConfig(
 
   if (!isFile) return {};
 
-  const mod = await import(getPath(filePath));
+  const mod = loadHMR(getPath(filePath));
 
   return (mod?.default ?? {}) as SiteConfig;
 }
 
 export const REGEXP = {
-  JSON: /\.json$/,
-  SCRIPT: /\.(js|ts)$/,
+  JSON: /^[^\s]+\.json$/,
+  SCRIPT: /^[^\s]+\.(?:js|ts)$/,
   TEMPLATE: /^index\.(html|ejs)$/i,
   HTML: /\.html$/,
   EJS: /\.ejs$/,

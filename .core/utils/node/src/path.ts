@@ -45,8 +45,9 @@ export function getProjectPath(projPath: string): string {
     '/',
     projPath.startsWith('@') ? projPath.indexOf('/') + 1 : undefined
   );
-  const name = projPath.slice(0, slashIdx);
-  const sub = projPath.slice(slashIdx + 1);
+  const noSlash = slashIdx === -1;
+  const name = projPath.slice(0, noSlash ? projPath.length : slashIdx);
+  const sub = projPath.slice(noSlash ? projPath.length : slashIdx + 1);
 
   if (!name) {
     throw new Error(`failed to parse project path ${projPath}`);

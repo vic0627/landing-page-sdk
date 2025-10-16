@@ -8,11 +8,14 @@ import {
   PreviewServer,
   InlineConfig,
 } from 'vite';
-// import viteRestart from 'vite-plugin-restart';
 import chalk from 'chalk';
-import { merge, pick, set } from 'lodash-es';
+import { isString, merge, pick, set } from 'lodash-es';
 import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
-import { SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
+import {
+  NormalizedSiteConfig,
+  SiteContext,
+  ViteExecutorSchema,
+} from '@landing-page-sdk/types';
 import {
   readRawSiteConfig,
   rewrites,
@@ -37,6 +40,11 @@ import routerLink from './lib/plugins/router-link';
 
 let devServer: ViteDevServer | null = null;
 let previewServer: PreviewServer | null = null;
+let siteConfig: NormalizedSiteConfig | null = null;
+
+export function getSiteConfig() {
+  return siteConfig;
+}
 
 export async function teardown() {
   try {
@@ -59,7 +67,7 @@ export async function main(
 ) {
   // create site context
   const rawSiteConfig = await readRawSiteConfig(cliOption.config);
-  const siteConfig = configNormalizer(rawSiteConfig);
+  siteConfig = configNormalizer(rawSiteConfig);
   const pagesInfo = await createPages({ cli: cliOption, cfg: siteConfig });
   const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
 
@@ -96,12 +104,12 @@ export async function main(
   // server
   set(config, 'server.host', cliOption.host);
   set(config, 'server.port', cliOption.port);
-  set(config, 'server.open', openTarget);
+  // set(config, 'server.open', openTarget);
 
   // preview
   set(config, 'preview.host', cliOption.host);
   set(config, 'preview.port', cliOption.port);
-  set(config, 'preview.open', openTarget);
+  // set(config, 'preview.open', openTarget);
 
   // build
   set(config, 'build.outDir', outDir);
@@ -121,11 +129,6 @@ export async function main(
   switch (cliOption.mode) {
     case 'dev':
       config.plugins?.push(mpaPlugin);
-      // config.plugins?.push(
-      //   viteRestart({
-      //     restart: [cliOption.config ?? 'site.config.js'],
-      //   })
-      // );
       devServer = await createServer(config);
       await devServer.listen();
       devServer.printUrls();
