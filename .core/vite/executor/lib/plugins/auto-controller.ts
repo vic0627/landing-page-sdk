@@ -2,8 +2,8 @@ import { isString, omitBy } from 'lodash-es';
 import { JSDOM } from 'jsdom';
 import {
   bundleInlineSync,
-  getPath,
-  getProjectPath,
+  resolve,
+  resolveProj,
   readFileAsString,
 } from '@landing-page-sdk/utils-node';
 import {
@@ -115,7 +115,7 @@ async function inlineTransform(
     const id = btoa(JSON.stringify(opt));
 
     if (!scriptMap.has(id)) {
-      const filename = getProjectPath(toControllerName(name));
+      const filename = resolveProj(toControllerName(name));
 
       if (injection.bundle) {
         const script = await bundleInlineSync(filename, data);
@@ -146,7 +146,7 @@ async function inlineTransform(
 function findEntryById(pages: Page[], id: string) {
   let entryInfo: Page | undefined;
   if (id.includes('/main.js')) {
-    id = id.replace(getPath(), '');
+    id = id.replace(resolve(), '');
     entryInfo = pages.find((p) => p.entry === id);
   } else if (id.includes('.html')) {
     id = id.slice(1);

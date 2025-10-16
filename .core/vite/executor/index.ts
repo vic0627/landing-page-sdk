@@ -9,8 +9,8 @@ import {
   InlineConfig,
 } from 'vite';
 import chalk from 'chalk';
-import { isString, merge, pick, set } from 'lodash-es';
-import { getPath, getPathFromRoot } from '@landing-page-sdk/utils-node';
+import { merge, pick, set } from 'lodash-es';
+import { resolve, resolveRoot } from '@landing-page-sdk/utils-node';
 import {
   NormalizedSiteConfig,
   SiteContext,
@@ -77,10 +77,10 @@ export async function main(
   const define = parseEnv(
     merge(pick(pagesInfo.langInfo, 'langs'), siteConfig.env)
   );
-  const cacheDir = getPathFromRoot('node_modules/.vite-cache');
-  const alias = { '@': getPath('src') };
+  const cacheDir = resolveRoot('node_modules/.vite-cache');
+  const alias = { '@': resolve('src') };
   const openTarget = pagesInfo.pages[0]!.filename as string;
-  const outDir = getPathFromRoot('dist');
+  const outDir = resolveRoot('dist');
 
   // shared
   set(config, 'mode', cliOption.mode);

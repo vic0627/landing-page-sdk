@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { promises as fsp } from 'node:fs';
 import { parse } from 'node:path';
-import { getProjectPath, join } from './path';
+import { resolveProj, join } from './path';
 
 export function isHiddenFile(filePath: string) {
   const filename = parse(filePath).name;
@@ -75,7 +75,7 @@ export function readFileAsString(
   options?: StringOptions
 ): string {
   try {
-    filePath = getProjectPath(filePath);
+    filePath = resolveProj(filePath);
   } catch {}
 
   const { encoding = 'utf-8', start, end } = options ?? {};
@@ -87,7 +87,7 @@ export function writeJsonFile(filePath: string, content: object) {
   const jsonString = JSON.stringify(content);
 
   try {
-    filePath = getProjectPath(filePath);
+    filePath = resolveProj(filePath);
   } catch {}
 
   writeFileSync(filePath, jsonString);

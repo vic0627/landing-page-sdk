@@ -28,19 +28,11 @@ export function basename(path: string, suffix?: string) {
   return normalizePath(_basename(path, suffix));
 }
 
-export function getPath(...paths: string[]) {
-  return resolve(process.cwd(), ...paths);
+export function resolveRoot(...paths: string[]) {
+  return join(workspaceRoot, ...paths);
 }
 
-export function getPathFromRoot(...paths: string[]) {
-  return resolve(workspaceRoot, ...paths);
-}
-
-export function getRelPathFromRoot(...paths: string[]) {
-  return relative(getPath(), getPathFromRoot(...paths));
-}
-
-export function getProjectPath(projPath: string): string {
+export function resolveProj(projPath: string): string {
   const slashIdx = projPath.indexOf(
     '/',
     projPath.startsWith('@') ? projPath.indexOf('/') + 1 : undefined

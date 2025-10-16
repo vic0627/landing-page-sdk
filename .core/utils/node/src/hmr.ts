@@ -17,7 +17,7 @@ function purgeTree(entryAbs: string, seen = new Set<string>()) {
   delete require.cache[entryAbs];
 }
 
-export function loadHMR(specifier: string) {
+export function loadHMR<MOD>(specifier: string): MOD {
   // 解析到實檔（ts/tsx/js都可以，pirates 會接手轉譯）
   const abs = require.resolve(specifier);
   // 砍掉 CJS 快取

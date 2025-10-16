@@ -8,7 +8,7 @@ import {
 } from '@landing-page-sdk/types';
 import {
   basename,
-  getProjectPath,
+  resolveProj,
   isHiddenFile,
   join,
   scanDir,
@@ -42,7 +42,7 @@ export default async function (
   // 語言包資訊初始化
   for (const file of files) {
     const lang = basename(file, '.json');
-    const content = readJsonFile(file);
+    const content = readJsonFile<I18nLangPack>(file);
     langInfo.langs.push(lang);
     langInfo.langPack[lang] = content;
   }
@@ -62,8 +62,8 @@ export default async function (
       name: 'redirect',
       filename: 'index.html',
       rootFilename: '/index.html',
-      template: getProjectPath('@landing-page-sdk/assets/redirect/index.html'),
-      entry: getProjectPath(
+      template: resolveProj('@landing-page-sdk/assets/redirect/index.html'),
+      entry: resolveProj(
         `@landing-page-sdk/assets/redirect/${route.mode}.ts`
       ),
       data: shadowData({
@@ -126,10 +126,10 @@ export default async function (
           name: `${_page.name}:stub`,
           filename: _page.filename,
           rootFilename: join('/', _page.filename),
-          template: getProjectPath(
+          template: resolveProj(
             '@landing-page-sdk/assets/redirect/stub.html'
           ),
-          entry: getProjectPath('@landing-page-sdk/assets/redirect/stub.ts'),
+          entry: resolveProj('@landing-page-sdk/assets/redirect/stub.ts'),
           data: shadowData({
             filename: _page.filename,
             lang,

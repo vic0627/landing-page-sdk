@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { isPlainObject, isString, merge, pick } from 'lodash-es';
 import { SitemapStream, SitemapIndexStream, streamToPromise } from 'sitemap';
 import { Page, SiteContext, SitemapOption } from '@landing-page-sdk/types';
-import { getPathFromRoot, join } from '@landing-page-sdk/utils-node';
+import { resolveRoot, join } from '@landing-page-sdk/utils-node';
 import { namedLogger, REGEXP } from '../common';
 
 const log = namedLogger({ name: 'sitemap-generator', verbose: true });
@@ -373,5 +373,5 @@ function ensureDir(dir: string) {
 }
 
 function outputSitemapPath(path: string) {
-  return chalk.green(path.replace(getPathFromRoot(), ''));
+  return chalk.green(path.replace(resolveRoot(), ''));
 }

@@ -10,7 +10,7 @@ import {
   SiteContext,
   SiteConfig,
 } from '@landing-page-sdk/types';
-import { getPath, getProjectPath, loadHMR } from '@landing-page-sdk/utils-node';
+import { resolve, resolveProj, loadHMR } from '@landing-page-sdk/utils-node';
 
 export async function readRawSiteConfig(
   filePath = 'site.config.js'
@@ -19,9 +19,9 @@ export async function readRawSiteConfig(
 
   if (!isFile) return {};
 
-  const mod = loadHMR(getPath(filePath));
+  const mod = loadHMR<{ default: SiteConfig }>(resolve(filePath));
 
-  return (mod?.default ?? {}) as SiteConfig;
+  return mod?.default ?? {};
 }
 
 export const REGEXP = {
@@ -156,7 +156,7 @@ export function mockOptions(ctx: SiteContext): ViteMockOptions {
     options.enable = false;
   } else if (isString(siteConfig.mock)) {
     options.mockPath = siteConfig.mock.startsWith('@')
-      ? getProjectPath(siteConfig.mock)
+      ? resolveProj(siteConfig.mock)
       : siteConfig.mock;
   }
 

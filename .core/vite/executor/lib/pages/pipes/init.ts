@@ -1,8 +1,8 @@
 import fsp from 'node:fs/promises';
 import { BuildPageOption, Page } from '@landing-page-sdk/types';
 import {
-  getPath,
-  getProjectPath,
+  resolve,
+  resolveProj,
   join,
   relative,
   scanDir,
@@ -15,7 +15,7 @@ export default async function (
 ): Promise<Page[]> {
   const { route: routeOpt, sourcePath, env } = buildPageOption.cfg;
 
-  const root = getPath();
+  const root = resolve();
 
   // 用 scanDir 掃描出所有 index.html / index.ejs（含子目錄）
   const files = await scanDir(sourcePath.pages, {
@@ -74,7 +74,7 @@ export default async function (
       env,
       $cmp: (_path: string) => {
         if (_path.startsWith('@')) {
-          return getProjectPath(_path);
+          return resolveProj(_path);
         }
 
         return join('/', sourcePath.components, _path);
