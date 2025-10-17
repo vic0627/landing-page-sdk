@@ -24,7 +24,7 @@
     },
     "verbose": {
       "type": "boolean",
-      "description": ""
+      "description": "Enable verbose logging (prints extra logs from the executor, Vite plugins, and mock middleware)."
     },
     "config": {
       "type": "string",

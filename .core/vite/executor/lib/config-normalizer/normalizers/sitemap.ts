@@ -23,7 +23,7 @@ export default (function (opt, cfg) {
     }
 
     if (isArray(sitemap.exclude)) {
-      opt.sitemap.exclude === sitemap.exclude;
+      opt.sitemap.exclude = sitemap.exclude;
     }
 
     if (isPlainObject(sitemap.defaults)) {

@@ -30,13 +30,17 @@ export interface ControllerInjection {
   placement?: Phase;
   /**
    * html 注入位置
-   * - 僅在當 `type` 設定為 `'inline'` 時生效
+   *
+   * 注意：僅在 `type: 'inline'` 時生效
+   *
    * @default 'head'
    */
   appendTo?: HTMLAppendTarget;
   /**
    * 注入 html 前是否先進行腳本打包
-   * - 僅在當 `type` 設定為 `'inline'` 時生效
+   *
+   * 注意：僅在 `type: 'inline'` 時生效
+   *
    * @default true
    */
   bundle?: boolean;
@@ -118,9 +122,10 @@ export interface RedirectOption {
   defaultLang?: string;
   /**
    * 用來操作轉向頁的 DOM
-   * @description
+   *
    * 注意：轉向邏輯本身不可修改，只能針對頁面結構做調整，
    * 例如新增 `<meta>` 標籤、修改 `<title>`、插入其他元素等。
+   *
    * @param page 當前處理的頁面資訊
    * @this DOMWindow JSDOM 的 window 物件，可用來直接操作頁面 DOM
    */
@@ -149,24 +154,52 @@ export interface OutputOption {
    * - `'abs'`：使用絕對路徑，例如 `/__ASSETS__/main.hash.js`。
    * - `'rel'`：使用相對路徑，例如在 `/en/about/me/index.html` 會轉換成
    *   `../../../__ASSETS__/main.hash.js`。
-   * @description
-   * 自動轉換會套用在 HTML 與 CSS 的資源路徑。
-   * JS 檔因技術限制，僅支援在 `/` 與 `./` 兩種前綴間互換。
+   *
+   * 注意：僅在 html 生效
+   *
    * @default 'abs'
    */
   assetsResolution?: Resolution;
   /**
    * 多媒體資產大小警示閥值 (單位：Byte)
-   * @description
+   *
    * 在 build 時檢查資產大小，若超過此值會輸出警告訊息。
    */
   threshold?: number;
 }
 
 export interface RouteOption {
+  /**
+   * 路由結構
+   * - `tree`: 樹狀結構，語系在前，頁面結構同 `src/pages`。
+   * - `flat`: 平坦結構，所有輸出頁面都在根目錄，頁面名稱預設以 `路徑_語系.html` 轉換。例如英文語系的 `src/pages/about/me/index.html` 將會輸出為 `about_me_en.html`。
+   * @default 'tree'
+   */
   mode?: RouteMode;
+  /**
+   * `data-to` 站內跳轉連結渲染後的路徑型態
+   * @default 'rel'
+   */
   resolution?: Resolution;
+  /**
+   * `data-to` 站內跳轉連結為 dir-based 還是 file-based
+   * - dir-based: 斜線結尾。例如 `/about/me/`
+   * - file-based: 明確指向 html。例如 `/about_me_zh.html`
+   *
+   * 注意：`dir` 僅在 `mode: 'tree'` 時生效
+   *
+   * @default 'dir'
+   */
   orientation?: DestOrientation;
+  /**
+   * 輸出 html 重命名規則
+   *
+   * 注意：僅在 `mode: flat` 時生效
+   *
+   * @param phase 命名階段，分為「頁面初始化」及「多語系載入」
+   * @param dirOrName 頁面初始化實為當前資料夾路徑，多語系載入階段時為上階段輸出結果
+   * @param lang 只存在多語系載入階段
+   */
   flatFileNaming?(
     phase: 'init' | 'localize',
     dirOrName: string,
@@ -204,9 +237,7 @@ export interface SourcePathOption {
 
 export interface SiteConfig {
   /**
-   * 路由結構設定
-   * - `tree`: 樹狀結構，語系在前，頁面結構同 `src/pages`。
-   * - `flat`: 平坦結構，所有輸出頁面都在根目錄，頁面名稱將以 `路徑_語系.html` 轉換。例如英文語系的 `src/pages/about/me/index.html` 將會輸出為 `about_me_en.html`。
+   * 路由設定
    * @default 'tree'
    */
   route?: RouteMode | RouteOption;
