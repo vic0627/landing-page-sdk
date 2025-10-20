@@ -1,8 +1,11 @@
+import { statSync } from 'fs';
+import { isArray, isPlainObject, isString } from 'lodash-es';
 import {
+  SiteConfig,
   NormalizedSiteConfig,
   SiteConfigNormalizer,
 } from '@landing-page-sdk/types';
-import { isArray, isPlainObject, isString } from 'lodash-es';
+import { loadHMR, resolve } from '@landing-page-sdk/utils-node';
 import controllerNormalizer from './normalizers/controller';
 import outputNormalizer from './normalizers/output';
 import redirectNormalizer from './normalizers/redirect';
@@ -10,7 +13,7 @@ import routeNormalizer from './normalizers/route';
 import sitemapNormalizer from './normalizers/sitemap';
 import sourcePathNormalizer from './normalizers/source-path';
 
-const normalizer: SiteConfigNormalizer = (cfg) => {
+const normalize: SiteConfigNormalizer = (cfg) => {
   const opt: NormalizedSiteConfig = {
     route: {
       mode: 'tree',
@@ -86,4 +89,18 @@ const normalizer: SiteConfigNormalizer = (cfg) => {
   return opt;
 };
 
-export default normalizer;
+function readRaw(filePath: string): SiteConfig {
+  try {
+    const isFile = statSync(filePath).isFile();
+
+    if (!isFile) return {};
+
+    const mod = loadHMR<{ default: SiteConfig }>(resolve(filePath));
+
+    return mod?.default ?? {};
+  } catch {
+    return {};
+  }
+}
+
+export { normalize, readRaw };

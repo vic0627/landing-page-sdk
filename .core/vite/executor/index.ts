@@ -16,13 +16,7 @@ import {
   SiteContext,
   ViteExecutorSchema,
 } from '@landing-page-sdk/types';
-import {
-  readRawSiteConfig,
-  rewrites,
-  parseEnv,
-  mockOptions,
-} from './lib/common';
-import configNormalizer from './lib/config-normalizer';
+import { rewrites, parseEnv, mockOptions } from './lib/common';
 import createPages from './lib/pages';
 // post build
 import siteDistributor from './lib/post-build/site-distributor';
@@ -40,11 +34,6 @@ import routerLink from './lib/plugins/router-link';
 
 let devServer: ViteDevServer | null = null;
 let previewServer: PreviewServer | null = null;
-let siteConfig: NormalizedSiteConfig | null = null;
-
-export function getSiteConfig() {
-  return siteConfig;
-}
 
 export async function teardown() {
   try {
@@ -59,16 +48,14 @@ export async function teardown() {
       previewServer = null;
     }
   } catch {}
-  siteConfig = null;
 }
 
 export async function main(
+  siteConfig: NormalizedSiteConfig,
   cliOption: ViteExecutorSchema,
   context: ExecutorContext
 ) {
   // create site context
-  const rawSiteConfig = await readRawSiteConfig(cliOption.config);
-  siteConfig = configNormalizer(rawSiteConfig);
   const pagesInfo = await createPages({ cli: cliOption, cfg: siteConfig });
   const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
 

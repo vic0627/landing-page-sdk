@@ -1,5 +1,4 @@
 import { AsyncIteratorExecutor } from '@nx/devkit';
-import chokidar, { FSWatcher } from 'chokidar';
 import chalk from 'chalk';
 import {
   NormalizedSiteConfig,
@@ -10,64 +9,70 @@ import {
   resolveProj,
   loadHMR,
   relative,
+  resolve as resolveCwd,
 } from '@landing-page-sdk/utils-node';
+import { Plug, Watcher } from '@landing-page-sdk/vite-executor/hmr';
+import { readRaw, normalize } from '@landing-page-sdk/vite-executor/config';
 
 type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite-executor')>;
+
+let siteConfig!: NormalizedSiteConfig;
 
 const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
   async function* (cliOptions, context) {
     // switch working dir
     process.chdir(resolveRoot(cliOptions.cwd));
 
-    let main!: (...args: any[]) => Promise<boolean>;
-    let teardown!: () => Promise<void>;
-    let getSiteConfig!: () => NormalizedSiteConfig | null;
+    let main!: ExecutorMod['main'];
+    let teardown!: ExecutorMod['teardown'];
+
+    const configFile = cliOptions.config ?? 'site.config.js';
 
     const initMainMod = () => {
+      const rawConfig = readRaw(configFile);
+      siteConfig = normalize(rawConfig);
       const mod = loadHMR<ExecutorMod>('@landing-page-sdk/vite-executor');
-      ({ main, teardown, getSiteConfig } = mod);
+      ({ main, teardown } = mod);
     };
 
     // 先跑一次
     initMainMod();
-    yield { success: await main(cliOptions, context) };
+
+    yield { success: await main(siteConfig, cliOptions, context) };
 
     // build 模式單次就結束
     if (cliOptions.mode === 'build') return;
 
-    let resolve!: (value?: unknown) => void;
-    let plug!: Promise<any>;
-    let watcher!: FSWatcher;
-
-    const initPlug = () => {
-      plug = new Promise((r) => {
-        resolve = r;
-      });
-    };
-
-    initPlug();
+    Plug.init();
 
     const initWatcher = () => {
-      const watchGlobs = [
-        resolveProj('@landing-page-sdk/vite-executor'),
-        resolveProj('@landing-page-sdk/utils-node'),
-        cliOptions.config ?? 'site.config.js',
-      ];
+      Watcher.set(resolveProj('@landing-page-sdk/vite-executor'));
+      Watcher.set(resolveProj('@landing-page-sdk/utils-node'));
+      Watcher.set(resolveCwd(cliOptions.config ?? 'site.config.js'), {
+        evt: ['add', 'change', 'unlink'],
+      });
 
-      const siteConfig = getSiteConfig();
+      const { i18n, sites, pages } = siteConfig.sourcePath;
 
-      if (siteConfig) {
-        const { i18n, sites } = siteConfig.sourcePath;
-        watchGlobs.push(i18n, sites);
-      }
-
-      watcher = chokidar.watch(watchGlobs, {
-        ignoreInitial: true,
+      Watcher.set(resolveCwd(i18n), {
+        evt: ['add', 'change', 'unlink'],
+        matcher: Watcher.createFileMatcher({ ext: ['.json'] }),
+      });
+      Watcher.set(resolveCwd(sites), {
+        evt: ['add', 'unlink'],
+        matcher: Watcher.createFileMatcher({ ext: ['.js', '.ts'] }),
+      });
+      Watcher.set(resolveCwd(pages), {
+        evt: ['add', 'unlink'],
+        matcher: Watcher.createFileMatcher(
+          { name: 'index', ext: ['.html'] },
+          { name: 'main', ext: ['.js', '.ts'] }
+        ),
       });
 
       // 監看事件，只負責發訊號
       // 用 on 處理，未來要看事件及對象判斷是否觸發 HMR
-      watcher.on('all', (evt, file) => {
+      Watcher.on((evt, file) => {
         file = relative(resolveRoot(), file);
         console.clear();
         timelog(
@@ -75,8 +80,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
           chalk.green('program reload'),
           chalk.dim(`(${evt}: ${file})`)
         );
-        resolve();
-        initPlug();
+        Plug.init();
       });
     };
 
@@ -84,11 +88,11 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
 
     // HMR 迴圈
     while (true) {
-      await plug; // 等待檔案變更訊號
-      await watcher.close();
+      await Plug.plug; // 等待檔案變更訊號
+      await Watcher.destroy();
       await teardown();
       initMainMod();
-      const success = await main(cliOptions, context);
+      const success = await main(siteConfig, cliOptions, context);
       initWatcher(); // 待程序完成再跑 watcher，才能重讀 siteConfig
       yield { success };
     }

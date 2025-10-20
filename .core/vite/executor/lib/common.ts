@@ -1,4 +1,3 @@
-import fsp, { stat } from 'node:fs/promises';
 import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import { ViteMockOptions } from 'vite-plugin-mock';
@@ -8,30 +7,8 @@ import {
   PageData,
   PageDataCommon,
   SiteContext,
-  SiteConfig,
 } from '@landing-page-sdk/types';
-import {
-  resolve,
-  resolveProj,
-  loadHMR,
-  isDir,
-} from '@landing-page-sdk/utils-node';
-
-export async function readRawSiteConfig(
-  filePath = 'site.config.js'
-): Promise<SiteConfig> {
-  try {
-    const isFile = (await fsp.stat(filePath)).isFile();
-
-    if (!isFile) return {};
-
-    const mod = loadHMR<{ default: SiteConfig }>(resolve(filePath));
-
-    return mod?.default ?? {};
-  } catch {
-    return {};
-  }
-}
+import { resolveProj, isDir } from '@landing-page-sdk/utils-node';
 
 export const REGEXP = {
   JSON: /^[^\s]+\.json$/,
