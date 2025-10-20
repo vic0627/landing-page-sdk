@@ -87,7 +87,7 @@ export default async function (
         page.rootFilename = join('/', lang, page.rootFilename);
       } else if (route.mode === 'flat') {
         const { name, ext } = path.parse(page.filename);
-        const newName = route.flatFileNaming('localize', name, lang);
+        const newName = `${name}_${lang}`
         filename = isMultiLang
           ? page.filename.replace(`${name}${ext}`, `${newName}${ext}`)
           : page.filename;

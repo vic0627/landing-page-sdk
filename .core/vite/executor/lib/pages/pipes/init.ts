@@ -44,7 +44,7 @@ export default async function (
     if (routeOpt.mode === 'tree') {
       filename = (relDir ? relDir + '/' : '') + 'index.html';
     } else if (routeOpt.mode === 'flat') {
-      filename = routeOpt.flatFileNaming('init', relDir || 'index') + '.html';
+      filename = filename.replace(/\//g, '_');
     }
 
     const rootFilename = join('/', filename);

@@ -18,9 +18,5 @@ export default (function (opt, cfg) {
     if (route.orientation === 'file') {
       opt.route.orientation = 'file';
     }
-
-    if (isFunction(route.flatFileNaming)) {
-      opt.route.flatFileNaming = route.flatFileNaming;
-    }
   }
 } satisfies OptionNormalizer);

@@ -191,20 +191,6 @@ export interface RouteOption {
    * @default 'dir'
    */
   orientation?: DestOrientation;
-  /**
-   * 輸出 html 重命名規則
-   *
-   * 注意：僅在 `mode: flat` 時生效
-   *
-   * @param phase 命名階段，分為「頁面初始化」及「多語系載入」
-   * @param dirOrName 頁面初始化實為當前資料夾路徑，多語系載入階段時為上階段輸出結果
-   * @param lang 只存在多語系載入階段
-   */
-  flatFileNaming?(
-    phase: 'init' | 'localize',
-    dirOrName: string,
-    lang?: string
-  ): string;
 }
 
 export interface SourcePathOption {
