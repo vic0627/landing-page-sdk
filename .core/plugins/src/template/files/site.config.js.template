@@ -1,0 +1,6 @@
+/** @type {import('@landing-page-sdk/types').SiteConfig} */
+export default {
+  route: {
+    mode: '<%= routeMode %>',
+  },
+};

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "Template",
+  "title": "",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "",
+      "pattern": "^[a-z]+(-[a-z]+)*$",
+      "x-prompt": "請輸入新的專案名稱"
+    },
+    "routeMode": {
+      "type": "string",
+      "description": "",
+      "enum": ["tree", "flat"],
+      "default": "tree",
+      "x-prompt": "新專案要使用哪種路由模式？"
+    }
+  },
+  "required": ["name"]
+}
