@@ -1,4 +1,4 @@
-import { ViteMode } from './types';
+import { RouteMode, ViteMode } from './types';
 
 export interface ViteExecutorSchema {
   cwd: string;
@@ -12,4 +12,9 @@ export interface ViteExecutorSchema {
    */
   config?: string;
   sites?: string;
+}
+
+export interface TemplateGeneratorSchema {
+  name: string;
+  routeMode?: RouteMode;
 }

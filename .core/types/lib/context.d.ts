@@ -1,7 +1,7 @@
 import { PluginOption } from 'vite';
 import { NormalizedSiteConfig } from './normalized';
 import { PagesInfo } from './page';
-import { ViteExecutorSchema } from './vite';
+import { ViteExecutorSchema } from './schema';
 
 export interface SiteContext {
   readonly pagesInfo: PagesInfo;

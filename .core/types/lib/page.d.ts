@@ -1,7 +1,7 @@
 import { I18nInfo, I18nLangPack } from './langs';
 import { NormalizedSiteConfig } from './normalized';
 import { RouteMode } from './types';
-import { ViteExecutorSchema } from './vite';
+import { ViteExecutorSchema } from './schema';
 
 export interface PageDataCommon {
   /**

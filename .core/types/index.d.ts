@@ -4,4 +4,4 @@ export * from './lib/normalized';
 export * from './lib/options';
 export * from './lib/page';
 export * from './lib/types';
-export * from './lib/vite';
+export * from './lib/schema';

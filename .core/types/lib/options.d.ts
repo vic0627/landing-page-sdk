@@ -49,7 +49,7 @@ export interface ControllerInjection {
 export interface ControllerOption {
   /**
    * 控制器名稱
-   * - 參考 `.core/assets/controller/*.ts`
+   * - 參考 `.core/assets/controller/*`
    */
   name: string;
   /**
