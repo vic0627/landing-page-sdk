@@ -1,14 +1,14 @@
-import { Page, SDKPlugin } from '@landing-page-sdk/types';
-import { isBoolean, isObject } from 'lodash-es';
-import { Connect } from 'vite';
 import {
   IncomingHttpHeaders,
   IncomingMessage,
   ServerResponse,
 } from 'node:http';
-import { join } from 'node:path';
-import { namedLogger } from '../common';
+import { Connect } from 'vite';
+import { isBoolean, isObject } from 'lodash-es';
 import chalk from 'chalk';
+import { Page, SDKPlugin } from '@landing-page-sdk/types';
+import { join } from '@landing-page-sdk/utils-node';
+import { namedLogger } from '../common';
 
 const name = 'vite-plugin-redirect';
 

@@ -14,7 +14,15 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@landing-page-sdk/assets": [".core/assets"],
+      "@landing-page-sdk/plugins": [".core/plugins"],
+      "@landing-page-sdk/types": [".core/types"],
+      "@landing-page-sdk/utils-browser": [".core/utils/browser"],
+      "@landing-page-sdk/utils-node": [".core/utils/node"],
+      "@landing-page-sdk/vite-executor": [".core/vite/executor"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

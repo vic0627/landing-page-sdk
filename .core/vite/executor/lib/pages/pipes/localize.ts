@@ -1,4 +1,5 @@
 import fsp from 'node:fs/promises';
+import { parse } from 'node:path';
 import { readJsonFile } from '@nx/devkit';
 import {
   BuildPageOption,
@@ -14,7 +15,6 @@ import {
   scanDir,
 } from '@landing-page-sdk/utils-node';
 import { REGEXP, shadowData } from '../../common';
-import path from 'node:path';
 
 export default async function (
   buildPageOption: BuildPageOption,
@@ -86,7 +86,7 @@ export default async function (
         filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
         page.rootFilename = join('/', lang, page.rootFilename);
       } else if (route.mode === 'flat') {
-        const { name, ext } = path.parse(page.filename);
+        const { name, ext } = parse(page.filename);
         const newName = `${name}_${lang}`
         filename = isMultiLang
           ? page.filename.replace(`${name}${ext}`, `${newName}${ext}`)
