@@ -106,6 +106,10 @@ export async function main(
   set(config, 'build.minify', siteConfig.output.minify.js);
   set(config, 'build.cssMinify', siteConfig.output.minify.css);
 
+  if (Object.keys(pagesInfo.sites).length) {
+    set(config, 'build.manifest', true);
+  }
+
   // mpa
   const mpaPlugin = createMpaPlugin({
     pages: pagesInfo.pages as _Page[],

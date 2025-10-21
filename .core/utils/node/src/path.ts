@@ -4,6 +4,7 @@ import {
   join as _join,
   dirname as _dirname,
   basename as _basename,
+  extname,
 } from 'node:path';
 import { normalizePath } from 'vite';
 import { workspaceRoot, readCachedProjectGraph } from '@nx/devkit';
@@ -53,4 +54,39 @@ export function resolveProj(projPath: string): string {
   }
 
   return join(workspaceRoot, node.data.root, sub);
+}
+
+const MEDIA_EXTS = new Set([
+  // image
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.webp',
+  '.avif',
+  '.svg',
+  // video
+  '.mp4',
+  '.webm',
+  '.ogg',
+  '.ogv',
+  '.mov',
+  '.m4v',
+  // audio
+  '.mp3',
+  '.wav',
+  '.aac',
+  '.m4a',
+  '.oga',
+  '.flac',
+  // fonts（若你也想納入字型）
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.otf',
+]);
+
+export function isMediaAsset(filePath: string): boolean {
+  const ext = extname(filePath).toLowerCase();
+  return MEDIA_EXTS.has(ext);
 }

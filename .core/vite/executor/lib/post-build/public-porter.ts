@@ -1,50 +1,14 @@
-import * as path from 'node:path';
+import { sep, dirname } from 'node:path';
 import * as fs from 'node:fs/promises';
 import chalk from 'chalk';
 import { SiteContext } from '@landing-page-sdk/types';
+import { isMediaAsset, join } from '@landing-page-sdk/utils-node';
 import { namedLogger } from '../common';
-
-// 依你的需求調整：常見「多媒體資產」副檔名（大小寫不敏感）
-const MEDIA_EXTS = new Set([
-  // image
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.gif',
-  '.webp',
-  '.avif',
-  '.svg',
-  // video
-  '.mp4',
-  '.webm',
-  '.ogg',
-  '.ogv',
-  '.mov',
-  '.m4v',
-  // audio
-  '.mp3',
-  '.wav',
-  '.aac',
-  '.m4a',
-  '.oga',
-  '.flac',
-  // fonts（若你也想納入字型）
-  '.woff',
-  '.woff2',
-  '.ttf',
-  '.otf',
-]);
 
 const log = namedLogger({
   name: 'public-porter',
   verbose: true,
 });
-
-/** 判斷是否為多媒體資產 */
-function isMediaAsset(filePath: string): boolean {
-  const ext = path.extname(filePath).toLowerCase();
-  return MEDIA_EXTS.has(ext);
-}
 
 /** 走訪 publicDir，逐檔搬運到一個目的根目錄 */
 async function copyPublicIntoRoot(
@@ -57,13 +21,13 @@ async function copyPublicIntoRoot(
 
   // DFS 走訪 publicDir
   async function walkAndCopy(srcDir: string, relDir = ''): Promise<void> {
-    const dirFull = path.join(srcDir, relDir);
+    const dirFull = join(srcDir, relDir);
     const entries = await fs.readdir(dirFull, { withFileTypes: true });
 
     for (const ent of entries) {
-      const rel = path.join(relDir, ent.name);
-      const src = path.join(srcDir, rel);
-      const dest = path.join(destRoot, rel);
+      const rel = join(relDir, ent.name);
+      const src = join(srcDir, rel);
+      const dest = join(destRoot, rel);
 
       if (ent.isDirectory()) {
         await fs.mkdir(dest, { recursive: true });
@@ -84,7 +48,7 @@ async function copyPublicIntoRoot(
           ) {
             const ceil = Math.round(thresholdBytes / 1024);
             const kb = (st.size / 1024).toFixed(1);
-            const relUnix = rel.split(path.sep).join('/'); // 日誌用一致分隔符
+            const relUnix = rel.split(sep).join('/'); // 日誌用一致分隔符
             log(
               `Large media asset: ${chalk.redBright(
                 relUnix
@@ -94,7 +58,7 @@ async function copyPublicIntoRoot(
         }
 
         // 確保目的目錄存在後複製
-        await fs.mkdir(path.dirname(dest), { recursive: true });
+        await fs.mkdir(dirname(dest), { recursive: true });
         await fs.copyFile(src, dest); // 標準檔案複製 API
       }
 
@@ -128,9 +92,7 @@ export default async function (
   const sites = Object.keys(ctx.pagesInfo.sites);
   // 決定目的根目錄們
   const siteRoots =
-    sites.length === 0
-      ? [outDir]
-      : sites.map((site) => path.join(outDir, site));
+    sites.length === 0 ? [outDir] : sites.map((site) => join(outDir, site));
 
   for (const root of siteRoots) {
     await copyPublicIntoRoot(publicDir, root, ctx.siteConfig.output.threshold);
