@@ -42,8 +42,7 @@
     ".core/utils/*",
     ".core/vite/executor",
     ".core/plugins",
-    "common/*",
-    "sites/*"
+    "sites/**/*"
   ],
   "nx": {},
   "executors": "./executors.json"

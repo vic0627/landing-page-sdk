@@ -16,5 +16,6 @@ export interface ViteExecutorSchema {
 
 export interface TemplateGeneratorSchema {
   name: string;
+  path: string;
   routeMode?: RouteMode;
 }
