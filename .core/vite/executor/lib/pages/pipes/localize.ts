@@ -1,20 +1,12 @@
 import fsp from 'node:fs/promises';
-import { parse } from 'node:path';
 import { readJsonFile } from '@nx/devkit';
 import {
   BuildPageOption,
   I18nInfo,
   I18nLangPack,
-  Page,
 } from '@landing-page-sdk/types';
-import {
-  basename,
-  resolveProj,
-  isHiddenFile,
-  join,
-  scanDir,
-} from '@landing-page-sdk/utils-node';
-import { REGEXP, shadowData } from '../../common';
+import { basename, isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
+import { REGEXP, createRedirectPage, createStubPage, Page } from '../../common';
 
 export default async function (
   buildPageOption: BuildPageOption,
@@ -22,6 +14,7 @@ export default async function (
 ): Promise<I18nInfo> {
   const { route, sourcePath, redirect } = buildPageOption.cfg;
 
+  // 掃描 src/i18n/*.json
   const rawFiles = await scanDir(sourcePath.i18n, { match: REGEXP.JSON });
   const predicates = await Promise.all(
     rawFiles.map(
@@ -29,7 +22,6 @@ export default async function (
     )
   );
   const files = rawFiles.filter((_, i) => predicates[i]);
-
   const langInfo: I18nInfo = {
     langs: [],
     langPack: {},
@@ -53,66 +45,39 @@ export default async function (
 
   const originalPages = [...pages];
   pages.length = 0; // in-place 清空
-
   const isMultiLang = langInfo.langs.length > 1;
 
   // 加上根目錄跳轉頁（redirect）
   if (isMultiLang && redirect.enable) {
-    pages.push({
-      name: 'redirect',
-      filename: 'index.html',
-      rootFilename: '/index.html',
-      template: resolveProj('@landing-page-sdk/assets/redirect/index.html'),
-      entry: resolveProj(
-        `@landing-page-sdk/assets/redirect/${route.mode}.ts`
-      ),
-      data: shadowData({
-        ...originalPages[0].data,
-        langs: langInfo.langs,
-        filename: 'index.html',
-      }),
+    const redirectPage = await createRedirectPage({
+      routeMode: route.mode,
     });
+    redirectPage.data = {
+      ...originalPages[0].data,
+      langs: langInfo.langs,
+      filename: redirectPage.filename,
+    };
+    pages.push(redirectPage);
   }
 
   let stubbed = false;
   for (const lang of langInfo.langs) {
-    for (const _page of originalPages) {
-      // const page = cloneDeep(_page);
-      const page = { ..._page };
+    for (const originalPage of originalPages) {
+      const langData = {
+        lang,
+        defaultLang: redirect.defaultLang,
+        langs: langInfo.langs,
+        i18n: langInfo.langPack[lang] as I18nLangPack,
+      };
 
-      let filename!: string;
-
-      if (route.mode === 'tree') {
-        filename = isMultiLang ? `${lang}/${page.filename}` : page.filename;
-        page.rootFilename = join('/', lang, page.rootFilename);
-      } else if (route.mode === 'flat') {
-        const { name, ext } = parse(page.filename);
-        const newName = `${name}_${lang}`
-        filename = isMultiLang
-          ? page.filename.replace(`${name}${ext}`, `${newName}${ext}`)
-          : page.filename;
-        page.rootFilename = join('/', filename);
-      }
-
-      page.name = isMultiLang ? `${lang}:${page.name}` : page.name;
-      page.filename = filename;
-
-      if (page.entry) {
-        page.entry += `${page.entry.includes('?') ? '&' : '?'}lang=${lang}`;
-      }
-
-      page.data = shadowData(
-        {
-          filename: filename,
-          lang: lang,
-          langs: langInfo.langs,
-          i18n: langInfo.langPack[lang] as I18nLangPack,
-        },
-        page.data
-      );
+      const page = await originalPage.cloneWithLang(lang, langInfo.langs);
+      page.data = {
+        filename: page.filename,
+        ...langData,
+      };
       pages.push(page);
 
-      const notIndexPage = !_page.name.endsWith('index');
+      const notIndexPage = !originalPage.name.endsWith('index');
 
       // 加上各路徑語系轉導頁（stub）
       if (
@@ -122,21 +87,16 @@ export default async function (
         redirect.stub &&
         notIndexPage
       ) {
-        pages.push({
-          name: `${_page.name}:stub`,
-          filename: _page.filename,
-          rootFilename: join('/', _page.filename),
-          template: resolveProj(
-            '@landing-page-sdk/assets/redirect/stub.html'
-          ),
-          entry: resolveProj('@landing-page-sdk/assets/redirect/stub.ts'),
-          data: shadowData({
-            filename: _page.filename,
-            lang,
-            langs: langInfo.langs,
-            i18n: langInfo.langPack[lang] as I18nLangPack,
-          }),
+        const stubPage = await createStubPage({
+          name: originalPage.name,
+          filename: originalPage.filename,
+          routeMode: route.mode,
         });
+        stubPage.data = {
+          filename: originalPage.filename,
+          ...langData,
+        };
+        pages.push(stubPage);
       }
     }
 

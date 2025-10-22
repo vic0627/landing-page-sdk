@@ -2,6 +2,7 @@ import { I18nInfo, I18nLangPack } from './langs';
 import { NormalizedSiteConfig } from './normalized';
 import { RouteMode } from './types';
 import { ViteExecutorSchema } from './schema';
+import { RedirectOption } from './options';
 
 export interface PageDataCommon {
   /**
@@ -24,7 +25,7 @@ export interface PageDataCommon {
   _data?: PageDataCommon;
 }
 
-export interface PageDataI18n {
+export interface PageDataI18n extends Pick<RedirectOption, 'defaultLang'> {
   /**
    * 此頁語系（多語時存在）
    */

@@ -1,5 +1,5 @@
 import fsp from 'node:fs/promises';
-import { BuildPageOption, Page } from '@landing-page-sdk/types';
+import { BuildPageOption } from '@landing-page-sdk/types';
 import {
   resolve,
   resolveProj,
@@ -8,7 +8,7 @@ import {
   scanDir,
   dirname,
 } from '@landing-page-sdk/utils-node';
-import { REGEXP, shadowData } from '../../common';
+import { REGEXP, createPage, Page } from '../../common';
 
 export default async function (
   buildPageOption: BuildPageOption
@@ -17,7 +17,7 @@ export default async function (
 
   const root = resolve();
 
-  // 用 scanDir 掃描出所有 index.html / index.ejs（含子目錄）
+  // 掃描 src/pages/**/*.{html,ejs}
   const files = await scanDir(sourcePath.pages, {
     match: REGEXP.TEMPLATE,
     recursive: true,
@@ -27,6 +27,7 @@ export default async function (
     if (!(await fsp.stat(file)).isFile()) return;
 
     const currentDir = dirname(file);
+    const template = file.replace(root, '').replace(/^[/\\]/, ''); // 將絕對路徑換成相對於 root 的 template 路徑
     let relDir = relative(sourcePath.pages, currentDir); // '.' 或 'about/contact'
 
     // 主頁特規處理
@@ -34,43 +35,14 @@ export default async function (
       relDir = '';
     }
 
-    const name = relDir
-      ? relDir.split('/').join(':') // 其餘頁面
-      : 'index'; // 主頁
-    const route = relDir ? '/' + relDir : '/';
-
-    let filename!: string;
-
-    if (routeOpt.mode === 'tree') {
-      filename = (relDir ? relDir + '/' : '') + 'index.html';
-    } else if (routeOpt.mode === 'flat') {
-      filename = (relDir ? relDir.replace(/\//g, '_') : 'index') + '.html';
-    }
-
-    const rootFilename = join('/', filename);
-    // 將絕對路徑換成相對於 root 的 template 路徑
-    const template = file.replace(root, '').replace(/^[/\\]/, '');
-    // 尋找對應入口作為可選 entry
-    const entryJs = join(currentDir, 'main.js');
-    const entryTs = join(currentDir, 'main.ts');
-    let entry: string | undefined;
-    try {
-      await fsp.access(entryJs);
-      entry = entryJs;
-    } catch {
-      try {
-        await fsp.access(entryTs);
-        entry = entryTs;
-      } catch {}
-    }
-
-    if (entry && !entry.startsWith('/')) {
-      entry = `/${entry}`;
-    }
-
-    // ejs data
-    const data = {
-      filename,
+    const page = await createPage({
+      routeMode: routeOpt.mode,
+      template,
+      relDir,
+      currentDir,
+    });
+    page.data = {
+      filename: page.filename,
       env,
       $cmp: (_path: string) => {
         if (_path.startsWith('@')) {
@@ -81,15 +53,7 @@ export default async function (
       },
     };
 
-    return {
-      name,
-      route,
-      filename,
-      rootFilename,
-      template,
-      ...(entry && { entry }),
-      data: shadowData(data),
-    } as Page;
+    return page;
   });
 
   return (await Promise.all(pagePromises)).filter((page) => !!page);

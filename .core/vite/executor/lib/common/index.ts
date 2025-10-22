@@ -2,13 +2,10 @@ import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import { ViteMockOptions } from 'vite-plugin-mock';
 import { isString } from 'lodash-es';
-import {
-  NormalizedSiteConfig,
-  PageData,
-  PageDataCommon,
-  SiteContext,
-} from '@landing-page-sdk/types';
+import { NormalizedSiteConfig, SiteContext } from '@landing-page-sdk/types';
 import { resolveProj, isDir } from '@landing-page-sdk/utils-node';
+
+export * from './page';
 
 export const REGEXP = {
   JSON: /^[^\s]+\.json$/,
@@ -53,15 +50,6 @@ export const rewrites = (cfg: NormalizedSiteConfig): RewriteRule => {
 
   return rules;
 };
-
-export function shadowData(
-  data: Partial<PageData>,
-  base: Partial<PageData> = {}
-) {
-  const result = { ...base, ...data };
-  result._data = result as PageDataCommon;
-  return result as PageData;
-}
 
 interface ImportStatementOptions {
   default?: string;

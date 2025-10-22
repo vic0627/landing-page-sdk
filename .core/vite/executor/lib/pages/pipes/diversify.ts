@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { fromPairs } from 'lodash-es';
-import { BuildPageOption, Page } from '@landing-page-sdk/types';
-import { isHiddenFile, scanDir, relative } from '@landing-page-sdk/utils-node';
-import { REGEXP, shadowData } from '../../common';
+import { BuildPageOption } from '@landing-page-sdk/types';
+import { isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
+import { REGEXP, Page } from '../../common';
 
 export default async function (
   buildPageOption: BuildPageOption,
@@ -11,6 +11,7 @@ export default async function (
   const { sites: _requiredSites, mode } = buildPageOption.cli;
   const { sourcePath } = buildPageOption.cfg;
 
+  // 掃描 src/sites/*.{js,ts}
   const files = await scanDir(sourcePath.sites, { match: REGEXP.SCRIPT });
 
   if (!files.length) {
@@ -18,6 +19,14 @@ export default async function (
   }
 
   const requiredSites = _requiredSites?.split(',');
+  const duplicate: string[] = [];
+  const checkDuplicate = (x: string) => {
+    if (duplicate.includes(x)) {
+      throw new Error(`Duplicate name or alias in sites: '${x}'`);
+    }
+
+    duplicate.push(x);
+  };
   const sites = files
     .map((p) => {
       const _path = p.startsWith('/') ? p : `/${p}`;
@@ -25,6 +34,9 @@ export default async function (
       const keep =
         !isHiddenFile(p) &&
         (requiredSites?.length ? requiredSites.includes(name) : true);
+
+      checkDuplicate(name);
+      alias && checkDuplicate(alias);
 
       return keep && { path: _path, name, alias };
     })
@@ -37,35 +49,14 @@ export default async function (
   const originalPages = [...pages];
   pages.length = 0; // in-place 清空
 
-  for (const { path: sitePath, name, alias } of sites) {
+  for (const { path: filePath, name, alias } of sites) {
     for (const _page of originalPages) {
-      // const page = cloneDeep(_page);
-      const page = { ..._page };
-      const filename = `${mode === 'dev' && alias ? alias : name}/${
-        page.filename
-      }`;
-      page.name = `${name}:${page.name}`;
-      page.filename = filename;
-
-      const redirectPage = page.name.endsWith('redirect');
-      const stubPage = page.name.endsWith('stub');
-
-      if (page.entry && !redirectPage && !stubPage) {
-        const entryDir = path.parse(page.entry).dir;
-        page.siteScript = relative(entryDir, sitePath);
-
-        if (page.entry) {
-          page.entry += `${page.entry?.includes('?') ? '&' : '?'}site=${name}`;
-        }
-      }
-
-      page.data = shadowData(
-        {
-          site: name,
-          alias,
-        },
-        page.data
-      );
+      const page = await _page.cloneWithSite({ mode, filePath, name, alias });
+      page.data = {
+        filename: page.filename,
+        site: name,
+        alias,
+      };
       pages.push(page);
     }
   }
