@@ -65,7 +65,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
       Watcher.set(resolveCwd(pages), {
         evt: ['add', 'unlink'],
         matcher: Watcher.createFileMatcher(
-          { name: 'index', ext: ['.html'] },
+          { name: 'index', ext: ['.html', '.ejs'] },
           { name: 'main', ext: ['.js', '.ts'] }
         ),
       });
