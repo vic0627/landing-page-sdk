@@ -171,7 +171,9 @@ function matchOptions(
   const { lang, site } = data as { lang: string; site: string };
 
   const matches = stdOpts.filter(({ targets, injection }) => {
-    const isTargetRoute = isString(route) && targets.routes.includes(route);
+    const isTargetRoute = targets.routes.length
+      ? isString(route) && targets.routes.includes(route)
+      : true;
     const isTargetLang = targets.lang.length
       ? targets.lang.includes(lang)
       : true;
