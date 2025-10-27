@@ -16,17 +16,17 @@ import { readRaw, normalize } from '@landing-page-sdk/vite-executor/config';
 
 type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite-executor')>;
 
-let siteConfig!: NormalizedSiteConfig;
-
 const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
-  async function* (cliOptions, context) {
+  async function* (cliOption, context) {
     // switch working dir
-    process.chdir(resolveRoot(cliOptions.cwd));
+    process.chdir(resolveRoot(cliOption.cwd));
 
     let main!: ExecutorMod['main'];
     let teardown!: ExecutorMod['teardown'];
+    let siteConfig!: NormalizedSiteConfig;
+    let isFirstProcess = true;
 
-    const configFile = cliOptions.config ?? 'site.config.js';
+    const configFile = cliOption.config ?? 'site.config.js';
 
     const initMainMod = () => {
       const rawConfig = readRaw(configFile);
@@ -35,20 +35,24 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
       ({ main, teardown } = mod);
     };
 
+    const runMod = () =>
+      main({ siteConfig, cliOption, context, isFirstProcess });
+
     // 先跑一次
     initMainMod();
 
-    yield { success: await main(siteConfig, cliOptions, context) };
+    yield { success: await runMod() };
 
     // build 模式單次就結束
-    if (cliOptions.mode === 'build') return;
+    if (cliOption.mode === 'build') return;
 
+    isFirstProcess = false;
     Plug.init();
 
     const initWatcher = () => {
       Watcher.set(resolveProj('@landing-page-sdk/vite-executor'));
       Watcher.set(resolveProj('@landing-page-sdk/utils-node'));
-      Watcher.set(resolveCwd(cliOptions.config ?? 'site.config.js'), {
+      Watcher.set(resolveCwd(cliOption.config ?? 'site.config.js'), {
         evt: ['add', 'change', 'unlink'],
       });
 
@@ -92,8 +96,8 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
       await Watcher.destroy();
       await teardown();
       initMainMod();
-      const success = await main(siteConfig, cliOptions, context);
-      initWatcher(); // 待程序完成再跑 watcher，才能重讀 siteConfig
+      const success = await runMod();
+      initWatcher(); // 待程序完成再跑 watcher
       yield { success };
     }
   };

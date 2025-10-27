@@ -1,4 +1,4 @@
-import { ExecutorContext } from '@nx/devkit';
+import { createProjectGraphAsync, ExecutorContext } from '@nx/devkit';
 import {
   createServer,
   build,
@@ -50,11 +50,15 @@ export async function teardown() {
   } catch {}
 }
 
-export async function main(
-  siteConfig: NormalizedSiteConfig,
-  cliOption: ViteExecutorSchema,
-  context: ExecutorContext
-) {
+export async function main(options: {
+  siteConfig: NormalizedSiteConfig;
+  cliOption: ViteExecutorSchema;
+  context: ExecutorContext;
+  isFirstProcess: boolean;
+}) {
+  const { siteConfig, cliOption, context, isFirstProcess } = options;
+  // initialize project graph in each processes, or otherwise `readCachedProjectGraph()` could cause error
+  await createProjectGraphAsync();
   // create site context
   const pagesInfo = await createPages({ cli: cliOption, cfg: siteConfig });
   const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
@@ -67,7 +71,6 @@ export async function main(
   );
   const cacheDir = resolveRoot('node_modules/.vite-cache');
   const alias = { '@': resolve('src') };
-  // const openTarget = pagesInfo.pages[0]!.filename as string;
   const outDir = resolveRoot('dist');
 
   // shared
@@ -92,12 +95,16 @@ export async function main(
   // server
   set(config, 'server.host', cliOption.host);
   set(config, 'server.port', cliOption.port);
-  // set(config, 'server.open', openTarget);
 
   // preview
   set(config, 'preview.host', cliOption.host);
   set(config, 'preview.port', cliOption.port);
-  // set(config, 'preview.open', openTarget);
+
+  if (isFirstProcess) {
+    const openTarget = pagesInfo.pages[0]!.filename as string;
+    set(config, 'server.open', openTarget);
+    set(config, 'preview.open', openTarget);
+  }
 
   // build
   set(config, 'build.outDir', outDir);
