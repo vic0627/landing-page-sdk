@@ -24,6 +24,10 @@ export function isHiddenFile(filePath: string) {
   return filename.startsWith('.');
 }
 
+export function ensureDir(dir: string) {
+  return fsp.mkdir(dir, { recursive: true });
+}
+
 type ScanOptions = {
   /**
    * 匹配的目錄或檔案

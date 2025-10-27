@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { pick } from 'lodash-es';
 import { SitemapStream, SitemapIndexStream, streamToPromise } from 'sitemap';
 import { Page, SiteContext, SitemapOption } from '@landing-page-sdk/types';
-import { resolveRoot, join } from '@landing-page-sdk/utils-node';
+import { resolveRoot, join, ensureDir } from '@landing-page-sdk/utils-node';
 import { namedLogger, REDIRECT, STUB } from '../common';
 
 const log = namedLogger({ name: 'sitemap-generator', verbose: true });
@@ -13,7 +13,7 @@ const log = namedLogger({ name: 'sitemap-generator', verbose: true });
 export default async function (ctx: SiteContext, outDir: string) {
   const { siteConfig, pagesInfo } = ctx;
 
-  if (!siteConfig.sitemap) {
+  if (!siteConfig.sitemap.enable) {
     // if baseUrl or config doesn't exist, close this plugin
     return;
   }
@@ -341,10 +341,6 @@ function groupBySite(routes: RouteInfo[]) {
   }
 
   return map;
-}
-
-function ensureDir(dir: string) {
-  return fsp.mkdir(dir, { recursive: true });
 }
 
 function outputSitemapPath(path: string) {
