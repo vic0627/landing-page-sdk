@@ -21,18 +21,18 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
 
   const outputFilenames: Record<string, string> = {
     hard: {
-      entryFileNames: `${ASSETS}/[name]-[hash].js`,
-      chunkFileNames: `${ASSETS}/[name]-[hash].js`,
+      entryFileNames: `${ASSETS}/entry-[name]-[hash].js`,
+      chunkFileNames: `${ASSETS}/chunk-[name]-[hash].js`,
       assetFileNames: `${ASSETS}/[name]-[hash].[ext]`,
     },
     soft: {
-      entryFileNames: `${ASSETS}/[name].js`,
-      chunkFileNames: `${ASSETS}/[name].js`,
+      entryFileNames: `${ASSETS}/entry-[name].js`,
+      chunkFileNames: `${ASSETS}/chunk-[name].js`,
       assetFileNames: `${ASSETS}/[name].[ext]`,
     },
   }[versioning];
 
-  const hash = base62Hash(Date.now().toString(), 6);
+  const hash = base62Hash(Date.now().toString(), 8);
 
   const rootRel = (hostId: string) => {
     let depth = hostId.split('/').length - 1;
