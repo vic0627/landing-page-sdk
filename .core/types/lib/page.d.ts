@@ -45,10 +45,6 @@ export interface PageDataSite {
    * 此頁所屬站點名稱（多站時存在）
    */
   site?: string;
-  /**
-   * 站點別名（多站腳本檔名的後綴，如 `site-a.alias.js` 的 alias）
-   */
-  alias?: string;
 }
 
 export type PageData = PageDataCommon &
@@ -94,7 +90,7 @@ export interface Page {
 export interface PagesInfo {
   pages: Page[];
   langInfo: I18nInfo;
-  sites: Record<string, string>;
+  sites: string[];
 }
 
 export interface BuildPageOption {

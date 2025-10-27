@@ -1,4 +1,4 @@
-import { findIndex, set } from 'lodash-es';
+import { set } from 'lodash-es';
 import { OutputAsset, OutputChunk } from 'rollup';
 import chalk from 'chalk';
 import { MinifyTargets, Page, SDKPlugin } from '@landing-page-sdk/types';
@@ -17,7 +17,7 @@ const name = 'vite-plugin-render-build-url';
 export default (({ pagesInfo, cliOption, siteConfig }) => {
   const { versioning, assetsResolution: resolution } = siteConfig.output;
   const routeMode = siteConfig.route.mode;
-  const sites = Object.keys(pagesInfo.sites);
+  const sites = pagesInfo.sites;
 
   const outputFilenames: Record<string, string> = {
     hard: {
@@ -71,7 +71,13 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     } else {
       switch (type) {
         case 'html':
-          render = join('/', page?.data?.alias ?? '', render);
+          render = join(
+            '/',
+            siteConfig.route.useSiteAsPath && page?.data?.site
+              ? page?.data?.site
+              : '',
+            render
+          );
           break;
         case 'css':
           render = join('../', render);

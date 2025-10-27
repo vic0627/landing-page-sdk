@@ -38,8 +38,8 @@ export default (function (opt, cfg) {
       }
     }
 
-    if (sitemap.useAliasAsPath === false) {
-      opt.sitemap.useAliasAsPath = false;
+    if (sitemap.useSiteAsPath === true) {
+      opt.sitemap.useSiteAsPath = true;
     }
   }
 } satisfies OptionNormalizer);

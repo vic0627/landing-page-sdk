@@ -6,18 +6,7 @@ import { NormalizedSiteConfig, SiteContext } from '@landing-page-sdk/types';
 import { resolveProj, isDir } from '@landing-page-sdk/utils-node';
 
 export * from './page';
-
-export const REGEXP = {
-  JSON: /^[^\s]+\.json$/,
-  SCRIPT: /^[^\s]+\.(?:js|ts)$/,
-  TEMPLATE: /^index\.(html|ejs)$/i,
-  HTML: /\.html$/,
-  EJS: /\.ejs$/,
-  REDIRECT: /^(?:.*:)?redirect$/,
-  STUB: /^(?:.*:)?stub$/,
-  HTML_PUBLIC: /(?:src|srcset|href)=(["'])(.*?)\1/g,
-  CSS_PUBLIC: /url\((["']?)(.*?)\1\)/g,
-};
+export * from './regexp';
 
 export const rewrites = (cfg: NormalizedSiteConfig): RewriteRule => {
   const { sourcePath } = cfg;

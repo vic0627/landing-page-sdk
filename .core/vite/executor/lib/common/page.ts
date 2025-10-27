@@ -10,14 +10,13 @@ import {
   promiseResolver,
   resolveProj,
 } from '@landing-page-sdk/utils-node';
+import { ALPHA_DASH_UNDERSCORE } from './regexp';
 
 type PageType = 'page' | 'redirect' | 'stub';
 
 interface DiversifyOption {
   filePath: string;
   name: string;
-  alias: string;
-  mode: string;
 }
 
 interface PageInit {
@@ -245,11 +244,13 @@ export class Page implements PageEssential {
   }
 
   private diversify(options: DiversifyOption) {
-    const { mode, filePath, name, alias } = options;
+    const { filePath, name } = options;
 
-    this._filename = `${mode === 'dev' && alias ? alias : name}/${
-      this._filename
-    }`;
+    if (!ALPHA_DASH_UNDERSCORE.test(name)) {
+      throw new Error(`Invalid site name: ${name}`);
+    }
+
+    this._filename = `${name}/${this._filename}`;
     this._name = `${name}${NAME_DELIMITER}${this._name}`;
 
     const redirectPage = this._name.endsWith('redirect');

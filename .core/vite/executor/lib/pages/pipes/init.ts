@@ -8,7 +8,7 @@ import {
   scanDir,
   dirname,
 } from '@landing-page-sdk/utils-node';
-import { REGEXP, createPage, Page } from '../../common';
+import { createPage, Page, TEMPLATE } from '../../common';
 
 export default async function (
   buildPageOption: BuildPageOption
@@ -19,7 +19,7 @@ export default async function (
 
   // 掃描 src/pages/**/*.{html,ejs}
   const files = await scanDir(sourcePath.pages, {
-    match: REGEXP.TEMPLATE,
+    match: TEMPLATE,
     recursive: true,
   });
 

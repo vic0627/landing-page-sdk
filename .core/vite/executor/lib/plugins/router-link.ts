@@ -14,9 +14,9 @@ const LINK_ATTRS = {
 let log!: Logger;
 
 export default (({ siteConfig, cliOption, pagesInfo }) => {
+  const { mode } = cliOption;
   const { pages } = pagesInfo;
   const { route } = siteConfig;
-  const { mode: viteMode } = cliOption;
 
   const treeRoute = route.mode === 'tree';
   const relResolution = route.resolution === 'rel';
@@ -43,7 +43,7 @@ export default (({ siteConfig, cliOption, pagesInfo }) => {
       const from = join(page.rootFilename, '../');
 
       links.forEach((dest, e) => {
-        const { alias, site } = dest.data ?? {};
+        const { site } = dest.data ?? {};
         const to = dest.rootFilename;
 
         let href!: string;
@@ -53,8 +53,9 @@ export default (({ siteConfig, cliOption, pagesInfo }) => {
             treeRoute ? relative(from, to) : join('./', to)
           );
         } else {
-          const segment = viteMode === 'dev' ? alias ?? site : alias;
-          href = segment ? join('/', segment, to) : to;
+          const segment =
+            route.useSiteAsPath || mode === 'dev' ? site ?? '' : '';
+          href = join('/', segment, to);
         }
 
         if (treeRoute && dirOrientation) {

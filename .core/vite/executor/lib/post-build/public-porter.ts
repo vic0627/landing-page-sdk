@@ -89,7 +89,7 @@ export default async function (
     return;
   }
 
-  const sites = Object.keys(ctx.pagesInfo.sites);
+  const sites = ctx.pagesInfo.sites;
   // 決定目的根目錄們
   const siteRoots =
     sites.length === 0 ? [outDir] : sites.map((site) => join(outDir, site));

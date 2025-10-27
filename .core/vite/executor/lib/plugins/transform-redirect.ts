@@ -1,6 +1,6 @@
 import { JSDOM } from 'jsdom';
 import { SDKPlugin } from '@landing-page-sdk/types';
-import { REGEXP } from '../common';
+import { REDIRECT, STUB } from '../common';
 import { isObject } from 'lodash-es';
 
 export default (({ pagesInfo, siteConfig }) => {
@@ -11,7 +11,7 @@ export default (({ pagesInfo, siteConfig }) => {
   }
 
   const redirectPages = pagesInfo.pages.filter(
-    (page) => REGEXP.REDIRECT.test(page.name) || REGEXP.STUB.test(page.name)
+    (page) => REDIRECT.test(page.name) || STUB.test(page.name)
   );
   const findRedirectPage = (path: string) =>
     redirectPages.find((page) => page.filename === path.replace('/', ''));

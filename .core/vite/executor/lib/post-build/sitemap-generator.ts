@@ -2,11 +2,11 @@ import { createWriteStream } from 'node:fs';
 import fsp from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import chalk from 'chalk';
-import { isPlainObject, isString, merge, pick } from 'lodash-es';
+import { pick } from 'lodash-es';
 import { SitemapStream, SitemapIndexStream, streamToPromise } from 'sitemap';
 import { Page, SiteContext, SitemapOption } from '@landing-page-sdk/types';
 import { resolveRoot, join } from '@landing-page-sdk/utils-node';
-import { namedLogger, REGEXP } from '../common';
+import { namedLogger, REDIRECT, STUB } from '../common';
 
 const log = namedLogger({ name: 'sitemap-generator', verbose: true });
 
@@ -18,37 +18,16 @@ export default async function (ctx: SiteContext, outDir: string) {
     return;
   }
 
-  const sitemapOption: Required<SitemapOption> = {
-    baseUrl: '',
-    enable: true,
-    orientation: 'file',
-    exclude: [],
-    defaults: {},
-    useAliasAsPath: true,
-  };
-
-  // normalize options
-  if (isString(siteConfig.sitemap)) {
-    sitemapOption.baseUrl = siteConfig.sitemap;
-  } else if (isPlainObject(siteConfig.sitemap)) {
-    if (siteConfig.sitemap.enable === false) {
-      // if not enable, close this plugin
-      return;
-    }
-
-    merge(sitemapOption, siteConfig.sitemap);
-  }
-
   const { sites, langInfo, pages } = pagesInfo;
   const { langs } = langInfo;
 
-  const routes = pagesToRoutes(pages, sites, sitemapOption);
+  const routes = pagesToRoutes(pages, sites, siteConfig.sitemap);
 
   const generatorOption: GeneratorOptions = {
     routes,
     sites,
     outDir,
-    option: sitemapOption,
+    option: siteConfig.sitemap,
   };
 
   await (langs.length < 2
@@ -71,16 +50,15 @@ type RouteInfo = {
   lang?: string;
   /** 同一內容頁的語意鍵（不含語系） */
   key?: string;
-  siteAlias?: string;
 };
 
 function pagesToRoutes(
   pages: Page[],
-  siteAliasMap: Record<string, string>,
+  sites: string[],
   options: Required<SitemapOption>
 ) {
   pages = pages.filter(
-    (page) => !(REGEXP.REDIRECT.test(page.name) || REGEXP.STUB.test(page.name))
+    (page) => !(REDIRECT.test(page.name) || STUB.test(page.name))
   );
 
   const routes = pages.map((page) => {
@@ -100,7 +78,6 @@ function pagesToRoutes(
       path: filename,
       key: page.route || undefined,
       ...pick(data, 'site', 'lang'),
-      siteAlias: siteAliasMap[data?.site as string],
     };
   }) as RouteInfo[];
 
@@ -109,8 +86,7 @@ function pagesToRoutes(
 
 type GeneratorOptions = {
   routes: RouteInfo[];
-  /** Record<站點名稱, 實際路徑對照（可能為空字串）> */
-  sites: Record<string, string>;
+  sites: string[];
   /** build 輸出資料夾 */
   outDir: string;
   option: Required<SitemapOption>;
@@ -285,8 +261,7 @@ async function generateSitemapIndex(option: MultiLangGeneratorOptions) {
 
       for (const lang of writtenLangs) {
         const urlPath = leadingSlash(
-          // 這裡是部署後實際路徑，要取 site alias
-          (sites[site] ? `/${sites[site]}` : '') + `/__SITEMAP__/${lang}.xml`,
+          (opt.useSiteAsPath ? `/${site}` : '') + `/__SITEMAP__/${lang}.xml`,
           false
         ).replace(/\/{2,}/g, '/');
         const loc = new URL(urlPath, base).toString();
@@ -313,14 +288,14 @@ function leadingSlash(p: string, lead: boolean = true) {
 
 /** 取得此 route 對應的絕對 URL（考慮多站 baseUrl） */
 function absoluteUrl(route: RouteInfo, options: GeneratorOptions) {
-  const { site, siteAlias } = route;
+  const { site } = route;
   const { option: sitemapOption } = options;
   const base = parseBase(sitemapOption.baseUrl, site);
 
   let path = route.path;
 
-  if (sitemapOption.useAliasAsPath && siteAlias) {
-    path = join(siteAlias, path);
+  if (sitemapOption.useSiteAsPath && site) {
+    path = join(site, path);
   }
 
   const u = new URL(leadingSlash(path), base);

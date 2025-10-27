@@ -63,8 +63,8 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
 function getRouteMap(pages: Page[]) {
   const map = new Map<string, (lang?: string) => string | undefined>();
   pages.forEach(({ data, route }) => {
-    const { site, alias } = data ?? {};
-    const sitePrefix = '/' + (alias || site || '');
+    const { site } = data ?? {};
+    const sitePrefix = '/' + (site || '');
     const pos1 = join(sitePrefix, route!);
     const pos2 = join(sitePrefix, route!, '/');
 

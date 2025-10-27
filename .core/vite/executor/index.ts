@@ -106,7 +106,7 @@ export async function main(
   set(config, 'build.minify', siteConfig.output.minify.js);
   set(config, 'build.cssMinify', siteConfig.output.minify.css);
 
-  if (Object.keys(pagesInfo.sites).length) {
+  if (pagesInfo.sites.length) {
     set(config, 'build.manifest', true);
   }
 
@@ -135,6 +135,7 @@ export async function main(
       await sitemapGenerator(siteContext, outDir);
       break;
     case 'preview':
+      /** @todo preview doesn't work well, mock api plugin is unavailable */
       previewServer = await preview(config);
       previewServer.printUrls();
       previewServer.bindCLIShortcuts({ print: true });

@@ -19,14 +19,7 @@ const normalize: SiteConfigNormalizer = (cfg) => {
       mode: 'tree',
       resolution: 'rel',
       orientation: 'dir',
-      flatFileNaming(phase, nameOrDir, lang) {
-        if (phase === 'init') {
-          nameOrDir = nameOrDir.replace(/\//g, '_');
-        } else if (phase === 'localize') {
-          nameOrDir = nameOrDir + '_' + lang;
-        }
-        return nameOrDir;
-      },
+      useSiteAsPath: false,
     },
     output: {
       minify: {
@@ -60,7 +53,7 @@ const normalize: SiteConfigNormalizer = (cfg) => {
       orientation: 'file',
       exclude: [],
       defaults: {},
-      useAliasAsPath: true,
+      useSiteAsPath: false,
     },
     mock: '@landing-page-sdk/assets/mock',
   };

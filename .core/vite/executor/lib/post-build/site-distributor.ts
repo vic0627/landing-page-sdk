@@ -8,7 +8,7 @@ import { namedLogger } from '../common';
 const MANIFEST = 'manifest.json';
 
 export default async (ctx: SiteContext, outDir: string) => {
-  const sites = Object.keys(ctx.pagesInfo.sites);
+  const sites = ctx.pagesInfo.sites;
 
   const log = namedLogger({
     name: 'build-helper',

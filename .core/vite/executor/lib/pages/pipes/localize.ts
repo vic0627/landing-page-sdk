@@ -6,7 +6,7 @@ import {
   I18nLangPack,
 } from '@landing-page-sdk/types';
 import { basename, isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
-import { REGEXP, createRedirectPage, createStubPage, Page } from '../../common';
+import { createRedirectPage, createStubPage, Page, JSON } from '../../common';
 
 export default async function (
   buildPageOption: BuildPageOption,
@@ -15,7 +15,7 @@ export default async function (
   const { route, sourcePath, redirect } = buildPageOption.cfg;
 
   // 掃描 src/i18n/*.json
-  const rawFiles = await scanDir(sourcePath.i18n, { match: REGEXP.JSON });
+  const rawFiles = await scanDir(sourcePath.i18n, { match: JSON });
   const predicates = await Promise.all(
     rawFiles.map(
       async (raw) => (await fsp.stat(raw)).isFile() && !isHiddenFile(raw)

@@ -18,5 +18,9 @@ export default (function (opt, cfg) {
     if (route.orientation === 'file') {
       opt.route.orientation = 'file';
     }
+
+    if (route.useSiteAsPath === true) {
+      opt.route.useSiteAsPath = true;
+    }
   }
 } satisfies OptionNormalizer);

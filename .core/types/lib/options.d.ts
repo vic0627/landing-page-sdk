@@ -98,9 +98,9 @@ export interface SitemapOption {
    */
   defaults?: SitemapDefaults;
   /**
-   * @default true
+   * @default false
    */
-  useAliasAsPath?: boolean;
+  useSiteAsPath?: boolean;
 }
 
 export interface RedirectOption {
@@ -191,6 +191,10 @@ export interface RouteOption {
    * @default 'dir'
    */
   orientation?: DestOrientation;
+  /**
+   * @default false
+   */
+  useSiteAsPath?: boolean;
 }
 
 export interface SourcePathOption {

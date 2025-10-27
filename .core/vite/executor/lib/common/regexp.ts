@@ -1,0 +1,10 @@
+export const JSON = /^[^\s]+\.json$/;
+export const SCRIPT = /^[^\s]+\.(?:js|ts)$/;
+export const TEMPLATE = /^index\.(html|ejs)$/i;
+export const HTML = /\.html$/;
+export const EJS = /\.ejs$/;
+export const REDIRECT = /^(?:.*:)?redirect$/;
+export const STUB = /^(?:.*:)?stub$/;
+export const HTML_PUBLIC = /(?:src|srcset|href)=(["'])(.*?)\1/g;
+export const CSS_PUBLIC = /url\((["']?)(.*?)\1\)/g;
+export const ALPHA_DASH_UNDERSCORE = /^[A-Za-z_-]+$/;
