@@ -10,7 +10,7 @@
     "@landing-page-sdk/utils-node": "*"
   },
   "nx": {
-    "$schema": "<%= depthRel %>/node_modules/nx/schemas/project-schema.json",
+    "$schema": "<%= depthRel %>node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "targets": {
       "dev": {
