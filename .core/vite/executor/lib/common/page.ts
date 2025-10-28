@@ -213,20 +213,21 @@ export class Page implements PageEssential {
     this.resolve();
   }
 
-  private async clone() {
-    const newPage = await createPage(this.initOptions);
+  async clone() {
+    const newPage = new Page(this.initOptions);
     newPage.data = this._data;
+    await newPage.ready;
     return newPage;
   }
 
-  private localize(lang: string, langs: string[]) {
+  localize(lang: string, langs: string[]) {
     const isMultiLang = langs.length > 1;
 
     this._name = isMultiLang ? `${lang}:${this._name}` : this._name;
 
     if (this.initOptions.routeMode === 'tree') {
       this._filename = isMultiLang
-        ? `${lang}/${this._filename}`
+        ? join(lang, this._rootFilename)
         : this._filename;
       this._rootFilename = join('/', lang, this._rootFilename);
     } else {
@@ -243,7 +244,7 @@ export class Page implements PageEssential {
     }
   }
 
-  private diversify(options: DiversifyOption) {
+  diversify(options: DiversifyOption) {
     const { filePath, name } = options;
 
     if (!ALPHA_DASH_UNDERSCORE.test(name)) {
@@ -257,8 +258,7 @@ export class Page implements PageEssential {
     const stubPage = this._name.endsWith('stub');
 
     if (this._entry && !redirectPage && !stubPage) {
-      const entryDir = parse(this._entry).dir;
-      this._siteScript = relative(entryDir, filePath);
+      this._siteScript = join(process.cwd(), filePath);
 
       if (this._entry) {
         this._entry += `${this._entry.includes('?') ? '&' : '?'}site=${name}`;
@@ -266,15 +266,7 @@ export class Page implements PageEssential {
     }
   }
 
-  async cloneWithLang(lang: string, langs: string[]) {
-    const page = await this.clone();
-    page.localize(lang, langs);
-    return page;
-  }
-
-  async cloneWithSite(options: DiversifyOption) {
-    const page = await this.clone();
-    page.diversify(options);
-    return page;
+  isStub() {
+    return this.initOptions.type === 'stub';
   }
 }

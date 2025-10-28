@@ -70,7 +70,8 @@ export default async function (
         i18n: langInfo.langPack[lang] as I18nLangPack,
       };
 
-      const page = await originalPage.cloneWithLang(lang, langInfo.langs);
+      const page = await originalPage.clone();
+      page.localize(lang, langInfo.langs);
       page.data = {
         filename: page.filename,
         ...langData,

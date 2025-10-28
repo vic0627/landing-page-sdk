@@ -39,7 +39,14 @@ export default async function (
 
   for (const { path: filePath, name } of sites) {
     for (const _page of originalPages) {
-      const page = await _page.cloneWithSite({ filePath, name });
+      const page = await _page.clone();
+
+      const { lang, langs } = _page.data ?? {};
+      if (lang && langs && !page.isStub()) {
+        page.localize(lang, langs);
+      }
+
+      page.diversify({ filePath, name });
       page.data = {
         filename: page.filename,
         site: name,
