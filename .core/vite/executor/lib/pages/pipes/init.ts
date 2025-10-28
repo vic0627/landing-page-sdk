@@ -23,6 +23,12 @@ export default async function (
     recursive: true,
   });
 
+  if (!files.length) {
+    throw new Error(
+      `It must contain at least one template file (index.html or index.ejs) under ${sourcePath.pages}`
+    );
+  }
+
   const pagePromises = files.map(async (file) => {
     if (!(await fsp.stat(file)).isFile()) return;
 
