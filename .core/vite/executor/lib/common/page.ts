@@ -1,6 +1,8 @@
 import fsp from 'node:fs/promises';
 import { parse, relative } from 'node:path';
+import { omit, pick } from 'lodash-es';
 import {
+  PageContext,
   PageData,
   Page as PageEssential,
   RouteMode,
@@ -268,5 +270,21 @@ export class Page implements PageEssential {
 
   isStub() {
     return this.initOptions.type === 'stub';
+  }
+
+  getContext() {
+    const basic = pick(
+      this,
+      'name',
+      'filename',
+      'rootFilename',
+      'template',
+      'route',
+      'entry',
+      'siteScript'
+    );
+    const data = omit(this.data, '_data', '$cmp');
+
+    return { ...basic, data } as PageContext;
   }
 }

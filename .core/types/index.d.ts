@@ -4,4 +4,5 @@ export * from './lib/normalized';
 export * from './lib/options';
 export * from './lib/page';
 export * from './lib/types';
+export * from './lib/route';
 export * from './lib/schema';

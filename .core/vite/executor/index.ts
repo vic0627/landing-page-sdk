@@ -31,6 +31,8 @@ import renderBuiltUrl from './lib/plugins/render-built-url';
 import autoController from './lib/plugins/auto-controller';
 import redirect from './lib/plugins/redirect';
 import routerLink from './lib/plugins/router-link';
+import pageContext from './lib/plugins/page-context';
+import virtualAssets from './lib/plugins/virtual-assets';
 
 let devServer: ViteDevServer | null = null;
 let previewServer: PreviewServer | null = null;
@@ -67,7 +69,7 @@ export async function main(options: {
   const config: InlineConfig = {};
 
   const define = parseEnv(
-    merge(pick(pagesInfo.langInfo, 'langs'), siteConfig.env)
+    merge(pick(pagesInfo.langInfo, 'langs', 'langPack'), siteConfig.env)
   );
   const cacheDir = resolveRoot('node_modules/.vite-cache');
   const alias = { '@': resolve('src') };
@@ -87,6 +89,8 @@ export async function main(options: {
     redirect(siteContext),
     viteMockServe(await mockOptions(siteContext)),
     routerLink(siteContext),
+    pageContext(siteContext),
+    virtualAssets(siteContext),
   ]);
 
   // resolve

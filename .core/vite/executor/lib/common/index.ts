@@ -7,6 +7,7 @@ import { resolveProj, isDir } from '@landing-page-sdk/utils-node';
 
 export * from './page';
 export * from './regexp';
+export * from './route-manifest';
 
 export const rewrites = (cfg: NormalizedSiteConfig): RewriteRule => {
   const { sourcePath } = cfg;

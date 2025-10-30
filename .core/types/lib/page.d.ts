@@ -52,6 +52,14 @@ export type PageData = PageDataCommon &
   PageDataSite &
   Record<string, any>;
 
+export type PageContext = Omit<Page, 'getContext' | 'data'> & {
+  data: Omit<PageDataCommon, '_data' | '$cmp'> & PageDataI18n & PageDataSite;
+};
+
+declare global {
+  var __PAGE_CTX__: PageContext;
+}
+
 export interface Page {
   /**
    * 頁面唯一識別符
@@ -85,6 +93,8 @@ export interface Page {
    * EJS 可用資料
    */
   data?: PageData;
+
+  getContext(): PageContext;
 }
 
 export interface PagesInfo {

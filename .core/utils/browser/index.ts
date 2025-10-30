@@ -6,3 +6,4 @@ export * from './src/loader';
 export * from './src/path';
 export * from './src/query';
 export * from './src/xhr';
+export * from '@landing-page-sdk/utils-node/src/route';
