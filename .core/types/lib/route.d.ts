@@ -27,8 +27,3 @@ export type RouteResolveOption = {
 };
 
 export type RouteResolver = (option: RouteResolveOption) => string;
-
-declare module 'virtual:route-manifest' {
-  const manifest: RouteManifest;
-  export default manifest;
-}

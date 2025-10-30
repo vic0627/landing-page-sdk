@@ -6,3 +6,4 @@ export * from './lib/page';
 export * from './lib/types';
 export * from './lib/route';
 export * from './lib/schema';
+export * from './lib/virtual';
