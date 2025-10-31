@@ -17,11 +17,16 @@ function purgeTree(entryAbs: string, seen = new Set<string>()) {
   delete require.cache[entryAbs];
 }
 
-export function loadHMR<MOD>(specifier: string): MOD {
-  // 解析到實檔（ts/tsx/js都可以，pirates 會接手轉譯）
-  const abs = require.resolve(specifier);
-  // 砍掉 CJS 快取
-  purgeTree(abs);
-  // 重新載入
-  return require(abs);
+export function loadHMR<MOD>(specifier: string): MOD | undefined {
+  try {
+    // 解析到實檔（ts/tsx/js都可以，pirates 會接手轉譯）
+    const abs = require.resolve(specifier);
+    // 砍掉 CJS 快取
+    purgeTree(abs);
+    // 重新載入
+    return require(abs);
+  } catch (error) {
+    console.error(error);
+    return;
+  }
 }

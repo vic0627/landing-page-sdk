@@ -32,11 +32,19 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
       const rawConfig = readRaw(configFile);
       siteConfig = normalize(rawConfig);
       const mod = loadHMR<ExecutorMod>('@landing-page-sdk/vite-executor');
-      ({ main, teardown } = mod);
+      if (mod) {
+        ({ main, teardown } = mod);
+      }
     };
 
-    const runMod = () =>
-      main({ siteConfig, cliOption, context, isFirstProcess });
+    const runMod = async () => {
+      try {
+        return await main({ siteConfig, cliOption, context, isFirstProcess });
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    };
 
     // 先跑一次
     initMainMod();
