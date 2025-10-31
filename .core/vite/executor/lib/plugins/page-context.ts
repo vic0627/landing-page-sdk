@@ -1,7 +1,7 @@
 import { SDKPlugin } from '@landing-page-sdk/types';
 import { namedLogger } from '../common';
 
-const PAGE_CTX = '__PAGE_CTX__';
+const PAGE_CTX = '__SDK_PAGE_CTX__';
 const name = 'vite-plugin-page-context';
 
 export default (({ pagesInfo, siteConfig, cliOption }) => {

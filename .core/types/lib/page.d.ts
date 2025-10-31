@@ -57,7 +57,10 @@ export type PageContext = Omit<Page, 'getContext' | 'data'> & {
 };
 
 declare global {
-  var __PAGE_CTX__: PageContext;
+  /**
+   * 頁面元數據
+   */
+  var __SDK_PAGE_CTX__: PageContext;
 }
 
 export interface Page {

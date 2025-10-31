@@ -1,8 +1,8 @@
 import { JSDOM, DOMWindow } from 'jsdom';
-import { Page, SDKPlugin } from '@landing-page-sdk/types';
-import { relative, join } from '@landing-page-sdk/utils-node';
-import { Logger, namedLogger } from '../common';
 import chalk from 'chalk';
+import { Page, SDKPlugin } from '@landing-page-sdk/types';
+import { manifestResolver } from '@landing-page-sdk/utils-node';
+import { Logger, namedLogger, manifest } from '../common';
 
 const name = 'vite-plugin-router-link';
 const LINK_ATTRS = {
@@ -14,13 +14,7 @@ const LINK_ATTRS = {
 let log!: Logger;
 
 export default (({ siteConfig, cliOption, pagesInfo }) => {
-  const { mode } = cliOption;
   const { pages } = pagesInfo;
-  const { route } = siteConfig;
-
-  const treeRoute = route.mode === 'tree';
-  const relResolution = route.resolution === 'rel';
-  const dirOrientation = route.orientation === 'dir';
 
   log = namedLogger({
     name,
@@ -40,43 +34,35 @@ export default (({ siteConfig, cliOption, pagesInfo }) => {
         return;
       }
 
-      const from = join(page.rootFilename, '../');
+      const { route: fromRoute } = page;
+      const { lang: fromLocale, site: fromSite } = page.data ?? {};
 
       links.forEach((dest, e) => {
-        const { site } = dest.data ?? {};
-        const to = dest.rootFilename;
+        const { route: toRoute } = dest;
+        const { site: toSite, lang: toLocale } = dest.data ?? {};
 
-        let href!: string;
-
-        if (relResolution) {
-          href = normalizeRelPath(
-            treeRoute ? relative(from, to) : join('./', to)
-          );
-        } else {
-          const segment =
-            route.useSiteAsPath || mode === 'dev' ? site ?? '' : '';
-          href = join('/', segment, to);
+        if (!fromRoute || !toRoute || fromSite !== toSite) {
+          return;
         }
 
-        if (treeRoute && dirOrientation) {
-          href = normalizeRelPath(join(href, '../'));
+        try {
+          const href = manifestResolver(manifest, {
+            site: fromSite,
+            fromRoute,
+            fromLocale,
+            toRoute,
+            toLocale,
+          });
+          e.setAttribute('href', href);
+        } catch (error) {
+          console.error(error);
         }
-
-        e.setAttribute('href', href);
       });
 
       return jsdom.serialize();
     },
   };
 }) satisfies SDKPlugin;
-
-function normalizeRelPath(path: string) {
-  if (path.startsWith('.') || path.startsWith('/')) {
-    return path;
-  }
-
-  return './' + path;
-}
 
 function getLinks(
   window: DOMWindow,
