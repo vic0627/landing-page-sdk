@@ -13,6 +13,7 @@ import {
 } from '@landing-page-sdk/utils-node';
 import { Plug, Watcher } from '@landing-page-sdk/vite-executor/hmr';
 import { readRaw, normalize } from '@landing-page-sdk/vite-executor/config';
+import { statSync } from 'node:fs';
 
 type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite-executor')>;
 
@@ -26,7 +27,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
     let siteConfig!: NormalizedSiteConfig;
     let isFirstProcess = true;
 
-    const configFile = cliOption.config ?? 'site.config.js';
+    const configFile = getConfigFile(cliOption.config);
 
     const initMainMod = () => {
       const rawConfig = readRaw(configFile);
@@ -60,7 +61,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
     const initWatcher = () => {
       Watcher.set(resolveProj('@landing-page-sdk/vite-executor'));
       Watcher.set(resolveProj('@landing-page-sdk/utils-node'));
-      Watcher.set(resolveCwd(cliOption.config ?? 'site.config.js'), {
+      Watcher.set(resolveCwd(configFile), {
         evt: ['add', 'change', 'unlink'],
       });
 
@@ -118,4 +119,22 @@ function timelog(label: string, ...msgs: string[]) {
     `${chalk.dim(now)} ${chalk.bold.cyanBright(`[${label}]`)}`,
     ...msgs
   );
+}
+
+function getConfigFile(config?: string): string {
+  const defaults = ['site.config.ts', 'site.config.js'];
+
+  if (config) {
+    return config;
+  }
+
+  const foundDefault = defaults.find((name) => {
+    try {
+      return statSync(resolveCwd(name)).isFile();
+    } catch {
+      return false; // File does not exist or is not a file
+    }
+  });
+
+  return foundDefault || defaults[defaults.length - 1]; // Fallback to 'site.config.js' if neither are found
 }

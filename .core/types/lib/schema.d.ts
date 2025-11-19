@@ -8,6 +8,7 @@ export interface ViteExecutorSchema {
   port?: number;
   /**
    * landing page 設定檔
+   * @default 'site.config.ts'
    * @default 'site.config.js'
    */
   config?: string;
