@@ -127,6 +127,8 @@ export class Page implements PageEssential {
     this._data._data = this._data;
   }
 
+  _stubFor?: string;
+
   // internal
   private resolve: () => void;
   private initOptions: PageInit;
@@ -212,6 +214,7 @@ export class Page implements PageEssential {
     this._rootFilename = join('/', filename);
     this._template = resolveProj('@landing-page-sdk/assets/redirect/stub.html');
     this._entry = resolveProj('@landing-page-sdk/assets/redirect/stub.ts');
+    this._stubFor = join('/', name.replace(NAME_DELIMITER, '/'));
     this.resolve();
   }
 

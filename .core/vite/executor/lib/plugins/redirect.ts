@@ -4,32 +4,25 @@ import {
   ServerResponse,
 } from 'node:http';
 import { Connect } from 'vite';
-import { isBoolean, isObject } from 'lodash-es';
+import { isPlainObject, isString } from 'lodash-es';
 import chalk from 'chalk';
-import { Page, SDKPlugin } from '@landing-page-sdk/types';
-import { join } from '@landing-page-sdk/utils-node';
-import { namedLogger } from '../common';
+import { SDKPlugin } from '@landing-page-sdk/types';
+import { namedLogger, redirectManifest } from '../common';
 
 const name = 'vite-plugin-redirect';
 
+/**
+ * @deprecated
+ */
 export default (({ pagesInfo, siteConfig, cliOption }) => {
   const { redirect } = siteConfig;
-  const { pages, langInfo } = pagesInfo;
+  const { langInfo } = pagesInfo;
   const { langs } = langInfo;
-
-  const disabledByRoot = isBoolean(redirect) && redirect !== false;
-  const disabledByInner = isObject(redirect) && redirect.enable !== false;
   const isSingleLang = langs.length < 2;
 
-  if (disabledByRoot || disabledByInner || isSingleLang) {
+  if (!redirect.enable || isSingleLang) {
     return;
   }
-
-  const routeMap = getRouteMap(pages);
-  const pageData = pages[0].data;
-  const defaultLang = pageData?.env?.['defaultLang'] as string | undefined;
-  const getUserLang = (headers?: IncomingHttpHeaders) =>
-    detectLang(langs, defaultLang, headers);
 
   const log = namedLogger({
     name,
@@ -45,13 +38,23 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
         }
 
         const [url, query] = req?.url!.split('?');
-        const lang = getUserLang(req.headers);
-        const matchRoute = routeMap.get(url);
-        const dest = matchRoute?.(lang);
+        const lang = detectLang(langs, redirect.defaultLang, req.headers);
 
-        if (redirectTo(res, dest, query)) {
-          log(`Redirect from ${chalk.green(url)} to ${chalk.green(dest)}`);
-          return;
+        if (url in redirectManifest) {
+          let dest = redirectManifest[url];
+
+          if (isPlainObject(dest)) {
+            dest = (dest as Record<string, string>)[
+              lang ?? redirect.defaultLang
+            ];
+          }
+
+          if (isString(dest)) {
+            redirectTo(res, dest, query);
+            log(`Redirect from ${chalk.green(url)} to ${chalk.green(dest)}`);
+
+            return;
+          }
         }
 
         next();
@@ -59,25 +62,6 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
     },
   };
 }) satisfies SDKPlugin;
-
-function getRouteMap(pages: Page[]) {
-  const map = new Map<string, (lang?: string) => string | undefined>();
-  pages.forEach(({ data, route }) => {
-    const { site } = data ?? {};
-    const sitePrefix = '/' + (site || '');
-    const pos1 = join(sitePrefix, route!);
-    const pos2 = join(sitePrefix, route!, '/');
-
-    if (map.has(pos1) || map.has(pos2)) {
-      return;
-    }
-
-    const dest = (lang?: string) => lang && join(sitePrefix, lang, route!, '/');
-    map.set(pos1, dest);
-    map.set(pos2, dest);
-  });
-  return map;
-}
 
 function routeGuard(
   req: Connect.IncomingMessage,
@@ -98,9 +82,9 @@ function routeGuard(
 
 function detectLang(
   supported: string[],
-  defaultLang?: string,
+  defaultLang: string,
   headers?: IncomingHttpHeaders
-) {
+): string {
   if (!headers) {
     return defaultLang;
   }
@@ -115,13 +99,9 @@ function detectLang(
 
 function redirectTo(
   res: ServerResponse<IncomingMessage>,
-  location?: string,
+  location: string,
   query?: string
 ) {
-  if (!location) {
-    return false;
-  }
-
   if (query) {
     location += '?' + query;
   }
@@ -129,5 +109,4 @@ function redirectTo(
   res.statusCode = 302;
   res.setHeader('Location', location);
   res.end();
-  return true;
 }

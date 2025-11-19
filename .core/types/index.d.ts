@@ -7,4 +7,5 @@ export * from './lib/types';
 export * from './lib/route';
 export * from './lib/schema';
 export * from './lib/virtual-data-inject';
+export * from './lib/virtual-redirect-manifest';
 export * from './lib/virtual-route-manifest';

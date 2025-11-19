@@ -1,13 +1,11 @@
-import { detectLang } from '@landing-page-sdk/utils-browser';
+import { detectLang, join } from '@landing-page-sdk/utils-browser';
 
-declare var filename: string;
+const { rootFilename } = __SDK_PAGE_CTX__
+const { langs, defaultLang } = __SDK_PAGE_CTX__.data;
 
-const langs = import.meta.env['langs'] as string[] | undefined;
-const lang = import.meta.env['defaultLang'] as string | undefined;
-const depth = filename.split('/').length - 1;
+const lang = detectLang(langs, defaultLang);
+const depth = rootFilename.split('/').filter(Boolean).length - 1;
 const relPath = Array.from({ length: depth }, () => '..').join('/');
-const dest = `${relPath}/${detectLang(langs, lang)}/${filename}${
-  location.search
-}`;
+const dest = join(relPath, lang, rootFilename) + location.search;
 
 window.location.href = dest;

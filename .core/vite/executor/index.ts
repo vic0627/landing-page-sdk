@@ -29,7 +29,7 @@ import sitesInjector from './lib/plugins/sites-injector';
 import transformRedirect from './lib/plugins/transform-redirect';
 import renderBuiltUrl from './lib/plugins/render-built-url';
 import autoController from './lib/plugins/auto-controller';
-import redirect from './lib/plugins/redirect';
+// import redirect from './lib/plugins/redirect';
 import routerLink from './lib/plugins/router-link';
 import pageContext from './lib/plugins/page-context';
 import virtualAssets from './lib/plugins/virtual-assets';
@@ -43,13 +43,13 @@ export async function teardown() {
       await devServer.close();
       devServer = null;
     }
-  } catch {}
+  } catch { }
   try {
     if (previewServer) {
       await previewServer.close();
       previewServer = null;
     }
-  } catch {}
+  } catch { }
 }
 
 export async function main(options: {
@@ -86,7 +86,7 @@ export async function main(options: {
     transformRedirect(siteContext),
     renderBuiltUrl(siteContext),
     autoController(siteContext),
-    redirect(siteContext),
+    // redirect(siteContext),
     viteMockServe(await mockOptions(siteContext)),
     routerLink(siteContext),
     pageContext(siteContext),

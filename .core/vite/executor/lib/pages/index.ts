@@ -12,7 +12,7 @@ export default async function (
   const sites = await diversifyPipe(buildPageOption, pages);
   const pagesInfo = { pages, langInfo, sites };
 
-  createManifest(pagesInfo, buildPageOption.cfg.route);
+  createManifest(pagesInfo, buildPageOption);
 
   return { pages, langInfo, sites };
 }

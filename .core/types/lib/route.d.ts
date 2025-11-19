@@ -27,3 +27,5 @@ export type RouteResolveOption = {
 };
 
 export type RouteResolver = (option: RouteResolveOption) => string;
+
+export type RedirectManifest = Record<string, string | Record<string, string>>;

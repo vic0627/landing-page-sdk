@@ -46,6 +46,7 @@ export default async function (
   const originalPages = [...pages];
   pages.length = 0; // in-place 清空
   const isMultiLang = langInfo.langs.length > 1;
+  const treeMode = route.mode === 'tree';
 
   // 加上根目錄跳轉頁（redirect）
   if (isMultiLang && redirect.enable) {
@@ -86,6 +87,7 @@ export default async function (
         isMultiLang &&
         redirect.enable &&
         redirect.stub &&
+        treeMode &&
         notIndexPage
       ) {
         const stubPage = await createStubPage({

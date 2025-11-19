@@ -98,6 +98,7 @@ export interface Page {
   data?: PageData;
 
   getContext(): PageContext;
+  _stubFor?: string;
 }
 
 export interface PagesInfo {

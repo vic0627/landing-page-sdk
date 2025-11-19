@@ -15,7 +15,17 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
   return {
     name,
     transform(code, id) {
-      if (!['main.js', 'main.ts'].some((name) => id.includes(name))) {
+      if (
+        ![
+          // entry from client
+          'main.js',
+          'main.ts',
+          // entry from core
+          'redirect/flat.ts',
+          'redirect/tree.ts',
+          'redirect/stub.ts',
+        ].some((name) => id.includes(name))
+      ) {
         return;
       }
 
