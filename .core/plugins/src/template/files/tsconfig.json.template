@@ -1,7 +1,6 @@
 {
   "extends": "<%= depthRel %>tsconfig.base.json",
   "compilerOptions": {
-    "module": "esnext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "importHelpers": true,
@@ -18,5 +17,5 @@
     }
   },
   "files": [],
-  "include": ["src/**/*.ts", "src/**/*.js"]
+  "include": ["src/**/*.ts", "src/**/*.js", "site.config.ts", "site.config.js"]
 }
