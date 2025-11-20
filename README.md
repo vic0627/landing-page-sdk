@@ -71,6 +71,16 @@ npx nx g @landing-page-sdk/plugins:template
 
 完成後，新的站點 `@sites/my-new-site` 將會被建立在 `sites/my-new-site` 目錄下，並包含所有必要的設定檔和基礎範例頁面。
 
+### 為子專案安裝套件
+
+若要為特定站點（子專案）安裝額外套件，請在**專案根目錄**使用 `npm install` 並搭配 `--workspace` 參數。
+
+```bash
+npm install <package-name> --workspace=@sites/<project-name>
+```
+
+**重要：** 嚴禁在子專案目錄下直接執行 `npm install`，這會導致套件被錯誤地安裝到根目錄的 `package.json` 中，進而影響整個 monorepo 的穩定性。
+
 ### 開發模式
 
 若要為特定站點啟動開發伺服器，請使用 `nx dev` 指令。例如，啟動 `@sites/my-new-site` 專案：
