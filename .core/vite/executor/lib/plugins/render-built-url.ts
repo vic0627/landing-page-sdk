@@ -10,6 +10,7 @@ const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
 const CSS_URL_RE = /url\(\s*(?:["'])?\/__BASE__\/([^)"']+)(?:["'])?\s*\)/g;
 const JS_IMPORT_RE =
   /(import\s+(?:[\s\S]*?\s+from\s+)?)["']([^"']+)["'](.*?;?)/g;
+const JS_BASE_ASSETS_RE = /["']\/__BASE__\/__ASSETS__\/([^"']+)["']/g;
 const ASSETS = '__ASSETS__';
 
 const name = 'vite-plugin-render-build-url';
@@ -18,6 +19,11 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
   const { versioning, assetsResolution: resolution } = siteConfig.output;
   const routeMode = siteConfig.route.mode;
   const sites = pagesInfo.sites;
+
+  const log = namedLogger({
+    name,
+    verbose: cliOption.verbose,
+  });
 
   const outputFilenames: Record<string, string> = {
     hard: {
@@ -85,22 +91,16 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
       }
     }
 
-    // if using spa, it's impossible to transform path type
-    if (type === 'spa') {
-      render = join('/', render);
-    }
-
     if (versioning === 'soft') {
       render += `?v=${hash}`;
     }
 
+    if (type === 'spa') {
+      render = `new URL("./${render}",import.meta.url).href`;
+    }
+
     return render;
   };
-
-  const log = namedLogger({
-    name,
-    verbose: cliOption.verbose,
-  });
 
   log(
     `Static asset path mode: ${chalk.green(
@@ -131,7 +131,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
             rel = JSON.stringify(transformPath(filename, rel, 'js'));
             return pre + rel + post;
           });
-          asset.code = asset.code.replace(HTML_BASE_RE, (_, rel) => {
+          asset.code = asset.code.replace(JS_BASE_ASSETS_RE, (_, rel) => {
             return transformPath(filename, rel, 'spa');
           });
 
