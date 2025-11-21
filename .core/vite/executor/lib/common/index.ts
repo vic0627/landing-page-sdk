@@ -1,9 +1,10 @@
+import { access } from 'node:fs/promises';
 import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import { ViteMockOptions } from 'vite-plugin-mock';
 import { isString } from 'lodash-es';
 import { NormalizedSiteConfig, SiteContext } from '@landing-page-sdk/types';
-import { resolveProj, isDir } from '@landing-page-sdk/utils-node';
+import { resolveProj, isDir, join } from '@landing-page-sdk/utils-node';
 
 export * from './page';
 export * from './regexp';
@@ -131,4 +132,20 @@ export async function mockOptions(ctx: SiteContext): Promise<ViteMockOptions> {
   }
 
   return options;
+}
+
+export async function findExist(
+  files: string[],
+  defaultFile?: string
+): Promise<string | undefined> {
+  for (const file of files) {
+    try {
+      await access(file);
+      return file.startsWith('/') ? file : join('/', file);
+    } catch {
+      // 檔案不存在 → 跳下一個
+    }
+  }
+
+  return defaultFile;
 }

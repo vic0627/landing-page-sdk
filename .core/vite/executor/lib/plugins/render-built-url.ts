@@ -53,7 +53,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
   const transformPath = (
     filename: string,
     path: string,
-    type: MinifyTargets,
+    type: MinifyTargets | 'spa',
     page?: Page
   ): string => {
     let render = path;
@@ -83,6 +83,11 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
           render = join('../', render);
           break;
       }
+    }
+
+    // if using spa, it's impossible to transform path type
+    if (type === 'spa') {
+      render = join('/', render);
     }
 
     if (versioning === 'soft') {
@@ -125,6 +130,9 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
           asset.code = asset.code.replace(JS_IMPORT_RE, (_, pre, rel, post) => {
             rel = JSON.stringify(transformPath(filename, rel, 'js'));
             return pre + rel + post;
+          });
+          asset.code = asset.code.replace(HTML_BASE_RE, (_, rel) => {
+            return transformPath(filename, rel, 'spa');
           });
 
           continue;

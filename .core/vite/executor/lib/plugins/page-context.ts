@@ -30,7 +30,7 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
       }
 
       id = id.replace(process.cwd(), '');
-      const page = pages.find((p) => p.entry === id);
+      const page = pages.find((p) => p.entry === id || p.entry?.includes(id));
 
       if (page) {
         const context = JSON.stringify(page.getContext());

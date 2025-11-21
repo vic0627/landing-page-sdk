@@ -1,5 +1,4 @@
-import fsp from 'node:fs/promises';
-import { parse, relative } from 'node:path';
+import { parse } from 'node:path';
 import { omit, pick } from 'lodash-es';
 import {
   PageContext,
@@ -8,11 +7,13 @@ import {
   RouteMode,
 } from '@landing-page-sdk/types';
 import {
+  base62Hash,
   join,
   promiseResolver,
   resolveProj,
 } from '@landing-page-sdk/utils-node';
 import { ALPHA_DASH_UNDERSCORE } from './regexp';
+import { findExist } from './index';
 
 type PageType = 'page' | 'redirect' | 'stub';
 
@@ -177,20 +178,12 @@ export class Page implements PageEssential {
   }
 
   private async findEntry(currentDir: string) {
-    const entryJs = join(currentDir, 'main.js');
-    const entryTs = join(currentDir, 'main.ts');
+    const exist = (await findExist(
+      [join(currentDir, 'main.js'), join(currentDir, 'main.ts')],
+      join(currentDir, 'main.ts?virtual-entry')
+    ))!;
 
-    try {
-      await fsp.access(entryJs);
-      return entryJs.startsWith('/') ? entryJs : join('/', entryJs);
-    } catch {
-      try {
-        await fsp.access(entryTs);
-        return entryTs.startsWith('/') ? entryTs : join('/', entryTs);
-      } catch {
-        return;
-      }
-    }
+    return join('/', exist);
   }
 
   private initRedirectPage() {
@@ -200,9 +193,12 @@ export class Page implements PageEssential {
     this._template = resolveProj(
       '@landing-page-sdk/assets/redirect/index.html'
     );
-    this._entry = resolveProj(
-      `@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`
-    );
+    this._entry =
+      resolveProj(
+        `@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`
+      ) +
+      '?' +
+      base62Hash(Math.random().toString(), 6); // add id to let this page appears in manifest.json
     this.resolve();
   }
 
@@ -213,7 +209,10 @@ export class Page implements PageEssential {
     this._filename = filename;
     this._rootFilename = join('/', filename);
     this._template = resolveProj('@landing-page-sdk/assets/redirect/stub.html');
-    this._entry = resolveProj('@landing-page-sdk/assets/redirect/stub.ts');
+    this._entry =
+      resolveProj('@landing-page-sdk/assets/redirect/stub.ts') +
+      '?' +
+      base62Hash(Math.random().toString(), 6); // add id to let this page appears in manifest.json
     this._stubFor = join('/', name.replace(NAME_DELIMITER, '/'));
     this.resolve();
   }
