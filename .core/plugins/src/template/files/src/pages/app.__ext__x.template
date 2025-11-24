@@ -8,13 +8,13 @@ export default function App() {
 
   return (
     <div>
-      <div<% if (style.includes('tailwindcss')) { %> class="flex justify-evenly"<% } else { %> style={{ display: 'flex', justifyContent: 'space-between' }}<% } %>>
+      <div<% if (style.includes('tailwindcss')) { %> className="flex justify-evenly"<% } else { %> style={{ display: 'flex', justifyContent: 'space-between' }}<% } %>>
         <ViteLogo />
         <ReactLogo />
       </div>
       <h1>Hello {$t('title')}!</h1>
       <Counter />
-      <p class="read-the-docs">Click on the Vite and React logos to learn more</p>
+      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
     </div>
   );
 }

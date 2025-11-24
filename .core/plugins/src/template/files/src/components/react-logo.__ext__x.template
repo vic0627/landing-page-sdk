@@ -6,7 +6,7 @@ export default function ReactLogo() {
       href="https://react.dev"
       target="_blank"
     >
-      <img src={reactLogo} class="logo react" alt="React logo" />
+      <img src={reactLogo} className="logo react" alt="React logo" />
     </a>
   );
 }
