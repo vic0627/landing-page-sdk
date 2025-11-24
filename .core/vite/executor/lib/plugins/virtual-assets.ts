@@ -34,6 +34,8 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
         const entry = await findExist([
           resolve(pagesDir, 'main.js'),
           resolve(pagesDir, 'main.ts'),
+          resolve(pagesDir, 'main.jsx'),
+          resolve(pagesDir, 'main.tsx'),
         ]);
 
         if (!entry) {

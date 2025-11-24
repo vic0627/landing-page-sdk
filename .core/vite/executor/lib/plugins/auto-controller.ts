@@ -70,9 +70,8 @@ function logMsg(id: string, opts: NormalizedControllerOption[]) {
       const conj = i && arr.length - 1 === i ? 'and ' : '';
       return (str += `, ${conj}${name}`);
     }, '');
-  return `Injected controller${
-    opts.length > 1 ? 's' : ''
-  } ${names} into ${chalk.green(id)}`;
+  return `Injected controller${opts.length > 1 ? 's' : ''
+    } ${names} into ${chalk.green(id)}`;
 }
 
 function toControllerName(name: string) {
@@ -145,7 +144,7 @@ async function inlineTransform(
 
 function findEntryById(pages: Page[], id: string) {
   let entryInfo: Page | undefined;
-  if (id.includes('/main.js')) {
+  if (id.includes('/main.js') || id.includes('/main.ts') || id.includes('/main.jsx') || id.includes('/main.tsx')) {
     id = id.replace(resolve(), '');
     entryInfo = pages.find((p) => p.entry === id);
   } else if (id.includes('.html')) {

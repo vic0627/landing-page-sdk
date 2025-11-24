@@ -19,7 +19,7 @@ type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite-executor')>;
 
 const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
   async function* (cliOption, context) {
-    // switch working dir
+    // Switch working directory to the workspace root resolved from CLI option
     process.chdir(resolveRoot(cliOption.cwd));
 
     let main!: ExecutorMod['main'];
@@ -47,18 +47,21 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
       }
     };
 
-    // 先跑一次
+    // Perform first run for the current config/module state
     initMainMod();
 
     yield { success: await runMod() };
 
-    // build 模式單次就結束
+    // In build mode we only run once and exit
     if (cliOption.mode === 'build') return;
 
     isFirstProcess = false;
     Plug.init();
 
     const initWatcher = () => {
+      // do not enable HMR in preview mode
+      if (cliOption.mode === 'preview') return;
+
       Watcher.set(resolveProj('@landing-page-sdk/vite-executor'));
       Watcher.set(resolveProj('@landing-page-sdk/utils-node'));
       Watcher.set(resolveCwd(configFile), {
@@ -83,8 +86,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
         ),
       });
 
-      // 監看事件，只負責發訊號
-      // 用 on 處理，未來要看事件及對象判斷是否觸發 HMR
+      // Watcher only emits change signals; future logic can decide when to trigger HMR per event/target
       Watcher.on((evt, file) => {
         file = relative(resolveRoot(), file);
         console.clear();
@@ -99,14 +101,14 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
 
     initWatcher();
 
-    // HMR 迴圈
+    // HMR loop: wait for changes, then reload executor + config
     while (true) {
-      await Plug.plug; // 等待檔案變更訊號
+      await Plug.plug; // Wait for file change signal
       await Watcher.destroy();
       await teardown();
       initMainMod();
       const success = await runMod();
-      initWatcher(); // 待程序完成再跑 watcher
+      initWatcher(); // Restart watcher after run completes
       yield { success };
     }
   };

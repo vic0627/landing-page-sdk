@@ -179,7 +179,12 @@ export class Page implements PageEssential {
 
   private async findEntry(currentDir: string) {
     const exist = (await findExist(
-      [join(currentDir, 'main.js'), join(currentDir, 'main.ts')],
+      [
+        join(currentDir, 'main.js'),
+        join(currentDir, 'main.ts'),
+        join(currentDir, 'main.jsx'),
+        join(currentDir, 'main.tsx'),
+      ],
       join(currentDir, 'main.ts?virtual-entry')
     ))!;
 
