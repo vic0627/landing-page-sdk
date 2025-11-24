@@ -27,7 +27,7 @@ export async function templateGenerator(
 
   const deleteFiles: string[] = [];
   const dependencies: Record<string, string> = {};
-  const vueExtracts: string[] = [
+  const vueExcludes: string[] = [
     `src/pages/app.${ext}x`,
     `src/pages/main.${ext}x`,
     `src/components/counter.${ext}x`,
@@ -35,7 +35,7 @@ export async function templateGenerator(
     `src/components/vite-logo.${ext}x`,
     'public/__ASSETS__/react.svg'
   ];
-  const reactExtracts: string[] = [
+  const reactExcludes: string[] = [
     'src/pages/app.vue',
     `src/pages/main.${ext}`,
     'src/components/counter.vue',
@@ -47,18 +47,18 @@ export async function templateGenerator(
   if (options.framework === 'none') {
     deleteFiles.push(
       `src/composables/use-i18n.${ext}`,
-      ...vueExtracts,
-      ...reactExtracts,
+      ...vueExcludes,
+      ...reactExcludes,
     );
   } else {
     deleteFiles.push(`src/composables/counter.${ext}`);
 
     if (options.framework === 'vue') {
-      deleteFiles.push(...vueExtracts);
+      deleteFiles.push(...vueExcludes);
       dependencies['vue'] = 'latest';
       dependencies['@vitejs/plugin-vue'] = 'latest';
     } else if (options.framework === 'react') {
-      deleteFiles.push(...reactExtracts);
+      deleteFiles.push(...reactExcludes);
       dependencies['react'] = 'latest';
       dependencies['react-dom'] = 'latest';
       dependencies['@vitejs/plugin-react'] = 'latest';
