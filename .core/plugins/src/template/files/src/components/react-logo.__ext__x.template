@@ -1,0 +1,12 @@
+import reactLogo from '/__ASSETS__/react.svg';
+
+export default function ReactLogo() {
+  return (
+    <a
+      href="https://react.dev"
+      target="_blank"
+    >
+      <img src={reactLogo} class="logo react" alt="React logo" />
+    </a>
+  );
+}

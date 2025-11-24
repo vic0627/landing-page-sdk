@@ -7,22 +7,42 @@
     "name": {
       "type": "string",
       "description": "",
-      "pattern": "^[a-z]+(-[a-z]+)*$",
-      "x-prompt": "請輸入專案名稱"
+      "pattern": "^(@[a-z0-9-]+\\/)?[a-z0-9-]+$",
+      "x-prompt": "Please enter the project name"
     },
     "path": {
       "type": "string",
       "description": "",
       "pattern": "^(?!.*[-/]{2})[a-z-/]+$",
-      "x-prompt": "請輸入專案路徑"
+      "x-prompt": "Please enter the project path"
     },
     "routeMode": {
       "type": "string",
       "description": "",
       "enum": ["tree", "flat"],
       "default": "tree",
-      "x-prompt": "新專案要使用哪種路由模式？"
+      "x-prompt": "Which routing mode should the new project use?"
+    },
+    "useTs": {
+      "type": "boolean",
+      "description": "",
+      "x-prompt": "Do you want to use TypeScript?"
+    },
+    "framework": {
+      "type": "string",
+      "description": "",
+      "enum": ["none", "vue", "react"],
+      "x-prompt": "Which SPA framework do you want to use?"
+    },
+    "style": {
+      "type": "array",
+      "description": "",
+      "items": {
+        "type": "string",
+        "enum": ["sass", "tailwindcss"]
+      },
+      "x-prompt": "Which CSS tools do you want to use? (Press <Enter> for none)"
     }
   },
-  "required": ["name", "path"]
+  "required": ["name", "path", "routeMode", "useTs", "framework", "style"]
 }

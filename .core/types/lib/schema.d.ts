@@ -15,8 +15,15 @@ export interface ViteExecutorSchema {
   sites?: string;
 }
 
+type Framework = 'vue' | 'react' | 'none';
+
+type Style = 'sass' | 'tailwindcss';
+
 export interface TemplateGeneratorSchema {
   name: string;
   path: string;
-  routeMode?: RouteMode;
+  routeMode: RouteMode;
+  useTs: boolean;
+  framework: Framework;
+  style: Style[];
 }

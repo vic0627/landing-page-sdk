@@ -1,0 +1,29 @@
+<template>
+  <div>
+    <div class="<% if (style.includes('tailwindcss')) { %>flex justify-evenly<% } else { %>logo-container<% } %>">
+      <vite-logo />
+      <vue-logo />
+    </div>
+    <h1>Hello {{ $t('title') }}!</h1>
+    <counter />
+    <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+  </div>
+</template>
+
+<script setup<% if (useTs) { %> lang="ts"<% } %>>
+import counter from '@/components/counter.vue';
+import viteLogo from '@/components/vite-logo.vue';
+import vueLogo from '@/components/vue-logo.vue';
+import useI18n from '@/composables/use-i18n';
+
+const $t = useI18n();
+</script>
+<% if (!style.includes('tailwindcss')) { %>
+
+<style scoped<% if (style.includes('sass')) { %> lang="scss"<% } %>>
+.logo-container {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+<% } %>

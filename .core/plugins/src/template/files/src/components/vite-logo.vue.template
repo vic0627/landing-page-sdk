@@ -1,0 +1,9 @@
+<template>
+  <a href="https://vite.dev" target="_blank">
+    <img :src="viteLogo" class="logo" alt="Vite logo" />
+  </a>
+</template>
+
+<script setup<% if (useTs) { %> lang="ts"<% } %>>
+import viteLogo from '/__ASSETS__/vite.svg'
+</script>

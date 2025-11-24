@@ -1,0 +1,9 @@
+import viteLogo from '/__ASSETS__/vite.svg'
+
+export default function ViteLogo() {
+  return (
+    <a href="https://vite.dev" target="_blank">
+      <img src={viteLogo} class="logo" alt="Vite logo" />
+    </a>
+  );
+}

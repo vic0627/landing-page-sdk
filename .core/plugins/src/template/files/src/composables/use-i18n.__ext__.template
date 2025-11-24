@@ -1,0 +1,27 @@
+import { isString } from 'lodash-es';
+
+export default function () {
+  const { i18n } = __SDK_PAGE_CTX__.data ?? {};
+
+  if (!i18n) {
+    throw new Error('Missing locale context for i18n');
+  }
+
+  const langPack = i18n;
+
+  return function (key<% if (useTs) { %>: string<% } %>, ...args<% if (useTs) { %>: any[]<% } %>) {
+    try {
+      const keys = key.split('.');
+      let pack = langPack;
+      let k;
+      while ((k = keys.shift())) {
+        pack = pack[k];
+      }
+      if (isString(pack)) {
+        return pack.replace(/{(\d+)}/g, (match, index) => args[index]);
+      } throw new Error();
+    } catch {
+      return key;
+    }
+  };
+}

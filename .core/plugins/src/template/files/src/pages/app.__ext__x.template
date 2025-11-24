@@ -1,0 +1,20 @@
+import useI18n from '@/composables/use-i18n';
+import Counter from '@/components/counter.<%= ext %>x';
+import ViteLogo from '@/components/vite-logo.<%= ext %>x';
+import ReactLogo from '@/components/react-logo.<%= ext %>x';
+
+export default function App() {
+  const $t = useI18n();
+
+  return (
+    <div>
+      <div<% if (style.includes('tailwindcss')) { %> class="flex justify-evenly"<% } else { %> style={{ display: 'flex', justifyContent: 'space-between' }}<% } %>>
+        <ViteLogo />
+        <ReactLogo />
+      </div>
+      <h1>Hello {$t('title')}!</h1>
+      <Counter />
+      <p class="read-the-docs">Click on the Vite and React logos to learn more</p>
+    </div>
+  );
+}

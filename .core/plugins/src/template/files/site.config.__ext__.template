@@ -1,0 +1,19 @@
+<% if (framework === 'vue') { %>
+import vue from '@vitejs/plugin-vue';
+<% } else if (framework === 'react') { %>
+import react from '@vitejs/plugin-react';
+<% } %><% if (style.includes('tailwindcss')) { %>
+import tailwindcss from '@tailwindcss/vite';
+<% } %>
+<% if (useTs) { %>import { SiteConfig } from '@landing-page-sdk/types';
+<% } else { %>/** @type {import('@landing-page-sdk/types').SiteConfig} */<% } %>
+export default {
+  <% if (framework !== 'none' || style.length) { %>plugins: [
+    <% if (framework === 'vue') { %>vue(),<% } %>
+    <% if (framework === 'react') { %>react(),<% } %>
+    <% if (style.includes('tailwindcss')) { %>tailwindcss(),<% } %>
+  ],<% } %>
+  route: {
+    mode: '<%= routeMode %>',
+  },
+}<% if (useTs) { %> satisfies SiteConfig<% } %>;

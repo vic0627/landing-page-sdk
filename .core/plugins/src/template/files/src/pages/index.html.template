@@ -7,6 +7,7 @@
     <title><%%= i18n.title %></title>
   </head>
   <body>
+    <% if (framework === 'none') { %>
     <div>
       <a href="https://vite.dev" target="_blank">
         <img src="/__ASSETS__/vite.svg" class="logo" alt="Vite logo" />
@@ -27,5 +28,8 @@
       </div>
       <p class="read-the-docs">Click on the Vite logo to learn more</p>
     </div>
+    <% } else { %>
+    <div id="app"></div>
+    <% } %>
   </body>
 </html>
