@@ -14,14 +14,12 @@ export async function templateGenerator(
   options: TemplateGeneratorSchema
 ) {
   const projectRoot = options.path.endsWith('/') ? options.path.slice(0, -1) : options.path;
-
   const source = join(__dirname, 'files');
+  const ext = options.useTs ? 'ts' : 'js';
   const depthRel = projectRoot
     .split('/')
     .map(() => '../')
     .join('');
-
-  const ext = options.useTs ? 'ts' : 'js';
 
   generateFiles(tree, source, projectRoot, { ...options, depthRel, ext });
 
@@ -44,6 +42,7 @@ export async function templateGenerator(
     'public/__ASSETS__/vue.svg'
   ];
 
+  // add framework dependencies
   if (options.framework === 'none') {
     deleteFiles.push(
       `src/composables/use-i18n.${ext}`,
@@ -65,25 +64,33 @@ export async function templateGenerator(
     }
   }
 
+  // add style dependencies
   if (options.style.includes('tailwindcss')) {
     dependencies['tailwindcss'] = 'latest';
     dependencies['@tailwindcss/vite'] = 'latest';
-  } else if (options.style.includes('sass')) {
+  }
+
+  if (options.style.includes('sass')) {
     dependencies['sass-embedded'] = 'latest';
   } else {
     deleteFiles.push('src/styles/main.scss');
   }
 
+  // delete unused files
   deleteFiles.forEach((file) => tree.delete(join(projectRoot, file)));
 
+  // add dependencies to project
   const pkg = readJson(tree, join(projectRoot, 'package.json'));
-
   pkg.dependencies = {
     ...pkg.dependencies,
     ...dependencies,
   };
-
   writeJson(tree, join(projectRoot, 'package.json'), pkg);
+
+  // add project to workspace
+  const rootPkg = readJson(tree, 'package.json');
+  rootPkg.workspaces.push(projectRoot);
+  writeJson(tree, 'package.json', rootPkg);
 
   await formatFiles(tree);
 
