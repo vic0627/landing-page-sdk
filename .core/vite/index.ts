@@ -82,7 +82,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> =
         evt: ['add', 'unlink'],
         matcher: Watcher.createFileMatcher(
           { name: 'index', ext: ['.html', '.ejs'] },
-          { name: 'main', ext: ['.js', '.ts'] }
+          { name: 'main', ext: ['.js', '.ts', '.jsx', '.tsx'] }
         ),
       });
 
