@@ -20,6 +20,11 @@ export async function templateGenerator(
     .split('/')
     .map(() => '../')
     .join('');
+  const rootPkg = readJson(tree, 'package.json');
+
+  if (rootPkg.workspaces.includes(projectRoot)) {
+    throw new Error(`${projectRoot} already exists as a workspace`);
+  }
 
   generateFiles(tree, source, projectRoot, { ...options, depthRel, ext });
 
@@ -88,7 +93,6 @@ export async function templateGenerator(
   writeJson(tree, join(projectRoot, 'package.json'), pkg);
 
   // add project to workspace
-  const rootPkg = readJson(tree, 'package.json');
   rootPkg.workspaces.push(projectRoot);
   writeJson(tree, 'package.json', rootPkg);
 
