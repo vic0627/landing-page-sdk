@@ -33,10 +33,11 @@ Landing Page SDK
 ```
 .
 ├── .core/         # 核心 SDK 邏輯、Vite 插件和工具程式
-├── sites/         # 各個獨立的登陸頁面專案=
+├── .nx/           # Nx 快取目錄
 ├── dist/          # 建置輸出目錄
+├── docs/          # 文件目錄
 ├── nx.json        # Nx 工作區設定
-└── package.json
+└── package.json   # 套件設定檔
 ```
 
 ## 如何開始
@@ -66,10 +67,13 @@ npx nx g @landing-page-sdk/plugins:template
 
 執行後，系統會提示您輸入以下資訊：
 -   **專案名稱 (name):** 新站點的名稱 (例如: `my-new-site`)。
--   **專案路徑 (path):** 新站點在 `sites` 目錄下的路徑 (例如: `my-new-site`)。
+-   **專案路徑 (path):** 新站點的路徑 (例如: `landing-page/my-new-site`)。
 -   **路由模式 (routeMode):** 站點要使用的路由模式 (`tree` 或 `flat`)。
+-   **使用 TypeScript (useTs):** 是否使用 TypeScript (是/否)。
+-   **框架 (framework):** 站點要使用的框架 (`vue`、`react` 或 `none`)。
+-   **樣式處理器 (style):** 站點要使用的樣式處理器 (`tailwindcss`、`sass` 或 `none`)。
 
-完成後，新的站點 `@sites/my-new-site` 將會被建立在 `sites/my-new-site` 目錄下，並包含所有必要的設定檔和基礎範例頁面。
+完成後，新的站點 `my-new-site` 將會被建立在 `landing-page/my-new-site` 目錄下，並包含所有必要的設定檔和基礎範例頁面。
 
 ### 為子專案安裝套件
 
@@ -83,10 +87,10 @@ npm install <package-name> --workspace=@sites/<project-name>
 
 ### 開發模式
 
-若要為特定站點啟動開發伺服器，請使用 `nx dev` 指令。例如，啟動 `@sites/my-new-site` 專案：
+若要為特定站點啟動開發伺服器，請使用 `nx dev` 指令。例如，啟動 `my-new-site` 專案：
 
 ```bash
-npx nx dev @sites/my-new-site
+npx nx dev my-new-site
 ```
 
 伺服器將會啟動，您可以在瀏覽器中看到您的網站，並享受即時重新載入的功能。
@@ -96,7 +100,7 @@ npx nx dev @sites/my-new-site
 若要為生產環境建置站點，請使用 `nx build` 指令：
 
 ```bash
-npx nx build @sites/my-new-site
+npx nx build my-new-site
 ```
 
 經過優化和打包的資源將會被放置在 `dist` 目錄中。

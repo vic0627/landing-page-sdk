@@ -8,24 +8,24 @@
 npx nx generate @landing-page-sdk/plugins:template
 ```
 
-執行後，系統會引導您輸入專案名稱、路徑等資訊，然後在 `sites/` 目錄下建立一個包含完整基礎結構的新站點，新站點將會以 `@sites/` 為命名空間，假設建立新站點輸入的名稱為 `new-site`，那麼完整的站點名稱將會是 `@sites/new-site`。
+執行後，系統會引導您輸入專案名稱、路徑等資訊，然後在您輸入的路徑下建立一個包含完整基礎結構的新站點。
 
 ### 目錄結構
 
 一個站點通常包含以下結構：
 
 ```
-/sites/your-site-name/
+your-site-name/
 |-- package.json       # 專案的基本資訊
 |-- site.config.js     # 專案的核心設定檔
 |-- public/
 |   |-- __ASSETS__/    # 靜態資源 (圖片、favicon 等)
 |-- src/
-    |-- components/    # 可複用的 EJS 元件
+    |-- components/    # 元件
     |-- i18n/          # 多國語系 JSON 檔案
     |-- pages/         # 頁面模板與邏輯
     |-- sites/         # 站點變體腳本
-    |-- styles/        # 共用樣式
+    |-- styles/        # 樣式
 ```
 
 ### 常用指令
@@ -38,7 +38,7 @@ npx nx generate @landing-page-sdk/plugins:template
 
 ```bash
 # 將 your-site-name 替換成您的站點名稱
-npx nx dev @sites/your-site-name
+npx nx dev your-site-name
 ```
 
 伺服器將會啟動，並提供一個可供預覽的網址，支援熱模組更換 (HMR)。
@@ -56,7 +56,7 @@ npx nx dev @sites/your-site-name
 執行以下指令來為生產環境建置站點：
 
 ```bash
-npx nx build @sites/your-site-name
+npx nx build your-site-name
 ```
 
 建置完成的檔案會輸出到 `dist/` 目錄。
@@ -72,7 +72,7 @@ npx nx build @sites/your-site-name
 在本地預覽生產環境建置後的結果：
 
 ```bash
-npx nx preview @sites/your-site-name
+npx nx preview your-site-name
 ```
 
 **可用選項：**
