@@ -11,9 +11,9 @@
 </template>
 
 <script setup<% if (useTs) { %> lang="ts"<% } %>>
-import counter from '@/components/counter.vue';
-import viteLogo from '@/components/vite-logo.vue';
-import vueLogo from '@/components/vue-logo.vue';
+import counter from '@/components/counter';
+import viteLogo from '@/components/vite-logo';
+import vueLogo from '@/components/vue-logo';
 import useI18n from '@/composables/use-i18n';
 
 const $t = useI18n();

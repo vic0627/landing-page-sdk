@@ -1,7 +1,7 @@
 import useI18n from '@/composables/use-i18n';
-import Counter from '@/components/counter.<%= ext %>x';
-import ViteLogo from '@/components/vite-logo.<%= ext %>x';
-import ReactLogo from '@/components/react-logo.<%= ext %>x';
+import Counter from '@/components/counter';
+import ViteLogo from '@/components/vite-logo';
+import ReactLogo from '@/components/react-logo';
 
 export default function App() {
   const $t = useI18n();

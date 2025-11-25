@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { <% if (useTs) { %>ReactNode, <% } %>useEffect, useState } from 'react';
 import { manifestResolver } from '@landing-page-sdk/utils-browser';
 import manifest from 'virtual:route-manifest';
 
@@ -18,7 +18,7 @@ export default function RouterLink({ to, locale, children }<% if (useTs) { %>: R
     const resolved = manifestResolver(manifest, {
       site,
       fromLocale,
-      fromRoute,
+      fromRoute: fromRoute<% if (useTs) { %>!<% } %>,
       toLocale: locale ?? fromLocale,
       toRoute: to,
     });

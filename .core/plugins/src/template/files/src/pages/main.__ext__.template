@@ -2,7 +2,7 @@
 import { setupCounter } from '@/composables/counter';
 <% } else if (framework === 'vue') { %>
 import { createApp } from 'vue';
-import App from './app.vue';
+import App from './app';
 <% } %>
 <% if (style.includes('sass')) { %>
 import '@/styles/main.scss';

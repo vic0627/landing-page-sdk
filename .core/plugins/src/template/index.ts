@@ -70,6 +70,8 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
       deleteFiles.push(...reactExcludes);
       dependencies['react'] = '^19.2.0';
       dependencies['react-dom'] = '^19.2.0';
+      dependencies['@types/react'] = '^19.2.0';
+      dependencies['@types/react-dom'] = '^19.2.0';
       dependencies['@vitejs/plugin-react'] = '^5.1.1';
     }
   }

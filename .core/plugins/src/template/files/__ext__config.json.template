@@ -10,6 +10,11 @@
     "noPropertyAccessFromIndexSignature": true,
     "allowJs": true,
     "checkJs": false,
+    <% if (framework === 'react') { %>
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    <% } %>
     "baseUrl": ".",
     "outDir": "dist",
     "paths": {
@@ -17,5 +22,5 @@
     }
   },
   "files": [],
-  "include": ["src/**/*.<%= ext %>", "site.config.<%= ext %>"<% if (framework === 'vue') { %>, "src/pages/app.vue"<% } %><% if (framework === 'react') { %>, "src/pages/app.jsx"<% } %>]
+  "include": ["src/**/*.<%= ext %>", "site.config.<%= ext %>"<% if (framework === 'vue') { %>, "src/pages/app.vue"<% } %><% if (framework === 'react') { %>, "src/pages/app.<%= ext %>x"<% } %>]
 }
