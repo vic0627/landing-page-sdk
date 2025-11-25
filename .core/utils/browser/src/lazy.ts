@@ -9,15 +9,9 @@ type Loader<L> = (el: L) => void;
 type RegisteredLoader<L> = Loader<L> & LoaderId;
 
 let observer: IntersectionObserver;
-const loaderMap: Map<
-  symbol,
-  { loader: RegisteredLoader<Element>; className: string }
-> = new Map();
+const loaderMap: Map<symbol, { loader: RegisteredLoader<Element>; className: string }> = new Map();
 
-export const createLoader = <L>(
-  loader: Loader<L>,
-  id?: string
-): RegisteredLoader<L> => {
+export const createLoader = <L>(loader: Loader<L>, id?: string): RegisteredLoader<L> => {
   const symbolId = Symbol(id);
 
   Object.defineProperty(loader, __LOADER__, { value: symbolId });
@@ -45,8 +39,7 @@ const loadImage = /* @__PURE__ */ createLoader<MediaElement>((img) => {
   if (!path) return;
   const [imageName, imgType] = imageNameAndType.split('.');
 
-  if (imageName === 'logo')
-    img.src = `${path}images/${imageName}_${lang}.${imgType}`;
+  if (imageName === 'logo') img.src = `${path}images/${imageName}_${lang}.${imgType}`;
   else img.src = img.dataset['src'] ?? '';
 }, 'LAZY_IMAGE');
 
@@ -67,10 +60,7 @@ const loadBackgroundImage = /* @__PURE__ */ createLoader<HTMLElement>((el) => {
   if (url) el.style.backgroundImage = `url('${url}')`;
 }, 'LAZY_BACKGROUND_IMAGE');
 
-export const lazyWrap = <E extends Element>(
-  className: string,
-  loader: RegisteredLoader<E>
-) => {
+export const lazyWrap = <E extends Element>(className: string, loader: RegisteredLoader<E>) => {
   const lazyTargets = $all(className) as NodeListOf<E>;
 
   if (!('IntersectionObserver' in window)) return lazyTargets.forEach(loader);

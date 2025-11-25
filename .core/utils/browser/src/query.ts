@@ -1,4 +1,4 @@
-import { $all } from './dom'
+import { $all } from './dom';
 
 /**
  * 從指定的 URL 中提取查詢字串部分。
@@ -7,8 +7,8 @@ import { $all } from './dom'
  * @returns 返回 URL 中的查詢字串部分，如果 URL 中不包含查詢字串，則返回空字串。
  */
 export function getQueryString(url = window.location.href) {
-  const queryStringStart = url.indexOf('?')
-  return queryStringStart !== -1 ? url.substring(queryStringStart + 1) : ''
+  const queryStringStart = url.indexOf('?');
+  return queryStringStart !== -1 ? url.substring(queryStringStart + 1) : '';
 }
 
 /**
@@ -18,12 +18,15 @@ export function getQueryString(url = window.location.href) {
  * @param url - 要解析的 URL，預設為當前頁面的 URL。
  * @returns 返回查詢參數的值，如果未找到則返回 null。
  */
-export function getQueryParam(paramName: string, url: string = window.location.href): string | null {
-  const queryParams = parseQueryParams(url)
+export function getQueryParam(
+  paramName: string,
+  url: string = window.location.href
+): string | null {
+  const queryParams = parseQueryParams(url);
 
-  if (queryParams) return queryParams[paramName] ?? null
+  if (queryParams) return queryParams[paramName] ?? null;
 
-  return null
+  return null;
 }
 
 /**
@@ -34,18 +37,22 @@ export function getQueryParam(paramName: string, url: string = window.location.h
  * @param url - 要修改的 URL，預設為當前頁面的 URL。
  * @returns 返回包含更新後查詢字串的 URL。
  */
-export function setQueryParam(paramName: string, paramValue: string, url: string = window.location.href): string {
-  const queryParams = parseQueryParams(url)
+export function setQueryParam(
+  paramName: string,
+  paramValue: string,
+  url: string = window.location.href
+): string {
+  const queryParams = parseQueryParams(url);
 
-  if (!queryParams) return url
+  if (!queryParams) return url;
 
-  queryParams[paramName] = paramValue
+  queryParams[paramName] = paramValue;
 
-  const queryString = buildQueryString(queryParams)
+  const queryString = buildQueryString(queryParams);
 
-  if (!queryString) return url
+  if (!queryString) return url;
 
-  return clearQueryParams(url) + '?' + queryString
+  return clearQueryParams(url) + '?' + queryString;
 }
 
 /**
@@ -56,17 +63,17 @@ export function setQueryParam(paramName: string, paramValue: string, url: string
  * @returns 返回刪除指定查詢參數後的 URL。
  */
 export function deleteQueryParam(paramName: string, url: string = window.location.href): string {
-  const queryParams = parseQueryParams(url)
+  const queryParams = parseQueryParams(url);
 
-  if (!queryParams) return url
+  if (!queryParams) return url;
 
-  delete queryParams[paramName]
+  delete queryParams[paramName];
 
-  const queryString = buildQueryString(queryParams)
+  const queryString = buildQueryString(queryParams);
 
-  if (!queryString) return url
+  if (!queryString) return url;
 
-  return clearQueryParams(url) + '?' + queryString
+  return clearQueryParams(url) + '?' + queryString;
 }
 
 /**
@@ -76,17 +83,17 @@ export function deleteQueryParam(paramName: string, url: string = window.locatio
  * @returns 返回包含所有查詢參數的對象。
  */
 export function parseQueryParams(url: string = window.location.href): Record<string, string> {
-  const queryString = url.split('?')[1]
+  const queryString = url.split('?')[1];
 
-  if (!queryString) return {}
+  if (!queryString) return {};
 
   const result = queryString.split('&').reduce((acc, param) => {
-    const [key, value] = param.split('=')
-    acc[key] = value
-    return acc
-  }, {} as Record<string, string>)
+    const [key, value] = param.split('=');
+    acc[key] = value;
+    return acc;
+  }, {} as Record<string, string>);
 
-  return result
+  return result;
 }
 
 /**
@@ -97,11 +104,11 @@ export function parseQueryParams(url: string = window.location.href): Record<str
  */
 export function buildQueryString(params: Record<string, string>): string {
   const queryString = Object.entries(params).reduce((acc, [key, value], i) => {
-    const pair = `${key}=${value}`
-    return !i ? (acc += pair) : (acc += `&${pair}`)
-  }, '')
+    const pair = `${key}=${value}`;
+    return !i ? (acc += pair) : (acc += `&${pair}`);
+  }, '');
 
-  return queryString
+  return queryString;
 }
 
 /**
@@ -111,20 +118,23 @@ export function buildQueryString(params: Record<string, string>): string {
  * @param url - 要修改的 URL，預設為當前頁面的 URL。
  * @returns 返回包含更新後查詢字串的 URL。
  */
-export function updateQueryParams(params: Record<string, string>, url: string = window.location.href): string {
-  const queryParams = parseQueryParams(url)
+export function updateQueryParams(
+  params: Record<string, string>,
+  url: string = window.location.href
+): string {
+  const queryParams = parseQueryParams(url);
 
-  if (!queryParams) return url
+  if (!queryParams) return url;
 
   for (const key in params) {
-    queryParams[key] = params[key]
+    queryParams[key] = params[key];
   }
 
-  const queryString = buildQueryString(queryParams)
+  const queryString = buildQueryString(queryParams);
 
-  if (!queryString) return url
+  if (!queryString) return url;
 
-  return clearQueryParams(url) + '?' + queryString
+  return clearQueryParams(url) + '?' + queryString;
 }
 
 /**
@@ -134,7 +144,7 @@ export function updateQueryParams(params: Record<string, string>, url: string = 
  * @returns 返回清除所有查詢參數後的 URL。
  */
 export function clearQueryParams(url: string = window.location.href): string {
-  return url.split('?')[0]
+  return url.split('?')[0];
 }
 
 /**
@@ -149,8 +159,8 @@ export function setDataQuery(
   selector: string,
   queryDescriptor: boolean | string[] | Record<string, string | number | boolean>
 ): void {
-  let dataQuery: string
-  if (typeof queryDescriptor === 'boolean') dataQuery = queryDescriptor ? '' : 'false'
-  if (typeof queryDescriptor === 'object') dataQuery = JSON.stringify(queryDescriptor)
-  $all(selector).forEach((node) => node.setAttribute('data-query', dataQuery))
+  let dataQuery: string;
+  if (typeof queryDescriptor === 'boolean') dataQuery = queryDescriptor ? '' : 'false';
+  if (typeof queryDescriptor === 'object') dataQuery = JSON.stringify(queryDescriptor);
+  $all(selector).forEach((node) => node.setAttribute('data-query', dataQuery));
 }

@@ -5,7 +5,7 @@
  * @returns 路徑中的最後一部分，即文件名及其擴展名。
  */
 export function basename(path: string): string {
-  return path.split("/").filter(Boolean).pop() || "";
+  return path.split('/').filter(Boolean).pop() || '';
 }
 
 /**
@@ -15,7 +15,7 @@ export function basename(path: string): string {
  * @returns 路徑中的目錄部分，排除最後一個斜槓及後面的部分。
  */
 export function dirname(path: string): string {
-  return path.split("/").slice(0, -1).join("/") || "/";
+  return path.split('/').slice(0, -1).join('/') || '/';
 }
 
 /**
@@ -26,8 +26,8 @@ export function dirname(path: string): string {
  */
 export function extname(path: string): string {
   const base = basename(path);
-  const dotIndex = base.lastIndexOf(".");
-  return dotIndex !== -1 ? base.slice(dotIndex) : "";
+  const dotIndex = base.lastIndexOf('.');
+  return dotIndex !== -1 ? base.slice(dotIndex) : '';
 }
 
 /**
@@ -38,10 +38,10 @@ export function extname(path: string): string {
  */
 export function join(...paths: string[]): string {
   return paths
-    .map((path) => path.replace(/\/+$/, "")) // 去除結尾的斜槓
+    .map((path) => path.replace(/\/+$/, '')) // 去除結尾的斜槓
     .filter(Boolean) // 過濾掉空字串
-    .join("/")
-    .replace(/\/{2,}/g, "/"); // 替換多個連續的斜槓為單個斜槓
+    .join('/')
+    .replace(/\/{2,}/g, '/'); // 替換多個連續的斜槓為單個斜槓
 }
 
 /**
@@ -51,18 +51,18 @@ export function join(...paths: string[]): string {
  * @returns 返回規範化後的路徑。
  */
 export function normalize(path: string): string {
-  const segments = path.split("/").filter(Boolean);
+  const segments = path.split('/').filter(Boolean);
   const stack: string[] = [];
 
   for (const segment of segments) {
-    if (segment === "..") {
+    if (segment === '..') {
       stack.pop();
-    } else if (segment !== ".") {
+    } else if (segment !== '.') {
       stack.push(segment);
     }
   }
 
-  return "/" + stack.join("/");
+  return '/' + stack.join('/');
 }
 
 /**
@@ -72,7 +72,7 @@ export function normalize(path: string): string {
  * @returns 如果 path 為絕對路徑，則返回 true，否則返回 false。
  */
 export function isAbsolute(path: string): boolean {
-  return path.startsWith("/");
+  return path.startsWith('/');
 }
 
 /**
@@ -82,17 +82,17 @@ export function isAbsolute(path: string): boolean {
  * @returns 返回解析後的絕對路徑。
  */
 export function resolve(...paths: string[]): string {
-  let resolvedPath = "";
+  let resolvedPath = '';
   for (let i = paths.length - 1; i >= 0; i--) {
     const segment = paths[i];
-    if (segment.startsWith("/")) {
-      resolvedPath = segment + "/" + resolvedPath;
+    if (segment.startsWith('/')) {
+      resolvedPath = segment + '/' + resolvedPath;
       break;
     } else if (segment) {
-      resolvedPath = segment + "/" + resolvedPath;
+      resolvedPath = segment + '/' + resolvedPath;
     }
   }
-  return normalize("/" + resolvedPath);
+  return normalize('/' + resolvedPath);
 }
 
 /**
@@ -120,12 +120,12 @@ export function dynamicAssetsPath(path: string): string {
 
   const isValidPath = /^(\/|\.\/)?assets\//.test(path);
   if (!isValidPath) {
-    throw new Error("路徑必須指向 assets 目錄，且不能是上層路徑或指向其他目錄");
+    throw new Error('路徑必須指向 assets 目錄，且不能是上層路徑或指向其他目錄');
   }
 
   if (isDev) {
-    return path.startsWith("/") ? path : `/${path.replace(/^\.\/?/, "")}`;
+    return path.startsWith('/') ? path : `/${path.replace(/^\.\/?/, '')}`;
   }
 
-  return path.startsWith("./") ? path : `./${path.replace(/^\//, "")}`;
+  return path.startsWith('./') ? path : `./${path.replace(/^\//, '')}`;
 }

@@ -7,7 +7,7 @@
  */
 export function loadScript<T>(src: string, cb?: () => T): Promise<T> {
   return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
+    const script = document.createElement('script');
     script.src = src;
     script.async = true;
 
@@ -37,8 +37,8 @@ export function loadScript<T>(src: string, cb?: () => T): Promise<T> {
  */
 export function loadCss<T>(src: string, cb?: () => T): Promise<T> {
   return new Promise((resolve, reject) => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
     link.href = src;
 
     link.onload = () => {

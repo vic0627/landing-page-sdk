@@ -8,8 +8,7 @@ import { namedLogger } from '../common';
 const BASE = '/__BASE__/';
 const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
 const CSS_URL_RE = /url\(\s*(?:["'])?\/__BASE__\/([^)"']+)(?:["'])?\s*\)/g;
-const JS_IMPORT_RE =
-  /(import\s+(?:[\s\S]*?\s+from\s+)?)["']([^"']+)["'](.*?;?)/g;
+const JS_IMPORT_RE = /(import\s+(?:[\s\S]*?\s+from\s+)?)["']([^"']+)["'](.*?;?)/g;
 const JS_BASE_ASSETS_RE = /["']\/__BASE__\/__ASSETS__\/([^"']+)["']/g;
 const ASSETS = '__ASSETS__';
 
@@ -79,9 +78,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
         case 'html':
           render = join(
             '/',
-            siteConfig.route.useSiteAsPath && page?.data?.site
-              ? page?.data?.site
-              : '',
+            siteConfig.route.useSiteAsPath && page?.data?.site ? page?.data?.site : '',
             render
           );
           break;
@@ -102,11 +99,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     return render;
   };
 
-  log(
-    `Static asset path mode: ${chalk.green(
-      resolution === 'rel' ? 'relative' : 'absolute'
-    )}`
-  );
+  log(`Static asset path mode: ${chalk.green(resolution === 'rel' ? 'relative' : 'absolute')}`);
 
   return {
     name,
@@ -122,10 +115,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     generateBundle(_, bundle) {
       for (const filename in bundle) {
         const asset = bundle[filename] as OutputAsset;
-        if (
-          !asset ||
-          (typeof asset.source !== 'string' && !Buffer.isBuffer(asset.source))
-        ) {
+        if (!asset || (typeof asset.source !== 'string' && !Buffer.isBuffer(asset.source))) {
           const asset = bundle[filename] as OutputChunk;
           asset.code = asset.code.replace(JS_IMPORT_RE, (_, pre, rel, post) => {
             rel = JSON.stringify(transformPath(filename, rel, 'js'));

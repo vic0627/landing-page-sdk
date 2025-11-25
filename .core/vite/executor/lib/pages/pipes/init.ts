@@ -10,9 +10,7 @@ import {
 } from '@landing-page-sdk/utils-node';
 import { createPage, Page, TEMPLATE } from '../../common';
 
-export default async function (
-  buildPageOption: BuildPageOption
-): Promise<Page[]> {
+export default async function (buildPageOption: BuildPageOption): Promise<Page[]> {
   const { route: routeOpt, sourcePath, env } = buildPageOption.cfg;
 
   const root = resolve();

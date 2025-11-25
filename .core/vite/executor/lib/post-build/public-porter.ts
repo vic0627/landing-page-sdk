@@ -50,9 +50,9 @@ async function copyPublicIntoRoot(
             const kb = (st.size / 1024).toFixed(1);
             const relUnix = rel.split(sep).join('/'); // 日誌用一致分隔符
             log(
-              `Large media asset: ${chalk.redBright(
-                relUnix
-              )} — ${chalk.redBright(kb)} KB (> ${ceil} KB)`
+              `Large media asset: ${chalk.redBright(relUnix)} — ${chalk.redBright(
+                kb
+              )} KB (> ${ceil} KB)`
             );
           }
         }
@@ -72,10 +72,7 @@ async function copyPublicIntoRoot(
 /**
  * 主要入口：把 publicDir 搬到 outDir（單站）或 outDir/<site>（多站）
  */
-export default async function (
-  ctx: SiteContext,
-  outDir: string
-): Promise<void> {
+export default async function (ctx: SiteContext, outDir: string): Promise<void> {
   const publicDir = ctx.siteConfig.sourcePath.public;
 
   // 若 publicDir 不存在，視為無事可做
@@ -91,8 +88,7 @@ export default async function (
 
   const sites = ctx.pagesInfo.sites;
   // 決定目的根目錄們
-  const siteRoots =
-    sites.length === 0 ? [outDir] : sites.map((site) => join(outDir, site));
+  const siteRoots = sites.length === 0 ? [outDir] : sites.map((site) => join(outDir, site));
 
   for (const root of siteRoots) {
     await copyPublicIntoRoot(publicDir, root, ctx.siteConfig.output.threshold);

@@ -16,10 +16,7 @@ type Langs = string;
  */
 export function getLangFromPath(supportLangs: Langs[]): Langs | null {
   const langsPattern = supportLangs.join('|');
-  const regexp = new RegExp(
-    `(?:/(${langsPattern})/)|(?:_(${langsPattern})\\.html)`,
-    'i'
-  );
+  const regexp = new RegExp(`(?:/(${langsPattern})/)|(?:_(${langsPattern})\\.html)`, 'i');
   const [, $1, $2] = (location.pathname.match(regexp) ?? []) as Langs[];
 
   return $1 || $2 || null;
@@ -42,10 +39,7 @@ export function getLangFromPath(supportLangs: Langs[]): Langs | null {
  * @param defaultLang - 預設語言代碼。當未能找到符合的語言代碼時，將返回此值。
  * @returns 返回檢測到的語言代碼，或在未檢測到有效語言時返回 `defaultLang` 或 `supportedLangs` 的第一個語言。
  */
-export function detectLang(
-  supportedLangs: Langs[] = [],
-  defaultLang: Langs = 'en'
-): Langs {
+export function detectLang(supportedLangs: Langs[] = [], defaultLang: Langs = 'en'): Langs {
   const detectResult = [
     document.documentElement.lang,
     getLangFromPath(supportedLangs),
@@ -62,10 +56,7 @@ export function detectLang(
   return supportedLangs[0];
 }
 
-export function detectLangLegacy(
-  supportedLangs: Langs[] = [],
-  defaultLang: Langs = 'en'
-) {
+export function detectLangLegacy(supportedLangs: Langs[] = [], defaultLang: Langs = 'en') {
   const langFromUrl = new URLSearchParams(window.location.search).get('lang');
   const langFromCookie = getCookie('lang');
   const langFromNavigator = navigator.language;

@@ -70,8 +70,7 @@ function logMsg(id: string, opts: NormalizedControllerOption[]) {
       const conj = i && arr.length - 1 === i ? 'and ' : '';
       return (str += `, ${conj}${name}`);
     }, '');
-  return `Injected controller${opts.length > 1 ? 's' : ''
-    } ${names} into ${chalk.green(id)}`;
+  return `Injected controller${opts.length > 1 ? 's' : ''} ${names} into ${chalk.green(id)}`;
 }
 
 function toControllerName(name: string) {
@@ -95,11 +94,7 @@ function bundleTransform(code: string, opts: NormalizedControllerOption[]) {
 
 const scriptMap = new Map<string, string>();
 
-async function inlineTransform(
-  code: string,
-  opts: NormalizedControllerOption[],
-  entry: Page
-) {
+async function inlineTransform(code: string, opts: NormalizedControllerOption[], entry: Page) {
   const vm = new JSDOM(code);
   const data = omitBy(entry.data, (v) => {
     try {
@@ -144,7 +139,12 @@ async function inlineTransform(
 
 function findEntryById(pages: Page[], id: string) {
   let entryInfo: Page | undefined;
-  if (id.includes('/main.js') || id.includes('/main.ts') || id.includes('/main.jsx') || id.includes('/main.tsx')) {
+  if (
+    id.includes('/main.js') ||
+    id.includes('/main.ts') ||
+    id.includes('/main.jsx') ||
+    id.includes('/main.tsx')
+  ) {
     id = id.replace(resolve(), '');
     entryInfo = pages.find((p) => p.entry === id);
   } else if (id.includes('.html')) {
@@ -159,11 +159,7 @@ function findEntryById(pages: Page[], id: string) {
   return entryInfo;
 }
 
-function matchOptions(
-  stdOpts: NormalizedControllerOption[],
-  type: ScriptSourceType,
-  entry?: Page
-) {
+function matchOptions(stdOpts: NormalizedControllerOption[], type: ScriptSourceType, entry?: Page) {
   if (!entry) return;
 
   const { route, data } = entry;
@@ -173,12 +169,8 @@ function matchOptions(
     const isTargetRoute = targets.routes.length
       ? isString(route) && targets.routes.includes(route)
       : true;
-    const isTargetLang = targets.lang.length
-      ? targets.lang.includes(lang)
-      : true;
-    const isTargetSite = targets.site.length
-      ? targets.site.includes(site)
-      : true;
+    const isTargetLang = targets.lang.length ? targets.lang.includes(lang) : true;
+    const isTargetSite = targets.site.length ? targets.site.includes(site) : true;
     const isTargetType = injection.type === type;
 
     return isTargetRoute && isTargetLang && isTargetSite && isTargetType;

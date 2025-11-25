@@ -9,10 +9,7 @@ import {
 import { TemplateGeneratorSchema } from '@landing-page-sdk/types';
 import { join } from '@landing-page-sdk/utils-node';
 
-export async function templateGenerator(
-  tree: Tree,
-  options: TemplateGeneratorSchema
-) {
+export async function templateGenerator(tree: Tree, options: TemplateGeneratorSchema) {
   const projectRoot = options.path.endsWith('/') ? options.path.slice(0, -1) : options.path;
   const source = join(__dirname, 'files');
   const ext = options.useTs ? 'ts' : 'js';
@@ -36,7 +33,7 @@ export async function templateGenerator(
     `src/components/counter.${ext}x`,
     `src/components/react-logo.${ext}x`,
     `src/components/vite-logo.${ext}x`,
-    'public/__ASSETS__/react.svg'
+    'public/__ASSETS__/react.svg',
   ];
   const reactExcludes: string[] = [
     'src/pages/app.vue',
@@ -44,16 +41,12 @@ export async function templateGenerator(
     'src/components/counter.vue',
     'src/components/vue-logo.vue',
     'src/components/vite-logo.vue',
-    'public/__ASSETS__/vue.svg'
+    'public/__ASSETS__/vue.svg',
   ];
 
   // add framework dependencies
   if (options.framework === 'none') {
-    deleteFiles.push(
-      `src/composables/use-i18n.${ext}`,
-      ...vueExcludes,
-      ...reactExcludes,
-    );
+    deleteFiles.push(`src/composables/use-i18n.${ext}`, ...vueExcludes, ...reactExcludes);
   } else {
     deleteFiles.push(`src/composables/counter.${ext}`);
 
@@ -100,7 +93,7 @@ export async function templateGenerator(
 
   return () => {
     installPackagesTask(tree);
-  }
+  };
 }
 
 export default templateGenerator;

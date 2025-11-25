@@ -20,7 +20,7 @@ export function setCookie(name: string, value: string, days: number = 1): void {
  */
 export function getCookie(name: string): string {
   const nameEQ = `${encodeURIComponent(name)}=`;
-  const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+  const cookies = document.cookie.split(';').map((cookie) => cookie.trim());
 
   for (const cookie of cookies) {
     if (cookie.startsWith(nameEQ)) {
@@ -28,7 +28,7 @@ export function getCookie(name: string): string {
     }
   }
 
-  return "";
+  return '';
 }
 
 /**
@@ -47,8 +47,8 @@ export function eraseCookie(name: string): void {
  */
 export function getAllCookies(): Record<string, string> {
   const cookies: Record<string, string> = {};
-  document.cookie.split(";").forEach((cookie) => {
-    const [name, value] = cookie.split("=").map((part) => part.trim());
+  document.cookie.split(';').forEach((cookie) => {
+    const [name, value] = cookie.split('=').map((part) => part.trim());
     if (name && value) {
       cookies[decodeURIComponent(name)] = decodeURIComponent(value);
     }
@@ -63,5 +63,5 @@ export function getAllCookies(): Record<string, string> {
  * @returns 如果存在返回 true，否則返回 false。
  */
 export function checkCookie(name: string): boolean {
-  return getCookie(name) !== "";
+  return getCookie(name) !== '';
 }

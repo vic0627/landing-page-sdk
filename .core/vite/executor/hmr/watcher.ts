@@ -58,9 +58,7 @@ type FileMatcherOption = {
   name?: string;
 };
 
-const createFileMatcher = (
-  ...options: FileMatcherOption[]
-): Extract<Matcher, Function> => {
+const createFileMatcher = (...options: FileMatcherOption[]): Extract<Matcher, Function> => {
   if (!options.length) {
     return () => false;
   }

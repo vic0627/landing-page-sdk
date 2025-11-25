@@ -1,17 +1,9 @@
-import {
-  RouteManifest,
-  RouteMapKey,
-  RouteResolveOption,
-} from '@landing-page-sdk/types';
+import { RouteManifest, RouteMapKey, RouteResolveOption } from '@landing-page-sdk/types';
 
-export function manifestResolver(
-  manifest: RouteManifest,
-  option: RouteResolveOption
-): string {
+export function manifestResolver(manifest: RouteManifest, option: RouteResolveOption): string {
   const mapKey = manifest.meta.keyOrder
     .map((k) => {
-      const label =
-        k === 'site' ? 'site' : k.includes('Locale') ? 'locale' : 'route';
+      const label = k === 'site' ? 'site' : k.includes('Locale') ? 'locale' : 'route';
       const value = option[k];
 
       if (!value) {

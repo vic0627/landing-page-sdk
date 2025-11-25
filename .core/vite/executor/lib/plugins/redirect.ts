@@ -1,8 +1,4 @@
-import {
-  IncomingHttpHeaders,
-  IncomingMessage,
-  ServerResponse,
-} from 'node:http';
+import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'node:http';
 import { Connect } from 'vite';
 import { isPlainObject, isString } from 'lodash-es';
 import chalk from 'chalk';
@@ -44,9 +40,7 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
           let dest = redirectManifest[url];
 
           if (isPlainObject(dest)) {
-            dest = (dest as Record<string, string>)[
-              lang ?? redirect.defaultLang
-            ];
+            dest = (dest as Record<string, string>)[lang ?? redirect.defaultLang];
           }
 
           if (isString(dest)) {
@@ -97,11 +91,7 @@ function detectLang(
   return found ?? defaultLang ?? supported[0];
 }
 
-function redirectTo(
-  res: ServerResponse<IncomingMessage>,
-  location: string,
-  query?: string
-) {
+function redirectTo(res: ServerResponse<IncomingMessage>, location: string, query?: string) {
   if (query) {
     location += '?' + query;
   }

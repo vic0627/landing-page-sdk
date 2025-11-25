@@ -1,6 +1,6 @@
 import { detectLang, join } from '@landing-page-sdk/utils-browser';
 
-const { rootFilename } = __SDK_PAGE_CTX__
+const { rootFilename } = __SDK_PAGE_CTX__;
 const { langs, defaultLang } = __SDK_PAGE_CTX__.data;
 
 const lang = detectLang(langs, defaultLang);

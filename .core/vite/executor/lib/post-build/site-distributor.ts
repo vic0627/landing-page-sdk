@@ -36,10 +36,7 @@ export default async (ctx: SiteContext, outDir: string) => {
   await fsp.rm(join(outDir, '.vite'), { recursive: true, force: true });
 };
 
-async function getAssetsList(
-  outDir: string,
-  site: string
-): Promise<Set<string>> {
+async function getAssetsList(outDir: string, site: string): Promise<Set<string>> {
   const manifest = readJsonFile<Manifest>(join(outDir, '.vite', MANIFEST));
   const list: Set<string> = new Set();
 

@@ -8,17 +8,13 @@ import { isArray, isPlainObject, isString } from 'lodash-es';
 
 export default (function (opt, cfg) {
   if (isPlainObject(cfg.controller)) {
-    opt.controller = [
-      normalizeControllerOption(cfg.controller as ControllerOption),
-    ];
+    opt.controller = [normalizeControllerOption(cfg.controller as ControllerOption)];
   } else if (isArray(cfg.controller)) {
     opt.controller = cfg.controller.map(normalizeControllerOption);
   }
 } satisfies OptionNormalizer);
 
-function normalizeControllerOption(
-  controllerOption: ControllerOption
-): NormalizedControllerOption {
+function normalizeControllerOption(controllerOption: ControllerOption): NormalizedControllerOption {
   const opt: NormalizedControllerOption = {
     name: controllerOption.name,
     targets: {

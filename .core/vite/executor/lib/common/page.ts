@@ -1,17 +1,7 @@
 import { parse } from 'node:path';
 import { omit, pick } from 'lodash-es';
-import {
-  PageContext,
-  PageData,
-  Page as PageEssential,
-  RouteMode,
-} from '@landing-page-sdk/types';
-import {
-  base62Hash,
-  join,
-  promiseResolver,
-  resolveProj,
-} from '@landing-page-sdk/utils-node';
+import { PageContext, PageData, Page as PageEssential, RouteMode } from '@landing-page-sdk/types';
+import { base62Hash, join, promiseResolver, resolveProj } from '@landing-page-sdk/utils-node';
 import { ALPHA_DASH_UNDERSCORE } from './regexp';
 import { findExist } from './index';
 
@@ -48,9 +38,7 @@ const RESERVED_NAMES_ARRAY = Object.values(RESERVED_NAMES);
 const emptyObj = <T extends string>(...props: T[]) =>
   props.reduce((o, p) => ((o[p] = ''), o), {} as Record<T, string>);
 
-export const createPage = async (
-  init: Omit<PageInit, 'type' | 'name' | 'filename'>
-) => {
+export const createPage = async (init: Omit<PageInit, 'type' | 'name' | 'filename'>) => {
   const page = new Page({
     type: 'page',
     ...init,
@@ -70,9 +58,7 @@ export const createRedirectPage = async (init: Pick<PageInit, 'routeMode'>) => {
   return page;
 };
 
-export const createStubPage = async (
-  init: Pick<PageInit, 'routeMode' | 'name' | 'filename'>
-) => {
+export const createStubPage = async (init: Pick<PageInit, 'routeMode' | 'name' | 'filename'>) => {
   const page = new Page({
     type: 'stub',
     ...init,
@@ -159,9 +145,7 @@ export class Page implements PageEssential {
     }
 
     if (isReserved) {
-      throw new Error(
-        `reserved word '${isReserved}' was found in path: ${relDir}`
-      );
+      throw new Error(`reserved word '${isReserved}' was found in path: ${relDir}`);
     }
 
     this._name = relDir ? dirs.join(NAME_DELIMITER) : RESERVED_NAMES.INDEX;
@@ -195,13 +179,9 @@ export class Page implements PageEssential {
     this._name = RESERVED_NAMES.REDIRECT;
     this._filename = 'index.html';
     this._rootFilename = '/index.html';
-    this._template = resolveProj(
-      '@landing-page-sdk/assets/redirect/index.html'
-    );
+    this._template = resolveProj('@landing-page-sdk/assets/redirect/index.html');
     this._entry =
-      resolveProj(
-        `@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`
-      ) +
+      resolveProj(`@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`) +
       '?' +
       base62Hash(Math.random().toString(), 6); // add id to let this page appears in manifest.json
     this.resolve();
@@ -235,9 +215,7 @@ export class Page implements PageEssential {
     this._name = isMultiLang ? `${lang}:${this._name}` : this._name;
 
     if (this.initOptions.routeMode === 'tree') {
-      this._filename = isMultiLang
-        ? join(lang, this._rootFilename)
-        : this._filename;
+      this._filename = isMultiLang ? join(lang, this._rootFilename) : this._filename;
       this._rootFilename = join('/', lang, this._rootFilename);
     } else {
       const { name, ext } = parse(this._filename);

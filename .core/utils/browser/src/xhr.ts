@@ -1,4 +1,4 @@
-import { buildQueryString } from "./query";
+import { buildQueryString } from './query';
 
 interface XhrInit {
   /**
@@ -25,7 +25,7 @@ interface XhrInit {
 }
 
 const autoJsonResponse = (xhr: XMLHttpRequest) =>
-  xhr.responseType === "json" ? JSON.parse(xhr.responseText) : xhr.responseText;
+  xhr.responseType === 'json' ? JSON.parse(xhr.responseText) : xhr.responseText;
 
 /**
  * 發送 AJAX 請求的通用函數，支援 GET、POST 等 HTTP 方法。
@@ -66,7 +66,7 @@ const autoJsonResponse = (xhr: XMLHttpRequest) =>
  */
 export function ajax<D>(xhrInit: XhrInit): Promise<D> {
   return new Promise((resolve, reject) => {
-    const { method = "GET", headers = {}, body = null, query } = xhrInit;
+    const { method = 'GET', headers = {}, body = null, query } = xhrInit;
     let { url } = xhrInit;
     const xhr = new XMLHttpRequest();
     if (query) url += `?${buildQueryString(query)}`;
@@ -78,7 +78,7 @@ export function ajax<D>(xhrInit: XhrInit): Promise<D> {
       status >= 200 && status < 300 ? resolve(res) : reject(res);
     };
     xhr.onerror = () => reject(autoJsonResponse(xhr));
-    const isJson = headers["Content-Type"] === "application/json";
+    const isJson = headers['Content-Type'] === 'application/json';
     xhr.send(isJson ? JSON.stringify(body) : body);
   });
 }

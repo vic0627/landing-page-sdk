@@ -47,10 +47,7 @@ export interface PageDataSite {
   site?: string;
 }
 
-export type PageData = PageDataCommon &
-  PageDataI18n &
-  PageDataSite &
-  Record<string, any>;
+export type PageData = PageDataCommon & PageDataI18n & PageDataSite & Record<string, any>;
 
 export type PageContext = Omit<Page, 'getContext' | 'data'> & {
   data: Omit<PageDataCommon, '_data' | '$cmp'> & PageDataI18n & PageDataSite;

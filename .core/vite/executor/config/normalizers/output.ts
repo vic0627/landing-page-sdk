@@ -7,14 +7,8 @@ export default (function (opt, cfg) {
     const minifyTargets = ['html', 'js', 'css'] as MinifyTargets[];
 
     if (output.minify === false) {
-      opt.output.minify.html =
-        opt.output.minify.js =
-        opt.output.minify.css =
-          false;
-    } else if (
-      isString(output.minify) &&
-      minifyTargets.includes(output.minify)
-    ) {
+      opt.output.minify.html = opt.output.minify.js = opt.output.minify.css = false;
+    } else if (isString(output.minify) && minifyTargets.includes(output.minify)) {
       for (const target of minifyTargets) {
         opt.output.minify[output.minify] = output.minify === target;
       }

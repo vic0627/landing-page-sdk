@@ -37,10 +37,7 @@ export interface NormalizedControllerOption {
   injection: NormalizedControllerInjection;
 }
 
-export type NormalizedSitemapOption = Omit<
-  Required<SitemapOption>,
-  'baseUrl'
-> & {
+export type NormalizedSitemapOption = Omit<Required<SitemapOption>, 'baseUrl'> & {
   baseUrl: Record<string, string>;
 };
 
@@ -56,11 +53,6 @@ export interface NormalizedSiteConfig {
   mock: boolean | string;
 }
 
-export type SiteConfigNormalizer = (
-  siteConfig: SiteConfig
-) => NormalizedSiteConfig;
+export type SiteConfigNormalizer = (siteConfig: SiteConfig) => NormalizedSiteConfig;
 
-export type OptionNormalizer = (
-  opt: NormalizedSiteConfig,
-  cfg: SiteConfig
-) => void;
+export type OptionNormalizer = (opt: NormalizedSiteConfig, cfg: SiteConfig) => void;

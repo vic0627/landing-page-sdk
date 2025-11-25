@@ -1,10 +1,6 @@
 import { statSync } from 'fs';
 import { isArray, isPlainObject, isString } from 'lodash-es';
-import {
-  SiteConfig,
-  NormalizedSiteConfig,
-  SiteConfigNormalizer,
-} from '@landing-page-sdk/types';
+import { SiteConfig, NormalizedSiteConfig, SiteConfigNormalizer } from '@landing-page-sdk/types';
 import { loadHMR, resolve } from '@landing-page-sdk/utils-node';
 import controllerNormalizer from './normalizers/controller';
 import outputNormalizer from './normalizers/output';

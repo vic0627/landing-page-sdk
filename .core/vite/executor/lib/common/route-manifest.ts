@@ -36,9 +36,7 @@ export function create(pagesInfo: PagesInfo, option: BuildPageOption) {
     // (p) => !STUB.test(p.name) || !REDIRECT.test(p.name)
     Boolean
   );
-  manifest.dict.route = Array.from(new Set(pages.map((p) => p.route))).filter(
-    Boolean
-  ) as string[];
+  manifest.dict.route = Array.from(new Set(pages.map((p) => p.route))).filter(Boolean) as string[];
   const useSite = useSiteAsPath || cli.mode === 'dev';
 
   pages.forEach((from) => {

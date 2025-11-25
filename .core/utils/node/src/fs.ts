@@ -43,10 +43,7 @@ type ScanOptions = {
 /**
  * 非同步掃描目標目錄，返回檔案或目錄的路徑
  */
-export async function scanDir(
-  dir: string,
-  options?: ScanOptions
-): Promise<string[]> {
+export async function scanDir(dir: string, options?: ScanOptions): Promise<string[]> {
   try {
     const { recursive = false } = options || {};
     // 避免 g-flag 造成 .test() 受 lastIndex 影響
@@ -90,10 +87,7 @@ type StringOptions = {
   end?: number;
 };
 
-export function readFileAsString(
-  filePath: string,
-  options?: StringOptions
-): string {
+export function readFileAsString(filePath: string, options?: StringOptions): string {
   try {
     filePath = resolveProj(filePath);
   } catch {}

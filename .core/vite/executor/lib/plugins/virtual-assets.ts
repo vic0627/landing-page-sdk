@@ -39,9 +39,7 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
         ]);
 
         if (!entry) {
-          throw new Error(
-            'root entry file must exist while using virtual entry'
-          );
+          throw new Error('root entry file must exist while using virtual entry');
         }
 
         log('virtual entry:', id);

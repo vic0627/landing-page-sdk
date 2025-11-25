@@ -1,25 +1,16 @@
 import fsp from 'node:fs/promises';
 import { readJsonFile } from '@nx/devkit';
-import {
-  BuildPageOption,
-  I18nInfo,
-  I18nLangPack,
-} from '@landing-page-sdk/types';
+import { BuildPageOption, I18nInfo, I18nLangPack } from '@landing-page-sdk/types';
 import { basename, isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
 import { createRedirectPage, createStubPage, Page, JSON } from '../../common';
 
-export default async function (
-  buildPageOption: BuildPageOption,
-  pages: Page[]
-): Promise<I18nInfo> {
+export default async function (buildPageOption: BuildPageOption, pages: Page[]): Promise<I18nInfo> {
   const { route, sourcePath, redirect } = buildPageOption.cfg;
 
   // 掃描 src/i18n/*.json
   const rawFiles = await scanDir(sourcePath.i18n, { match: JSON });
   const predicates = await Promise.all(
-    rawFiles.map(
-      async (raw) => (await fsp.stat(raw)).isFile() && !isHiddenFile(raw)
-    )
+    rawFiles.map(async (raw) => (await fsp.stat(raw)).isFile() && !isHiddenFile(raw))
   );
   const files = rawFiles.filter((_, i) => predicates[i]);
   const langInfo: I18nInfo = {
@@ -82,14 +73,7 @@ export default async function (
       const notIndexPage = !originalPage.name.endsWith('index');
 
       // 加上各路徑語系轉導頁（stub）
-      if (
-        !stubbed &&
-        isMultiLang &&
-        redirect.enable &&
-        redirect.stub &&
-        treeMode &&
-        notIndexPage
-      ) {
+      if (!stubbed && isMultiLang && redirect.enable && redirect.stub && treeMode && notIndexPage) {
         const stubPage = await createStubPage({
           name: originalPage.name,
           filename: originalPage.filename,

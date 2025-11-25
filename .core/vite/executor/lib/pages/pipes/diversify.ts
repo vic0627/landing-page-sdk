@@ -3,10 +3,7 @@ import { BuildPageOption } from '@landing-page-sdk/types';
 import { isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
 import { Page, SCRIPT } from '../../common';
 
-export default async function (
-  buildPageOption: BuildPageOption,
-  pages: Page[]
-): Promise<string[]> {
+export default async function (buildPageOption: BuildPageOption, pages: Page[]): Promise<string[]> {
   const { sites: _requiredSites } = buildPageOption.cli;
   const { sourcePath } = buildPageOption.cfg;
 
@@ -23,8 +20,7 @@ export default async function (
       const _path = p.startsWith('/') ? p : `/${p}`;
       const name = path.parse(_path).name;
       const keep =
-        !isHiddenFile(p) &&
-        (requiredSites?.length ? requiredSites.includes(name) : true);
+        !isHiddenFile(p) && (requiredSites?.length ? requiredSites.includes(name) : true);
 
       return keep && { path: _path, name };
     })

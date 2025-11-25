@@ -35,9 +35,7 @@ export default async function (ctx: SiteContext, outDir: string) {
     : generateSitemapIndex({
         ...generatorOption,
         langs,
-        defaultLang:
-          (siteConfig.env && (siteConfig.env as any)['defaultLang']) ||
-          langs[0],
+        defaultLang: (siteConfig.env && (siteConfig.env as any)['defaultLang']) || langs[0],
       }));
 }
 
@@ -52,14 +50,8 @@ type RouteInfo = {
   key?: string;
 };
 
-function pagesToRoutes(
-  pages: Page[],
-  sites: string[],
-  options: Required<SitemapOption>
-) {
-  pages = pages.filter(
-    (page) => !(REDIRECT.test(page.name) || STUB.test(page.name))
-  );
+function pagesToRoutes(pages: Page[], sites: string[], options: Required<SitemapOption>) {
+  pages = pages.filter((page) => !(REDIRECT.test(page.name) || STUB.test(page.name)));
 
   const routes = pages.map((page) => {
     let { filename, data } = page;
@@ -105,9 +97,7 @@ type GeneratorOptions = {
 async function generateSitemap(option: GeneratorOptions) {
   const { routes, sites, outDir, option: opt } = option;
 
-  const grouped = groupBySite(
-    routes.filter((r) => !isExcluded(r.path, opt.exclude))
-  );
+  const grouped = groupBySite(routes.filter((r) => !isExcluded(r.path, opt.exclude)));
 
   // 逐 site 產一份 sitemap.xml
   for (const [site, list] of grouped.entries()) {
@@ -124,9 +114,7 @@ async function generateSitemap(option: GeneratorOptions) {
     // 我們已經餵「絕對 URL」，故 SitemapStream 無需指定 hostname
     // 注意：使用 streamToPromise 讓串流完整寫入後再落盤，避免空流結束（EmptyStream）錯誤
     const stream = new SitemapStream();
-    const xml = await streamToPromise(Readable.from(links).pipe(stream)).then(
-      (d) => d.toString()
-    );
+    const xml = await streamToPromise(Readable.from(links).pipe(stream)).then((d) => d.toString());
 
     const file = join(dir, 'sitemap.xml');
     log(`generate sitemap ${outputSitemapPath(file)}`);
@@ -159,9 +147,7 @@ type MultiLangGeneratorOptions = GeneratorOptions & {
 async function generateSitemapIndex(option: MultiLangGeneratorOptions) {
   const { routes, sites, outDir, option: opt, langs, defaultLang } = option;
 
-  const grouped = groupBySite(
-    routes.filter((r) => !isExcluded(r.path, opt.exclude))
-  );
+  const grouped = groupBySite(routes.filter((r) => !isExcluded(r.path, opt.exclude)));
 
   for (const [site, list] of grouped.entries()) {
     const dir = join(outDir, site);
@@ -170,9 +156,7 @@ async function generateSitemapIndex(option: MultiLangGeneratorOptions) {
     await ensureDir(subDir);
 
     // 僅處理此站點實際存在的語系，避免產生空卷導致 EmptyStream 錯誤
-    const siteLangs = Array.from(
-      new Set(list.map((r) => r.lang).filter((x): x is string => !!x))
-    );
+    const siteLangs = Array.from(new Set(list.map((r) => r.lang).filter((x): x is string => !!x)));
 
     const writtenLangs: string[] = [];
 
@@ -224,12 +208,9 @@ async function generateSitemapIndex(option: MultiLangGeneratorOptions) {
           .map((r) => ({ lang: r.lang!, url: absoluteUrl(r, option) }));
 
         // x-default 指向預設語系（若不在 alternates 中，略過）
-        const defaultLangCode =
-          defaultLang && langs.includes(defaultLang) ? defaultLang : langs[0];
+        const defaultLangCode = defaultLang && langs.includes(defaultLang) ? defaultLang : langs[0];
         const def = alternates.find((l) => l.lang === defaultLangCode);
-        const links = def
-          ? [...alternates, { lang: 'x-default', url: def.url }]
-          : alternates;
+        const links = def ? [...alternates, { lang: 'x-default', url: def.url }] : alternates;
 
         sm.write({
           url,
@@ -304,9 +285,7 @@ function absoluteUrl(route: RouteInfo, options: GeneratorOptions) {
 
 function parseBase(baseUrl: string | Record<string, string>, site?: string) {
   const base =
-    typeof baseUrl === 'string'
-      ? baseUrl
-      : baseUrl[site ?? ''] ?? baseUrl['default'] ?? ''; // 允許使用 'default' 鍵
+    typeof baseUrl === 'string' ? baseUrl : baseUrl[site ?? ''] ?? baseUrl['default'] ?? ''; // 允許使用 'default' 鍵
 
   if (!base) {
     throw new Error(`[sitemap] Missing baseUrl for site "${site ?? ''}"`);

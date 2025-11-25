@@ -47,10 +47,7 @@ interface ImportStatementOptions {
   imports?: string[];
 }
 
-export function getImportStatement(
-  id: string,
-  options?: ImportStatementOptions
-) {
+export function getImportStatement(id: string, options?: ImportStatementOptions) {
   if (!id) {
     throw new Error(`'id' is required for import statement`);
   }

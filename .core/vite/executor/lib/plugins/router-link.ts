@@ -64,12 +64,7 @@ export default (({ siteConfig, cliOption, pagesInfo }) => {
   };
 }) satisfies SDKPlugin;
 
-function getLinks(
-  window: DOMWindow,
-  path: string,
-  pages: Page[],
-  page?: Page
-): Map<Element, Page> {
+function getLinks(window: DOMWindow, path: string, pages: Page[], page?: Page): Map<Element, Page> {
   const map = new Map<Element, Page>();
   const lang = page?.data?.lang;
   const site = page?.data?.site;
@@ -79,9 +74,7 @@ function getLinks(
     const validFormat = !!to && to.startsWith('/');
 
     if (!validFormat) {
-      log(
-        `invalid route format ${chalk.redBright(to)} from ${chalk.green(path)}`
-      );
+      log(`invalid route format ${chalk.redBright(to)} from ${chalk.green(path)}`);
       return;
     }
 
@@ -91,11 +84,7 @@ function getLinks(
     );
 
     if (!destPage) {
-      log(
-        `unidentified route destination ${chalk.redBright(
-          to
-        )} from ${chalk.green(path)}`
-      );
+      log(`unidentified route destination ${chalk.redBright(to)} from ${chalk.green(path)}`);
       return;
     }
 
