@@ -46,9 +46,9 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
     `src/components/vite-logo.${ext}x`,
     'public/__ASSETS__/react.svg',
   ];
+  const commonEntry = `src/pages/main.${ext}`;
   const reactExcludes: string[] = [
     'src/pages/app.vue',
-    `src/pages/main.${ext}`,
     'src/components/router-link.vue',
     'src/components/counter.vue',
     'src/components/vue-logo.vue',
@@ -67,7 +67,7 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
       dependencies['vue'] = '^3.5.22';
       dependencies['@vitejs/plugin-vue'] = '^6.0.1';
     } else if (options.framework === 'react') {
-      deleteFiles.push(...reactExcludes);
+      deleteFiles.push(...reactExcludes, commonEntry);
       dependencies['react'] = '^19.2.0';
       dependencies['react-dom'] = '^19.2.0';
       dependencies['@types/react'] = '^19.2.0';
