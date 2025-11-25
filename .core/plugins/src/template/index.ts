@@ -40,6 +40,7 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
   const vueExcludes: string[] = [
     `src/pages/app.${ext}x`,
     `src/pages/main.${ext}x`,
+    `src/components/router-link.${ext}x`,
     `src/components/counter.${ext}x`,
     `src/components/react-logo.${ext}x`,
     `src/components/vite-logo.${ext}x`,
@@ -48,6 +49,7 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
   const reactExcludes: string[] = [
     'src/pages/app.vue',
     `src/pages/main.${ext}`,
+    'src/components/router-link.vue',
     'src/components/counter.vue',
     'src/components/vue-logo.vue',
     'src/components/vite-logo.vue',

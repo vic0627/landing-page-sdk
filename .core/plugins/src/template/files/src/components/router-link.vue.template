@@ -1,0 +1,28 @@
+<template>
+  <a :href>
+    <slot />
+  </a>
+</template>
+
+<script setup<% if (useTs) { %> lang="ts"<% } %>>
+import { manifestResolver } from '@landing-page-sdk/utils-browser';
+import manifest from 'virtual:route-manifest';
+import { ref } from 'vue';
+
+const href = ref('/');
+const props = defineProps<% if (useTs) { %><{
+  to: string;
+  locale?: string;
+}><% } %>(<% if (!useTs) { %>['to', 'locale']<% } %>);
+
+const { route: fromRoute } = __SDK_PAGE_CTX__;
+const { site, lang: fromLocale } = __SDK_PAGE_CTX__.data;
+
+href.value = manifestResolver(manifest, {
+  site,
+  fromLocale,
+  fromRoute: fromRoute!,
+  toLocale: props.locale ?? fromLocale,
+  toRoute: props.to,
+});
+</script>
