@@ -1,8 +1,8 @@
 {
   "generators": {
     "template": {
-      "factory": "./.core/generators/template/index",
-      "schema": "./.core/generators/template/schema.json",
+      "factory": "./.core/plugins/template/index",
+      "schema": "./.core/plugins/template/schema.json",
       "description": "template generator"
     }
   }

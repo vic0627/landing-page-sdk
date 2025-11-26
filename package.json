@@ -43,7 +43,7 @@
     ".core/assets",
     ".core/types",
     ".core/utils/*",
-    ".core/vite/executor"
+    ".core/vite"
   ],
   "nx": {},
   "executors": "./executors.json",

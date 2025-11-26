@@ -1,134 +1,161 @@
-import { AsyncIteratorExecutor } from '@nx/devkit';
-import chalk from 'chalk';
-import { NormalizedSiteConfig, ViteExecutorSchema } from '@landing-page-sdk/types';
+import { createProjectGraphAsync, ExecutorContext } from '@nx/devkit';
 import {
-  resolveRoot,
-  resolveProj,
-  loadHMR,
-  relative,
-  resolve as resolveCwd,
-} from '@landing-page-sdk/utils-node';
-import { Plug, Watcher } from '@landing-page-sdk/vite-executor/hmr';
-import { readRaw, normalize } from '@landing-page-sdk/vite-executor/config';
-import { statSync } from 'node:fs';
+  createServer,
+  build,
+  preview,
+  Plugin,
+  ViteDevServer,
+  PreviewServer,
+  InlineConfig,
+} from 'vite';
+import chalk from 'chalk';
+import { merge, pick, set } from 'lodash-es';
+import { resolve, resolveRoot } from '@landing-page-sdk/utils-node';
+import { NormalizedSiteConfig, SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
+import { rewrites, parseEnv, mockOptions } from './lib/common';
+import createPages from './lib/pages';
+// post build
+import siteDistributor from './lib/post-build/site-distributor';
+import publicPorter from './lib/post-build/public-porter';
+import sitemapGenerator from './lib/post-build/sitemap-generator';
+// plugins
+import { createMpaPlugin, Page as _Page } from 'vite-plugin-virtual-mpa';
+import { viteMockServe } from 'vite-plugin-mock';
+import sitesInjector from './lib/plugins/sites-injector';
+import transformRedirect from './lib/plugins/transform-redirect';
+import renderBuiltUrl from './lib/plugins/render-built-url';
+import autoController from './lib/plugins/auto-controller';
+// import redirect from './lib/plugins/redirect';
+import routerLink from './lib/plugins/router-link';
+import pageContext from './lib/plugins/page-context';
+import virtualAssets from './lib/plugins/virtual-assets';
 
-type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite-executor')>;
+let devServer: ViteDevServer | null = null;
+let previewServer: PreviewServer | null = null;
 
-const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> = async function* (
-  cliOption,
-  context
-) {
-  // Switch working directory to the workspace root resolved from CLI option
-  process.chdir(resolveRoot(cliOption.cwd));
-
-  let main!: ExecutorMod['main'];
-  let teardown!: ExecutorMod['teardown'];
-  let siteConfig!: NormalizedSiteConfig;
-  let isFirstProcess = true;
-
-  const configFile = getConfigFile(cliOption.config);
-
-  const initMainMod = () => {
-    const rawConfig = readRaw(configFile);
-    siteConfig = normalize(rawConfig);
-    const mod = loadHMR<ExecutorMod>('@landing-page-sdk/vite-executor');
-    if (mod) {
-      ({ main, teardown } = mod);
+export async function teardown() {
+  try {
+    if (devServer) {
+      await devServer.close();
+      devServer = null;
     }
-  };
-
-  const runMod = async () => {
-    try {
-      return await main({ siteConfig, cliOption, context, isFirstProcess });
-    } catch (error) {
-      console.error(error);
-      return false;
+  } catch {}
+  try {
+    if (previewServer) {
+      await previewServer.close();
+      previewServer = null;
     }
-  };
-
-  // Perform first run for the current config/module state
-  initMainMod();
-
-  yield { success: await runMod() };
-
-  // In build mode we only run once and exit
-  if (cliOption.mode === 'build') return;
-
-  isFirstProcess = false;
-  Plug.init();
-
-  const initWatcher = () => {
-    // do not enable HMR in preview mode
-    if (cliOption.mode === 'preview') return;
-
-    Watcher.set(resolveProj('@landing-page-sdk/vite-executor'));
-    Watcher.set(resolveProj('@landing-page-sdk/utils-node'));
-    Watcher.set(resolveCwd(configFile), {
-      evt: ['add', 'change', 'unlink'],
-    });
-
-    const { i18n, sites, pages } = siteConfig.sourcePath;
-
-    Watcher.set(resolveCwd(i18n), {
-      evt: ['add', 'change', 'unlink'],
-      matcher: Watcher.createFileMatcher({ ext: ['.json'] }),
-    });
-    Watcher.set(resolveCwd(sites), {
-      evt: ['add', 'unlink'],
-      matcher: Watcher.createFileMatcher({ ext: ['.js', '.ts'] }),
-    });
-    Watcher.set(resolveCwd(pages), {
-      evt: ['add', 'unlink'],
-      matcher: Watcher.createFileMatcher(
-        { name: 'index', ext: ['.html', '.ejs'] },
-        { name: 'main', ext: ['.js', '.ts', '.jsx', '.tsx'] }
-      ),
-    });
-
-    // Watcher only emits change signals; future logic can decide when to trigger HMR per event/target
-    Watcher.on((evt, file) => {
-      file = relative(resolveRoot(), file);
-      console.clear();
-      timelog('executor', chalk.green('program reload'), chalk.dim(`(${evt}: ${file})`));
-      Plug.init();
-    });
-  };
-
-  initWatcher();
-
-  // HMR loop: wait for changes, then reload executor + config
-  while (true) {
-    await Plug.plug; // Wait for file change signal
-    await Watcher.destroy();
-    await teardown();
-    initMainMod();
-    const success = await runMod();
-    initWatcher(); // Restart watcher after run completes
-    yield { success };
-  }
-};
-
-export default viteExecutor;
-
-function timelog(label: string, ...msgs: string[]) {
-  const now = new Date().toLocaleTimeString();
-  console.log(`${chalk.dim(now)} ${chalk.bold.cyanBright(`[${label}]`)}`, ...msgs);
+  } catch {}
 }
 
-function getConfigFile(config?: string): string {
-  const defaults = ['site.config.ts', 'site.config.js'];
+export async function main(options: {
+  siteConfig: NormalizedSiteConfig;
+  cliOption: ViteExecutorSchema;
+  context: ExecutorContext;
+  isFirstProcess: boolean;
+}) {
+  const { siteConfig, cliOption, context, isFirstProcess } = options;
+  // initialize project graph in each processes, or otherwise `readCachedProjectGraph()` could cause error
+  await createProjectGraphAsync();
+  // create site context
+  const pagesInfo = await createPages({ cli: cliOption, cfg: siteConfig });
+  const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
 
-  if (config) {
-    return config;
+  // configs
+  const config: InlineConfig = {};
+
+  const define = parseEnv(merge(pick(pagesInfo.langInfo, 'langs', 'langPack'), siteConfig.env));
+  const cacheDir = resolveRoot('node_modules/.vite-cache');
+  const alias = { '@': resolve('src') };
+  const outDir = resolveRoot('dist');
+
+  // shared
+  set(config, 'mode', cliOption.mode);
+  set(config, 'define', define);
+  set(config, 'cacheDir', cacheDir);
+  set(config, 'publicDir', siteConfig.sourcePath.public);
+  set(config, 'plugins', [
+    ...siteConfig.plugins,
+    sitesInjector(siteContext),
+    transformRedirect(siteContext),
+    renderBuiltUrl(siteContext),
+    autoController(siteContext),
+    // redirect(siteContext),
+    viteMockServe(await mockOptions(siteContext)),
+    routerLink(siteContext),
+    pageContext(siteContext),
+    virtualAssets(siteContext),
+  ]);
+
+  // resolve
+  set(config, 'resolve.alias', alias);
+
+  // server
+  set(config, 'server.host', cliOption.host);
+  set(config, 'server.port', cliOption.port);
+
+  // preview
+  set(config, 'preview.host', cliOption.host);
+  set(config, 'preview.port', cliOption.port);
+
+  if (isFirstProcess) {
+    const openTarget = pagesInfo.pages[0]!.filename as string;
+    set(config, 'server.open', openTarget);
+    set(config, 'preview.open', openTarget);
   }
 
-  const foundDefault = defaults.find((name) => {
-    try {
-      return statSync(resolveCwd(name)).isFile();
-    } catch {
-      return false; // File does not exist or is not a file
-    }
-  });
+  // build
+  set(config, 'build.outDir', outDir);
+  set(config, 'build.emptyOutDir', true);
+  set(config, 'build.copyPublicDir', false);
+  set(config, 'build.minify', siteConfig.output.minify.js);
+  set(config, 'build.cssMinify', siteConfig.output.minify.css);
 
-  return foundDefault || defaults[defaults.length - 1]; // Fallback to 'site.config.js' if neither are found
+  if (pagesInfo.sites.length) {
+    set(config, 'build.manifest', true);
+  }
+
+  // mpa
+  const mpaPlugin = createMpaPlugin({
+    pages: pagesInfo.pages as _Page[],
+    rewrites: rewrites(siteConfig),
+    htmlMinify: siteConfig.output.minify.html,
+    verbose: cliOption.verbose ?? false,
+  }) as Plugin[];
+
+  switch (cliOption.mode) {
+    case 'dev':
+      config.plugins?.push(mpaPlugin);
+      devServer = await createServer(config);
+      await devServer.listen();
+      devServer.printUrls();
+      devServer.bindCLIShortcuts({ print: true });
+      printVerboseHint(cliOption.verbose);
+      break;
+    case 'build':
+      config.plugins?.push(mpaPlugin);
+      await build(config);
+      await siteDistributor(siteContext, outDir);
+      await publicPorter(siteContext, outDir);
+      await sitemapGenerator(siteContext, outDir);
+      break;
+    case 'preview':
+      /** @todo preview doesn't work well, mock api plugin is unavailable */
+      previewServer = await preview(config);
+      previewServer.printUrls();
+      previewServer.bindCLIShortcuts({ print: true });
+      printVerboseHint(cliOption.verbose);
+      break;
+  }
+
+  return true;
+}
+
+function printVerboseHint(verbose?: boolean) {
+  verbose ??
+    console.log(
+      `  ${chalk.dim.green('➜')}  ${chalk.dim.white('use')} ${chalk.bold(
+        '--verbose'
+      )} ${chalk.dim.white('to print log')}`
+    );
 }
