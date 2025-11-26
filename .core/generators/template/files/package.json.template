@@ -14,21 +14,21 @@
     "projectType": "application",
     "targets": {
       "dev": {
-        "executor": "@landing-page-sdk/source:vite",
+        "executor": "@landing-page-sdk/core:vite",
         "options": {
           "mode": "dev",
           "cwd": "{projectRoot}"
         }
       },
       "build": {
-        "executor": "@landing-page-sdk/source:vite",
+        "executor": "@landing-page-sdk/core:vite",
         "options": {
           "mode": "build",
           "cwd": "{projectRoot}"
         }
       },
       "preview": {
-        "executor": "@landing-page-sdk/source:vite",
+        "executor": "@landing-page-sdk/core:vite",
         "options": {
           "mode": "preview",
           "cwd": "{projectRoot}"
