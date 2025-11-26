@@ -1,5 +1,5 @@
 {
-  "name": "@landing-page-sdk/source",
+  "name": "@landing-page-sdk/core",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -47,5 +47,6 @@
     ".core/plugins"
   ],
   "nx": {},
-  "executors": "./executors.json"
+  "executors": "./executors.json",
+  "generators": "./generators.json"
 }
