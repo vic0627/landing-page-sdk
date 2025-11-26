@@ -7,6 +7,8 @@ import {
   writeJson,
   offsetFromRoot,
   getProjects,
+  globAsync,
+  toJS,
 } from '@nx/devkit';
 import { TemplateGeneratorSchema } from '@landing-page-sdk/types';
 import { join } from '@landing-page-sdk/utils-node';
@@ -35,32 +37,33 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
 
   generateFiles(tree, source, projectRoot, { ...options, depthRel, ext });
 
+  if (!options.useTs) {
+    toJS(tree, {
+      useJsx: true,
+    });
+  }
+
+  const usePath = (path: string) => join(projectRoot, path);
   const deleteFiles: string[] = [];
-  const dependencies: Record<string, string> = {};
   const vueExcludes: string[] = [
-    `src/pages/app.${ext}x`,
-    `src/pages/main.${ext}x`,
-    `src/components/router-link.${ext}x`,
-    `src/components/counter.${ext}x`,
-    `src/components/react-logo.${ext}x`,
-    `src/components/vite-logo.${ext}x`,
-    'public/__ASSETS__/react.svg',
+    ...(await globAsync(tree, [usePath(`**/*.${ext}x`)])),
+    usePath('public/__ASSETS__/react.svg'),
   ];
-  const commonEntry = `src/pages/main.${ext}`;
+  const commonEntry = usePath(`src/pages/main.${ext}`);
   const reactExcludes: string[] = [
-    'src/pages/app.vue',
-    'src/components/router-link.vue',
-    'src/components/counter.vue',
-    'src/components/vue-logo.vue',
-    'src/components/vite-logo.vue',
-    'public/__ASSETS__/vue.svg',
+    ...(await globAsync(tree, [usePath(`**/*.vue`)])),
+    usePath('public/__ASSETS__/vue.svg'),
   ];
+  const dependencies: Record<string, string> = {};
 
   // add framework dependencies
   if (options.framework === 'none') {
-    deleteFiles.push(`src/composables/use-i18n.${ext}`, ...vueExcludes, ...reactExcludes);
+    deleteFiles.push(usePath(`src/composables/use-i18n.${ext}`), ...vueExcludes, ...reactExcludes);
   } else {
-    deleteFiles.push(`src/composables/counter.${ext}`);
+    deleteFiles.push(
+      usePath(`src/composables/counter.${ext}`),
+      usePath('public/__ASSETS__/javascript.svg')
+    );
 
     if (options.framework === 'vue') {
       deleteFiles.push(...vueExcludes);
@@ -89,7 +92,7 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
   }
 
   // delete unused files
-  deleteFiles.forEach((file) => tree.delete(join(projectRoot, file)));
+  deleteFiles.forEach((file) => tree.delete(file));
 
   // add dependencies to project
   const pkg = readJson(tree, join(projectRoot, 'package.json'));

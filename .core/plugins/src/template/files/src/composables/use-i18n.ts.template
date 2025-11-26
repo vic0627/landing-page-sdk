@@ -9,7 +9,7 @@ export default function () {
 
   const langPack = i18n;
 
-  return function (key<% if (useTs) { %>: string<% } %>, ...args<% if (useTs) { %>: any[]<% } %>) {
+  return function (key: string, ...args: any[]) {
     try {
       const keys = key.split('.');
       let pack = langPack;

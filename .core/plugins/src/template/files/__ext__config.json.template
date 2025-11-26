@@ -22,5 +22,5 @@
     }
   },
   "files": [],
-  "include": ["src/**/*.<%= ext %>", "site.config.<%= ext %>"<% if (framework === 'vue') { %>, "src/**/*.vue"<% } %><% if (framework === 'react') { %>, "src/**/*.tsx"<% } %>]
+  "include": ["src/**/*.<%= ext %>", "site.config.<%= ext %>"<% if (framework === 'vue') { %>, "src/**/*.vue"<% } %><% if (framework === 'react') { %>, "src/**/*.<%= ext %>x"<% } %>]
 }

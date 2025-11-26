@@ -6,4 +6,4 @@ import '@/styles/main.scss';
 <% } %>
 import '@/styles/main.css';
 
-createRoot(document.getElementById('app')<% if (useTs) { %>!<% } %>).render(<App />);
+createRoot(document.getElementById('app')!).render(<App />);

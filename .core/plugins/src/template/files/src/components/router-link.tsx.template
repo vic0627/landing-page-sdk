@@ -1,14 +1,14 @@
-import { <% if (useTs) { %>ReactNode, <% } %>useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { manifestResolver } from '@landing-page-sdk/utils-browser';
 import manifest from 'virtual:route-manifest';
 
-<% if (useTs) { %>interface RouterLinkProps {
+interface RouterLinkProps {
   to: string;
   locale?: string;
   children?: ReactNode;
-}<% } %>
+}
 
-export default function RouterLink({ to, locale, children }<% if (useTs) { %>: RouterLinkProps<% } %>) {
+export default function RouterLink({ to, locale, children }: RouterLinkProps) {
   const [href, setHref] = useState('/');
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function RouterLink({ to, locale, children }<% if (useTs) { %>: R
     const resolved = manifestResolver(manifest, {
       site,
       fromLocale,
-      fromRoute: fromRoute<% if (useTs) { %>!<% } %>,
+      fromRoute: fromRoute!,
       toLocale: locale ?? fromLocale,
       toRoute: to,
     });
