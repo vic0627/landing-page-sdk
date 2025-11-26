@@ -5,7 +5,7 @@
 開始一個新專案最快的方式是使用內建的程式碼產生器：
 
 ```bash
-npx nx generate @landing-page-sdk/plugins:template
+npx nx generate @landing-page-sdk/core:template
 ```
 
 執行後，系統會引導您輸入專案名稱、路徑等資訊，然後在您輸入的路徑下建立一個包含完整基礎結構的新站點。
