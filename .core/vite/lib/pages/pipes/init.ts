@@ -50,7 +50,14 @@ export default async function (buildPageOption: BuildPageOption): Promise<Page[]
       env,
       $cmp: (_path: string) => {
         if (_path.startsWith('@')) {
-          return resolveProj(_path);
+          const projPath = resolveProj(_path);
+          let relPath = relative(resolve(), projPath);
+
+          if (!relPath.startsWith('/')) {
+            relPath = '/' + relPath;
+          }
+
+          return relPath;
         }
 
         return join('/', sourcePath.components, _path);
