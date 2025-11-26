@@ -8,11 +8,11 @@ import {
   relative,
   resolve as resolveCwd,
 } from '@landing-page-sdk/utils-node';
-import { Plug, Watcher } from '@landing-page-sdk/vite-executor/hmr';
-import { readRaw, normalize } from '@landing-page-sdk/vite-executor/config';
+import { Plug, Watcher } from '@landing-page-sdk/vite/hmr';
+import { readRaw, normalize } from '@landing-page-sdk/vite/config';
 import { statSync } from 'node:fs';
 
-type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite-executor')>;
+type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite')>;
 
 const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> = async function* (
   cliOption,
@@ -31,7 +31,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> = async function* 
   const initMainMod = () => {
     const rawConfig = readRaw(configFile);
     siteConfig = normalize(rawConfig);
-    const mod = loadHMR<ExecutorMod>('@landing-page-sdk/vite-executor');
+    const mod = loadHMR<ExecutorMod>('@landing-page-sdk/vite');
     if (mod) {
       ({ main, teardown } = mod);
     }
@@ -61,7 +61,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> = async function* 
     // do not enable HMR in preview mode
     if (cliOption.mode === 'preview') return;
 
-    Watcher.set(resolveProj('@landing-page-sdk/vite-executor'));
+    Watcher.set(resolveProj('@landing-page-sdk/vite'));
     Watcher.set(resolveProj('@landing-page-sdk/utils-node'));
     Watcher.set(resolveCwd(configFile), {
       evt: ['add', 'change', 'unlink'],
