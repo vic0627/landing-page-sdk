@@ -129,14 +129,21 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
           continue;
         }
 
+        const isHtml = filename.endsWith('.html');
+        const isCss = filename.endsWith('.css');
+
+        if (!isHtml && !isCss) {
+          continue;
+        }
+
         let content = asset.source.toString();
 
-        if (filename.endsWith('.css')) {
+        if (isCss) {
           content = content.replace(CSS_URL_RE, (_, rel) => {
             rel = transformPath(filename, rel, 'css');
             return `url(${JSON.stringify(rel)})`;
           });
-        } else if (filename.endsWith('.html')) {
+        } else if (isHtml) {
           const page = pagesInfo.pages.find((p) => p.filename === filename);
           content = content.replace(HTML_BASE_RE, (_, quote, rel) => {
             return transformPath(filename, rel, 'html', page);
