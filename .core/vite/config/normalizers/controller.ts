@@ -4,7 +4,7 @@ import {
   NormalizedControllerOption,
   OptionNormalizer,
 } from '@landing-page-sdk/types';
-import { isArray, isPlainObject, isString } from 'lodash-es';
+import { isArray, isPlainObject, isString, merge } from 'lodash-es';
 
 export default (function (opt, cfg) {
   if (isPlainObject(cfg.controller)) {
@@ -27,6 +27,11 @@ function normalizeControllerOption(controllerOption: ControllerOption): Normaliz
       placement: 'post',
       appendTo: 'head',
       bundle: true,
+      esbuildOptions: {
+        minify: true,
+        platform: 'browser',
+        target: 'es2015',
+      },
     },
   };
 
@@ -75,6 +80,10 @@ function normalizeControllerOption(controllerOption: ControllerOption): Normaliz
 
     if (injection.bundle === false) {
       opt.injection.bundle = false;
+    }
+
+    if (isPlainObject(injection.esbuildOptions)) {
+      opt.injection.esbuildOptions = merge(opt.injection.esbuildOptions, injection.esbuildOptions!);
     }
   }
 

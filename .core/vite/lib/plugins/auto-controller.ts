@@ -112,7 +112,7 @@ async function inlineTransform(code: string, opts: NormalizedControllerOption[],
       const filename = resolveProj(toControllerName(name));
 
       if (injection.bundle) {
-        const script = await bundleInlineSync(filename, data);
+        const script = await bundleInlineSync(filename, opt.injection.esbuildOptions, data);
         const file = script.outputFiles[0];
         scriptMap.set(id, file.text);
       } else {
