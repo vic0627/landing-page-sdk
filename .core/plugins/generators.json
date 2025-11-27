@@ -1,9 +1,0 @@
-{
-  "generators": {
-    "template": {
-      "factory": "./src/template/index",
-      "schema": "./src/template/schema.json",
-      "description": "template generator"
-    }
-  }
-}

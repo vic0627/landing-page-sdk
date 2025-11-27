@@ -1,0 +1,26 @@
+{
+  "extends": "<%= depthRel %>tsconfig.base.json",
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "importHelpers": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowJs": true,
+    "checkJs": false,
+    <% if (framework === 'react') { %>
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    <% } %>
+    "baseUrl": ".",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "files": [],
+  "include": ["src/**/*.<%= ext %>", "site.config.<%= ext %>"<% if (framework === 'vue') { %>, "src/**/*.vue"<% } %><% if (framework === 'react') { %>, "src/**/*.<%= ext %>x"<% } %>]
+}

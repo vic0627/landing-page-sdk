@@ -1,5 +1,5 @@
 {
-  "name": "@landing-page-sdk/source",
+  "name": "@landing-page-sdk/core",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,7 +17,7 @@
     "@nx/plugin": "21.4.1",
     "@swc-node/register": "~1.9.1",
     "@swc/cli": "~0.6.0",
-    "@swc/core": "~1.5.7",
+    "@swc/core": "~1.15.0",
     "@swc/helpers": "~0.5.11",
     "@types/jsdom": "^21.1.7",
     "@types/lodash-es": "^4.17.12",
@@ -33,6 +33,7 @@
     "typescript": "~5.8.2",
     "vite": "^7.0.4",
     "vite-plugin-mock": "^3.0.2",
+    "mockjs": "^1.1.0",
     "vite-plugin-virtual-mpa": "^1.12.1"
   },
   "dependencies": {
@@ -42,9 +43,9 @@
     ".core/assets",
     ".core/types",
     ".core/utils/*",
-    ".core/vite/executor",
-    ".core/plugins"
+    ".core/vite"
   ],
   "nx": {},
-  "executors": "./executors.json"
+  "executors": "./executors.json",
+  "generators": "./generators.json"
 }

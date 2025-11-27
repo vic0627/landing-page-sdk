@@ -1,5 +1,6 @@
 import { DOMWindow } from 'jsdom';
 import { PluginOption } from 'vite';
+import { BuildOptions } from 'esbuild';
 import {
   ScriptSourceType,
   Phase,
@@ -44,6 +45,7 @@ export interface ControllerInjection {
    * @default true
    */
   bundle?: boolean;
+  esbuildOptions?: Omit<BuildOptions, 'entryPoints' | 'bundle' | 'write' | 'plugins' | 'inject'>;
 }
 
 export interface ControllerOption {

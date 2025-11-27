@@ -1,0 +1,11 @@
+{
+  "name": "@landing-page-sdk/vite",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "dependencies": {
+    "@landing-page-sdk/utils-node": "*"
+  },
+  "nx": {}
+}

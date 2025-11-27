@@ -31,14 +31,12 @@ function dataInjectPlugin(data: Record<string, any> = {}) {
   } as esbuild.Plugin;
 }
 
-export const bundleInlineSync = (path: string, data?: Record<string, any>) =>
+export const bundleInlineSync = (path: string, options: esbuild.BuildOptions, data?: Record<string, any>) =>
   esbuild.build({
+    ...options,
     entryPoints: [path],
     bundle: true,
-    minify: true,
     write: false,
-    platform: 'browser',
-    target: 'ie11',
     plugins: data ? [dataInjectPlugin(data)] : [],
     // 讓每個模組都能「看見」那些 export（只有用到的才會保留）
     inject: data ? [MOD_ID] : [],

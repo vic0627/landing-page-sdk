@@ -1,9 +1,0 @@
-import { createRoot } from 'react-dom/client';
-import App from './app.<%= ext %>x';
-
-<% if (style.includes('sass')) { %>
-import '@/styles/main.scss';
-<% } %>
-import '@/styles/main.css';
-
-createRoot(document.getElementById('app')).render(<App />);

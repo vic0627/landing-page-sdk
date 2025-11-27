@@ -94,38 +94,3 @@ export function resolve(...paths: string[]): string {
   }
   return normalize('/' + resolvedPath);
 }
-
-/**
- * 根據開發或生產版本解析靜態資源的動態路徑
- *
- * @param path - 要依環境動態改變的路徑，可為相對路徑（限定指向同層）或絕對路徑，但必須是指向 assets 的路徑。
- * @returns 返回解析後的動態路徑，開發模式下為絕對路徑，構建生產版本時為相對路徑。
- *
- * @example
- * dynamicAssetsPath("assets/images/logo.png");
- * dynamicAssetsPath("/assets/images/logo.png");
- * dynamicAssetsPath("./assets/images/logo.png");
- * // 以上三種輸出結果皆相同
- * // dev => "/assets/images/logo.png"
- * // build => "./assets/images/logo.png"
- *
- * @example
- * // 錯誤路徑
- * dynamicAssetsPath("../assets/images/logo.png");
- * dynamicAssetsPath("../public/assets/images/logo.png");
- * dynamicAssetsPath("/public/assets/images/logo.png");
- */
-export function dynamicAssetsPath(path: string): string {
-  const isDev = import.meta.env.DEV;
-
-  const isValidPath = /^(\/|\.\/)?assets\//.test(path);
-  if (!isValidPath) {
-    throw new Error('路徑必須指向 assets 目錄，且不能是上層路徑或指向其他目錄');
-  }
-
-  if (isDev) {
-    return path.startsWith('/') ? path : `/${path.replace(/^\.\/?/, '')}`;
-  }
-
-  return path.startsWith('./') ? path : `./${path.replace(/^\//, '')}`;
-}
