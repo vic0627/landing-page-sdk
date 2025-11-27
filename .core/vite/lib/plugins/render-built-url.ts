@@ -6,7 +6,8 @@ import { base62Hash, join } from '@landing-page-sdk/utils-node';
 import { namedLogger } from '../common';
 
 const BASE = '/__BASE__/';
-const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
+const HTML_BASE_RE = /(["'])\/__BASE__\/([^"']+)\1/g;
+const HTML_ASSETS_RE = /(["'])\/__ASSETS__\/([^"']+)\1/g; // Used for attributes not processed by Vite’s base config — like data-src, content, etc.
 const CSS_URL_RE = /url\(\s*(?:["'])?\/__BASE__\/([^)"']+)(?:["'])?\s*\)/g;
 const JS_IMPORT_RE = /(import\s+(?:[\s\S]*?\s+from\s+)?)["']([^"']+)["'](.*?;?)/g;
 const JS_BASE_ASSETS_RE = /["']\/__BASE__\/__ASSETS__\/([^"']+)["']/g;
@@ -137,8 +138,11 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
           });
         } else if (filename.endsWith('.html')) {
           const page = pagesInfo.pages.find((p) => p.filename === filename);
-          content = content.replace(HTML_BASE_RE, (_, rel) => {
+          content = content.replace(HTML_BASE_RE, (_, quote, rel) => {
             return transformPath(filename, rel, 'html', page);
+          });
+          content = content.replace(HTML_ASSETS_RE, (_, quote, rel) => {
+            return transformPath(filename, join(ASSETS, rel), 'html', page);
           });
         }
 
