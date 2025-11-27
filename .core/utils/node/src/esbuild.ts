@@ -38,7 +38,7 @@ export const bundleInlineSync = (path: string, data?: Record<string, any>) =>
     minify: true,
     write: false,
     platform: 'browser',
-    target: 'ie11',
+    target: 'es2015',
     plugins: data ? [dataInjectPlugin(data)] : [],
     // 讓每個模組都能「看見」那些 export（只有用到的才會保留）
     inject: data ? [MOD_ID] : [],

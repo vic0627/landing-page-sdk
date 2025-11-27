@@ -38,6 +38,10 @@ export interface PageDataI18n extends Pick<RedirectOption, 'defaultLang'> {
    * 對應語系的字典物件（由 `src/i18n/*.json` 載入）
    */
   i18n?: I18nLangPack;
+  /**
+   * 完整的字典包（由 `src/i18n/*.json` 載入）
+   */
+  i18nPack?: I18nLangPack;
 }
 
 export interface PageDataSite {
@@ -45,6 +49,10 @@ export interface PageDataSite {
    * 此頁所屬站點名稱（多站時存在）
    */
   site?: string;
+  /**
+   * 此頁的路由
+   */
+  route?: string;
 }
 
 export type PageData = PageDataCommon & PageDataI18n & PageDataSite & Record<string, any>;

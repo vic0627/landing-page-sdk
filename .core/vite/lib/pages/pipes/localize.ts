@@ -59,6 +59,7 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
         lang,
         defaultLang: redirect.defaultLang,
         langs: langInfo.langs,
+        i18nPack: langInfo.langPack,
         i18n: langInfo.langPack[lang] as I18nLangPack,
       };
 

@@ -62,6 +62,7 @@ export default async function (buildPageOption: BuildPageOption): Promise<Page[]
 
         return join('/', sourcePath.components, _path);
       },
+      route: page.route,
     };
 
     return page;
