@@ -1,18 +1,14 @@
-import fsp from 'node:fs/promises';
+import fg from 'fast-glob';
 import { readJsonFile } from '@nx/devkit';
 import { BuildPageOption, I18nInfo, I18nLangPack } from '@landing-page-sdk/types';
-import { basename, isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
-import { createRedirectPage, createStubPage, Page, JSON } from '../../common';
+import { basename } from '@landing-page-sdk/utils-node';
+import { createRedirectPage, createStubPage, Page } from '../../common';
 
 export default async function (buildPageOption: BuildPageOption, pages: Page[]): Promise<I18nInfo> {
   const { route, sourcePath, redirect } = buildPageOption.cfg;
 
   // 掃描 src/i18n/*.json
-  const rawFiles = await scanDir(sourcePath.i18n, { match: JSON });
-  const predicates = await Promise.all(
-    rawFiles.map(async (raw) => (await fsp.stat(raw)).isFile() && !isHiddenFile(raw))
-  );
-  const files = rawFiles.filter((_, i) => predicates[i]);
+  const files = await fg(`${sourcePath.i18n}/**/*.json`);
   const langInfo: I18nInfo = {
     langs: [],
     langPack: {},

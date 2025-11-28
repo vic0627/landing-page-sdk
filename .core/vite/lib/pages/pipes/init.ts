@@ -1,14 +1,14 @@
 import fsp from 'node:fs/promises';
+import fg from 'fast-glob';
 import { BuildPageOption } from '@landing-page-sdk/types';
 import {
   resolve,
   resolveProj,
   join,
   relative,
-  scanDir,
   dirname,
 } from '@landing-page-sdk/utils-node';
-import { createPage, Page, TEMPLATE } from '../../common';
+import { createPage, Page } from '../../common';
 
 export default async function (buildPageOption: BuildPageOption): Promise<Page[]> {
   const { route: routeOpt, sourcePath, env } = buildPageOption.cfg;
@@ -16,10 +16,7 @@ export default async function (buildPageOption: BuildPageOption): Promise<Page[]
   const root = resolve();
 
   // 掃描 src/pages/**/*.{html,ejs}
-  const files = await scanDir(sourcePath.pages, {
-    match: TEMPLATE,
-    recursive: true,
-  });
+  const files = await fg(`${sourcePath.pages}/**/*.{html,ejs}`);
 
   if (!files.length) {
     throw new Error(
