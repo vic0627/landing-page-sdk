@@ -55,7 +55,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
   const transformPath = (
     filename: string,
     path: string,
-    type: MinifyTargets | 'spa',
+    type: MinifyTargets | 'esm',
     page?: Page
   ): string => {
     let render = path;
@@ -89,7 +89,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
       render += `?v=${hash}`;
     }
 
-    if (type === 'spa') {
+    if (type === 'esm') {
       render = `new URL("./${render}",import.meta.url).href`;
     }
 
@@ -119,7 +119,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
             return pre + rel + post;
           });
           asset.code = asset.code.replace(JS_BASE_ASSETS_RE, (_, rel) => {
-            return transformPath(filename, rel, 'spa');
+            return transformPath(filename, rel, 'esm');
           });
 
           continue;
