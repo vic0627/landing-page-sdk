@@ -40,12 +40,8 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
 
   const hash = base62Hash(Date.now().toString(), 8);
 
-  const rootRel = (hostId: string) => {
+  const offsetFromRoot = (hostId: string) => {
     let depth = hostId.split('/').length - 1;
-
-    if (pagesInfo.langInfo.langs.length < 2) {
-      depth--;
-    }
 
     if (sites.length) {
       depth--;
@@ -67,7 +63,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     if (resolution === 'rel') {
       switch (type) {
         case 'html':
-          const rel = rootRel(filename);
+          const rel = offsetFromRoot(filename);
           render = join(`${routeMode === 'flat' ? '.' : rel}/`, render);
           break;
         case 'css':
