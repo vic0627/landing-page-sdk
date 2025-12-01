@@ -1,13 +1,7 @@
 import fsp from 'node:fs/promises';
 import fg from 'fast-glob';
 import { BuildPageOption } from '@landing-page-sdk/types';
-import {
-  resolve,
-  resolveProj,
-  join,
-  relative,
-  dirname,
-} from '@landing-page-sdk/utils-node';
+import { resolve, resolveProj, join, relative, dirname } from '@landing-page-sdk/utils-node';
 import { createPage, Page } from '../../common';
 
 export default async function (buildPageOption: BuildPageOption): Promise<Page[]> {

@@ -31,7 +31,11 @@ function dataInjectPlugin(data: Record<string, any> = {}) {
   } as esbuild.Plugin;
 }
 
-export const bundleInlineSync = (path: string, options: esbuild.BuildOptions, data?: Record<string, any>) =>
+export const bundleInlineSync = (
+  path: string,
+  options: esbuild.BuildOptions,
+  data?: Record<string, any>
+) =>
   esbuild.build({
     ...options,
     entryPoints: [path],
