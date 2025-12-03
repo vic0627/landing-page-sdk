@@ -1,14 +1,14 @@
 import path from 'node:path';
+import fg from 'fast-glob';
 import { BuildPageOption } from '@landing-page-sdk/types';
-import { isHiddenFile, scanDir } from '@landing-page-sdk/utils-node';
-import { Page, SCRIPT } from '../../common';
+import { Page } from '../../common';
 
 export default async function (buildPageOption: BuildPageOption, pages: Page[]): Promise<string[]> {
   const { sites: _requiredSites } = buildPageOption.cli;
   const { sourcePath } = buildPageOption.cfg;
 
   // 掃描 src/sites/*.{js,ts}
-  const files = await scanDir(sourcePath.sites, { match: SCRIPT });
+  const files = await fg(`${sourcePath.sites}/**/*.{js,ts}`);
 
   if (!files.length) {
     return [];
@@ -19,8 +19,7 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
     .map((p) => {
       const _path = p.startsWith('/') ? p : `/${p}`;
       const name = path.parse(_path).name;
-      const keep =
-        !isHiddenFile(p) && (requiredSites?.length ? requiredSites.includes(name) : true);
+      const keep = requiredSites?.length ? requiredSites.includes(name) : true;
 
       return keep && { path: _path, name };
     })

@@ -6,7 +6,8 @@ import { base62Hash, join } from '@landing-page-sdk/utils-node';
 import { namedLogger } from '../common';
 
 const BASE = '/__BASE__/';
-const HTML_BASE_RE = /\/__BASE__\/([^\s"'>,)]+)/g;
+const HTML_BASE_RE = /(["'])\/__BASE__\/([^"']+)\1/g;
+const HTML_ASSETS_RE = /(["'])\/__ASSETS__\/([^"']+)\1/g; // Used for attributes not processed by Vite’s base config — like data-src, content, etc.
 const CSS_URL_RE = /url\(\s*(?:["'])?\/__BASE__\/([^)"']+)(?:["'])?\s*\)/g;
 const JS_IMPORT_RE = /(import\s+(?:[\s\S]*?\s+from\s+)?)["']([^"']+)["'](.*?;?)/g;
 const JS_BASE_ASSETS_RE = /["']\/__BASE__\/__ASSETS__\/([^"']+)["']/g;
@@ -39,12 +40,8 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
 
   const hash = base62Hash(Date.now().toString(), 8);
 
-  const rootRel = (hostId: string) => {
+  const offsetFromRoot = (hostId: string) => {
     let depth = hostId.split('/').length - 1;
-
-    if (pagesInfo.langInfo.langs.length < 2) {
-      depth--;
-    }
 
     if (sites.length) {
       depth--;
@@ -58,7 +55,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
   const transformPath = (
     filename: string,
     path: string,
-    type: MinifyTargets | 'spa',
+    type: MinifyTargets | 'esm',
     page?: Page
   ): string => {
     let render = path;
@@ -66,7 +63,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
     if (resolution === 'rel') {
       switch (type) {
         case 'html':
-          const rel = rootRel(filename);
+          const rel = offsetFromRoot(filename);
           render = join(`${routeMode === 'flat' ? '.' : rel}/`, render);
           break;
         case 'css':
@@ -92,7 +89,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
       render += `?v=${hash}`;
     }
 
-    if (type === 'spa') {
+    if (type === 'esm') {
       render = `new URL("./${render}",import.meta.url).href`;
     }
 
@@ -122,23 +119,33 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
             return pre + rel + post;
           });
           asset.code = asset.code.replace(JS_BASE_ASSETS_RE, (_, rel) => {
-            return transformPath(filename, rel, 'spa');
+            return transformPath(filename, rel, 'esm');
           });
 
           continue;
         }
 
+        const isHtml = filename.endsWith('.html');
+        const isCss = filename.endsWith('.css');
+
+        if (!isHtml && !isCss) {
+          continue;
+        }
+
         let content = asset.source.toString();
 
-        if (filename.endsWith('.css')) {
+        if (isCss) {
           content = content.replace(CSS_URL_RE, (_, rel) => {
             rel = transformPath(filename, rel, 'css');
             return `url(${JSON.stringify(rel)})`;
           });
-        } else if (filename.endsWith('.html')) {
+        } else if (isHtml) {
           const page = pagesInfo.pages.find((p) => p.filename === filename);
-          content = content.replace(HTML_BASE_RE, (_, rel) => {
+          content = content.replace(HTML_BASE_RE, (_, quote, rel) => {
             return transformPath(filename, rel, 'html', page);
+          });
+          content = content.replace(HTML_ASSETS_RE, (_, quote, rel) => {
+            return transformPath(filename, join(ASSETS, rel), 'html', page);
           });
         }
 

@@ -55,6 +55,12 @@ async function getAssetsList(outDir: string, site: string): Promise<Set<string>>
       }
     }
 
+    if (chunk.assets) {
+      for (const asset of chunk.assets) {
+        list.add(asset);
+      }
+    }
+
     if (chunk.imports) {
       for (const script of chunk.imports) {
         traverseManifest(script);
