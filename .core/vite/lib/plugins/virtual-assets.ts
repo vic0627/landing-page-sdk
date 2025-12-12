@@ -1,6 +1,7 @@
-import { SDKPlugin } from '@landing-page-sdk/types';
-import { namedLogger, manifest, findExist } from '../common';
 import { readFile } from 'node:fs/promises';
+import fg from 'fast-glob';
+import { SDKPlugin } from '@landing-page-sdk/types';
+import { namedLogger, manifest } from '../common';
 import { resolve } from '@landing-page-sdk/utils-node';
 
 const name = 'vite-plugin-virtual-assets';
@@ -31,19 +32,14 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
 
       if (id.includes('virtual-entry')) {
         const pagesDir = siteConfig.sourcePath.pages;
-        const entry = await findExist([
-          resolve(pagesDir, 'main.js'),
-          resolve(pagesDir, 'main.ts'),
-          resolve(pagesDir, 'main.jsx'),
-          resolve(pagesDir, 'main.tsx'),
-        ]);
+        const entry = await fg(resolve(pagesDir, 'main.{js,ts,jsx,tsx}'))
 
-        if (!entry) {
+        if (!entry.length) {
           throw new Error('root entry file must exist while using virtual entry');
         }
 
         log('virtual entry:', id);
-        return (await readFile(entry)).toString('utf-8');
+        return (await readFile(entry[0])).toString('utf-8');
       }
 
       return;

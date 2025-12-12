@@ -130,19 +130,3 @@ export async function mockOptions(ctx: SiteContext): Promise<ViteMockOptions> {
 
   return options;
 }
-
-export async function findExist(
-  files: string[],
-  defaultFile?: string
-): Promise<string | undefined> {
-  for (const file of files) {
-    try {
-      await access(file);
-      return file.startsWith('/') ? file : join('/', file);
-    } catch {
-      // 檔案不存在 → 跳下一個
-    }
-  }
-
-  return defaultFile;
-}
