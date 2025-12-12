@@ -16,8 +16,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@landing-page-sdk/core": ["."],
       "@landing-page-sdk/assets": [".core/assets"],
+      "@landing-page-sdk/core": ["."],
       "@landing-page-sdk/types": [".core/types"],
       "@landing-page-sdk/utils-browser": [".core/utils/browser"],
       "@landing-page-sdk/utils-node": [".core/utils/node"],
