@@ -1,6 +1,6 @@
-import { detectLangLegacy } from '@landing-page-sdk/utils-browser';
+import { detectLangLegacy, getPageContext } from '@landing-page-sdk/utils-browser';
 
-const { defaultLang, langs } = __SDK_PAGE_CTX__;
+const { defaultLang, langs } = getPageContext();
 const dest = `./index_${detectLangLegacy(langs, defaultLang)}.html${location.search}`;
 
 window.location.href = dest;

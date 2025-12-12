@@ -64,10 +64,7 @@ export type PageData = PageDataCommon & PageDataI18n & PageDataSite & Record<str
 export type PageContext = Omit<Page, 'getContext' | 'data' | 'siteScript' | 'entry' | 'template'> & PageDataI18n & PageDataSite;
 
 declare global {
-  /**
-   * 頁面元數據
-   */
-  var __SDK_PAGE_CTX__: PageContext;
+  // global vars
 }
 
 export interface Page {

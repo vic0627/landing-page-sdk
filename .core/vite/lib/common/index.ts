@@ -3,8 +3,8 @@ import chalk from 'chalk';
 import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import { ViteMockOptions } from 'vite-plugin-mock';
 import { isString } from 'lodash-es';
-import { NormalizedSiteConfig, SiteContext } from '@landing-page-sdk/types';
-import { resolveProj, isDir, join } from '@landing-page-sdk/utils-node';
+import { NormalizedSiteConfig, Page, SiteContext } from '@landing-page-sdk/types';
+import { resolveProj, isDir, join, resolve } from '@landing-page-sdk/utils-node';
 
 export * from './page';
 export * from './regexp';

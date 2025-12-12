@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { manifestResolver } from '@landing-page-sdk/utils-browser';
+import { manifestResolver, getPageContext } from '@landing-page-sdk/utils-browser';
 import manifest from 'virtual:route-manifest';
 
 interface RouterLinkProps {
@@ -12,7 +12,7 @@ export default function RouterLink({ to, locale, children }: RouterLinkProps) {
   const [href, setHref] = useState('/');
 
   useEffect(() => {
-    const { route: fromRoute, site, lang: fromLocale } = __SDK_PAGE_CTX__;
+    const { route: fromRoute, site, lang: fromLocale } = getPageContext();
 
     const resolved = manifestResolver(manifest, {
       site,

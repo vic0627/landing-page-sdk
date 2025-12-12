@@ -1,6 +1,6 @@
-import { detectLang, join } from '@landing-page-sdk/utils-browser';
+import { detectLang, join, getPageContext } from '@landing-page-sdk/utils-browser';
 
-const { langs, defaultLang } = __SDK_PAGE_CTX__;
+const { langs, defaultLang } = getPageContext();
 const isFileOrientated = import.meta.env['SDK_CONFIG'].route.orientation === 'file';
 let dest = join('./', detectLang(langs, defaultLang), isFileOrientated ? 'index.html' : '')
 

@@ -5,7 +5,7 @@
 </template>
 
 <script setup<% if (useTs) { %> lang="ts"<% } %>>
-import { manifestResolver } from '@landing-page-sdk/utils-browser';
+import { manifestResolver, getPageContext } from '@landing-page-sdk/utils-browser';
 import manifest from 'virtual:route-manifest';
 import { ref } from 'vue';
 
@@ -15,7 +15,7 @@ const props = defineProps<% if (useTs) { %><{
   locale?: string;
 }><% } %>(<% if (!useTs) { %>['to', 'locale']<% } %>);
 
-const { route: fromRoute, site, lang: fromLocale } = __SDK_PAGE_CTX__;
+const { route: fromRoute, site, lang: fromLocale } = getPageContext();
 
 href.value = manifestResolver(manifest, {
   site,

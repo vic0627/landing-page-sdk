@@ -5,5 +5,6 @@ export * from './src/lazy';
 export * from './src/loader';
 export * from './src/path';
 export * from './src/query';
+export * from './src/sdk';
 export * from './src/xhr';
 export * from '@landing-page-sdk/utils-node/src/route';

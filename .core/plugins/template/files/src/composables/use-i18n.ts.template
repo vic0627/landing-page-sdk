@@ -1,7 +1,8 @@
 import { isString } from 'lodash-es';
+import { getPageContext } from '@landing-page-sdk/utils-browser';
 
 export default function () {
-  const { i18n } = __SDK_PAGE_CTX__;
+  const { i18n } = getPageContext();
 
   if (!i18n) {
     throw new Error('Missing locale context for i18n');
