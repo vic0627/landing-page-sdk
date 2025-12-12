@@ -25,7 +25,7 @@ export interface PageDataCommon {
   _data?: PageDataCommon;
 }
 
-export interface PageDataI18n extends Pick<RedirectOption, 'defaultLang'> {
+export interface PageDataI18n {
   /**
    * 此頁語系（多語時存在）
    */
@@ -42,6 +42,10 @@ export interface PageDataI18n extends Pick<RedirectOption, 'defaultLang'> {
    * 完整的字典包（由 `src/i18n/*.json` 載入）
    */
   i18nPack?: I18nLangPack;
+  /**
+   * 預設語系
+   */
+  defaultLang?: string;
 }
 
 export interface PageDataSite {
@@ -57,9 +61,7 @@ export interface PageDataSite {
 
 export type PageData = PageDataCommon & PageDataI18n & PageDataSite & Record<string, any>;
 
-export type PageContext = Omit<Page, 'getContext' | 'data'> & {
-  data: Omit<PageDataCommon, '_data' | '$cmp'> & PageDataI18n & PageDataSite;
-};
+export type PageContext = Omit<Page, 'getContext' | 'data' | 'siteScript' | 'entry' | 'template'> & PageDataI18n & PageDataSite;
 
 declare global {
   /**

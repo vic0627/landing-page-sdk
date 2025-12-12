@@ -20,7 +20,18 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
 
   // 語言包資訊初始化
   for (const file of files) {
-    const lang = basename(file, '.json');
+    const [lang, isDefault] = basename(file, '.json').split('.');
+
+    if (isDefault) {
+      if (!langInfo.defaultLang) {
+        langInfo.defaultLang = lang;
+      } else {
+        throw new Error(
+          `Multiple default language files found: ${langInfo.defaultLang} and ${lang}`
+        );
+      }
+    }
+
     const content = readJsonFile<I18nLangPack>(file);
     langInfo.langs.push(lang);
     langInfo.langPack[lang] = content;
@@ -43,6 +54,7 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
     redirectPage.data = {
       ...originalPages[0].data,
       langs: langInfo.langs,
+      defaultLang: langInfo.defaultLang,
       filename: redirectPage.filename,
     };
     pages.push(redirectPage);
@@ -53,7 +65,7 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
     for (const originalPage of originalPages) {
       const langData = {
         lang,
-        defaultLang: redirect.defaultLang,
+        defaultLang: langInfo.defaultLang,
         langs: langInfo.langs,
         i18nPack: langInfo.langPack,
         i18n: langInfo.langPack[lang] as I18nLangPack,

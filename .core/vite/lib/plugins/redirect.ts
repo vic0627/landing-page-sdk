@@ -13,7 +13,7 @@ const name = 'vite-plugin-redirect';
 export default (({ pagesInfo, siteConfig, cliOption }) => {
   const { redirect } = siteConfig;
   const { langInfo } = pagesInfo;
-  const { langs } = langInfo;
+  const { langs, defaultLang } = langInfo;
   const isSingleLang = langs.length < 2;
 
   if (!redirect.enable || isSingleLang) {
@@ -34,13 +34,13 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
         }
 
         const [url, query] = req?.url!.split('?');
-        const lang = detectLang(langs, redirect.defaultLang, req.headers);
+        const lang = detectLang(langs, defaultLang, req.headers);
 
         if (url in redirectManifest) {
           let dest = redirectManifest[url];
 
           if (isPlainObject(dest)) {
-            dest = (dest as Record<string, string>)[lang ?? redirect.defaultLang];
+            dest = (dest as Record<string, string>)[lang ?? defaultLang ?? ''];
           }
 
           if (isString(dest)) {
@@ -76,9 +76,9 @@ function routeGuard(
 
 function detectLang(
   supported: string[],
-  defaultLang: string,
+  defaultLang?: string,
   headers?: IncomingHttpHeaders
-): string {
+): string | undefined {
   if (!headers) {
     return defaultLang;
   }
