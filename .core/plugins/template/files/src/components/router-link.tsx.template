@@ -12,8 +12,7 @@ export default function RouterLink({ to, locale, children }: RouterLinkProps) {
   const [href, setHref] = useState('/');
 
   useEffect(() => {
-    const { route: fromRoute } = __SDK_PAGE_CTX__;
-    const { site, lang: fromLocale } = __SDK_PAGE_CTX__.data;
+    const { route: fromRoute, site, lang: fromLocale } = __SDK_PAGE_CTX__;
 
     const resolved = manifestResolver(manifest, {
       site,

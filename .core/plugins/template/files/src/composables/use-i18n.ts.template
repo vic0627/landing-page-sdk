@@ -1,7 +1,7 @@
 import { isString } from 'lodash-es';
 
 export default function () {
-  const { i18n } = __SDK_PAGE_CTX__.data ?? {};
+  const { i18n } = __SDK_PAGE_CTX__;
 
   if (!i18n) {
     throw new Error('Missing locale context for i18n');

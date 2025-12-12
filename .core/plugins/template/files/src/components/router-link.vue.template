@@ -15,8 +15,7 @@ const props = defineProps<% if (useTs) { %><{
   locale?: string;
 }><% } %>(<% if (!useTs) { %>['to', 'locale']<% } %>);
 
-const { route: fromRoute } = __SDK_PAGE_CTX__;
-const { site, lang: fromLocale } = __SDK_PAGE_CTX__.data;
+const { route: fromRoute, site, lang: fromLocale } = __SDK_PAGE_CTX__;
 
 href.value = manifestResolver(manifest, {
   site,
