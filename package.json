@@ -1,6 +1,6 @@
 {
   "name": "@landing-page-sdk/core",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.1",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -44,7 +44,8 @@
     ".core/assets",
     ".core/types",
     ".core/utils/*",
-    ".core/vite"
+    ".core/vite",
+    "example"
   ],
   "nx": {},
   "executors": "./executors.json",

@@ -1,9 +1,9 @@
 import { parse } from 'node:path';
-import { omit, pick } from 'lodash-es';
+import { merge, omit, pick } from 'lodash-es';
+import fg from 'fast-glob';
 import { PageContext, PageData, Page as PageEssential, RouteMode } from '@landing-page-sdk/types';
 import { base62Hash, join, promiseResolver, resolveProj } from '@landing-page-sdk/utils-node';
 import { ALPHA_DASH_UNDERSCORE } from './regexp';
-import { findExist } from './index';
 
 type PageType = 'page' | 'redirect' | 'stub';
 
@@ -162,15 +162,8 @@ export class Page implements PageEssential {
   }
 
   private async findEntry(currentDir: string) {
-    const exist = (await findExist(
-      [
-        join(currentDir, 'main.js'),
-        join(currentDir, 'main.ts'),
-        join(currentDir, 'main.jsx'),
-        join(currentDir, 'main.tsx'),
-      ],
-      join(currentDir, 'main.ts?virtual-entry')
-    ))!;
+    const found = await fg(join(currentDir, 'main.{js,ts,jsx,tsx}'))
+    const exist = found.length ? found[0] : join(currentDir, 'main.ts?virtual-entry')
 
     return join('/', exist);
   }
@@ -258,18 +251,9 @@ export class Page implements PageEssential {
   }
 
   getContext() {
-    const basic = pick(
-      this,
-      'name',
-      'filename',
-      'rootFilename',
-      'template',
-      'route',
-      'entry',
-      'siteScript'
-    );
-    const data = omit(this.data, '_data', '$cmp');
-
-    return { ...basic, data } as PageContext;
+    return merge(
+      pick(this, 'name', 'filename', 'rootFilename', 'route'),
+      omit(this.data, '_data', '$cmp', 'env', 'filename')
+    ) as PageContext;
   }
 }

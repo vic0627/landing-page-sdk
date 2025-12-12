@@ -19,7 +19,7 @@ export default async function (ctx: SiteContext, outDir: string) {
   }
 
   const { sites, langInfo, pages } = pagesInfo;
-  const { langs } = langInfo;
+  const { langs, defaultLang } = langInfo;
 
   const routes = pagesToRoutes(pages, sites, siteConfig.sitemap);
 
@@ -35,7 +35,7 @@ export default async function (ctx: SiteContext, outDir: string) {
     : generateSitemapIndex({
         ...generatorOption,
         langs,
-        defaultLang: (siteConfig.env && (siteConfig.env as any)['defaultLang']) || langs[0],
+        defaultLang,
       }));
 }
 

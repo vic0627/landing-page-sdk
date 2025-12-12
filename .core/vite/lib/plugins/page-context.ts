@@ -1,5 +1,6 @@
 import { SDKPlugin } from '@landing-page-sdk/types';
 import { namedLogger } from '../common';
+import { resolve } from '@landing-page-sdk/utils-node';
 
 const PAGE_CTX = '__SDK_PAGE_CTX__';
 const name = 'vite-plugin-page-context';
@@ -14,30 +15,17 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
 
   return {
     name,
-    transform(code, id) {
-      if (
-        ![
-          // entry from client
-          'main.js',
-          'main.ts',
-          // entry from core
-          'redirect/flat.ts',
-          'redirect/tree.ts',
-          'redirect/stub.ts',
-        ].some((name) => id.includes(name))
-      ) {
-        return;
+    transformIndexHtml(html, { filename }) {
+      filename = filename.replace(resolve(), '').slice(1);
+      const page = pages.find((p) => p.filename === filename);
+      
+      if (!page) {
+        return
       }
 
-      id = id.replace(process.cwd(), '');
-      const page = pages.find((p) => p.entry === id || p.entry?.includes(id));
+      const ctx = JSON.stringify(page.getContext())
 
-      if (page) {
-        const context = JSON.stringify(page.getContext());
-        return `globalThis['${PAGE_CTX}']=Object.freeze(${context});Object.freeze(${PAGE_CTX}.data)\n${code}`;
-      }
-
-      return;
+      return html.replace(/<\/body>/, `<script id="${PAGE_CTX}" type="application/json">${ctx}</script></body>`)
     },
   };
 }) as SDKPlugin;

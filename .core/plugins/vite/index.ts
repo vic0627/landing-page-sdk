@@ -1,5 +1,6 @@
 import { AsyncIteratorExecutor } from '@nx/devkit';
 import chalk from 'chalk';
+import fg from 'fast-glob';
 import { NormalizedSiteConfig, ViteExecutorSchema } from '@landing-page-sdk/types';
 import {
   resolveRoot,
@@ -10,7 +11,6 @@ import {
 } from '@landing-page-sdk/utils-node';
 import { Plug, Watcher } from '@landing-page-sdk/vite/hmr';
 import { readRaw, normalize } from '@landing-page-sdk/vite/config';
-import { statSync } from 'node:fs';
 
 type ExecutorMod = Awaited<typeof import('@landing-page-sdk/vite')>;
 
@@ -26,7 +26,7 @@ const viteExecutor: AsyncIteratorExecutor<ViteExecutorSchema> = async function* 
   let siteConfig!: NormalizedSiteConfig;
   let isFirstProcess = true;
 
-  const configFile = getConfigFile(cliOption.config);
+  const configFile = await getConfigFile(cliOption.config);
 
   const initMainMod = () => {
     const rawConfig = readRaw(configFile);
@@ -115,20 +115,20 @@ function timelog(label: string, ...msgs: string[]) {
   console.log(`${chalk.dim(now)} ${chalk.bold.cyanBright(`[${label}]`)}`, ...msgs);
 }
 
-function getConfigFile(config?: string): string {
-  const defaults = ['site.config.ts', 'site.config.js'];
-
+async function getConfigFile(config?: string): Promise<string> {
   if (config) {
     return config;
   }
 
-  const foundDefault = defaults.find((name) => {
-    try {
-      return statSync(resolveCwd(name)).isFile();
-    } catch {
-      return false; // File does not exist or is not a file
-    }
-  });
+  const found = await fg(['site.config.ts', 'site.config.js']);
 
-  return foundDefault || defaults[defaults.length - 1]; // Fallback to 'site.config.js' if neither are found
+  if (!found.length) {
+    throw new Error('can not find site config file')
+  }
+
+  if (found.length > 1) {
+    throw new Error('duplicate site config files detected')
+  }
+
+  return found[0];
 }

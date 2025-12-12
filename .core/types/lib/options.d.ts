@@ -120,6 +120,7 @@ export interface RedirectOption {
   stub?: boolean;
   /**
    * 預設的跳轉語系
+   * @deprecated
    */
   defaultLang?: string;
   /**
