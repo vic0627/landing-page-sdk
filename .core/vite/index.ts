@@ -9,7 +9,7 @@ import {
   InlineConfig,
 } from 'vite';
 import chalk from 'chalk';
-import { merge, pick, set } from 'lodash-es';
+import { merge, omit, pick, set } from 'lodash-es';
 import { resolve, resolveRoot } from '@landing-page-sdk/utils-node';
 import { NormalizedSiteConfig, SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
 import { rewrites, parseEnv, mockOptions } from './lib/common';
@@ -39,13 +39,13 @@ export async function teardown() {
       await devServer.close();
       devServer = null;
     }
-  } catch {}
+  } catch { }
   try {
     if (previewServer) {
       await previewServer.close();
       previewServer = null;
     }
-  } catch {}
+  } catch { }
 }
 
 export async function main(options: {
@@ -64,7 +64,7 @@ export async function main(options: {
   // configs
   const config: InlineConfig = {};
 
-  const define = parseEnv(merge(pick(pagesInfo.langInfo, 'langs', 'langPack'), siteConfig.env));
+  const define = parseEnv(merge(siteConfig.env, { SDK_CONFIG: omit(siteConfig, 'plugins', 'env', 'sourcePath') }));
   const cacheDir = resolveRoot('node_modules/.vite-cache');
   const alias = { '@': resolve('src') };
   const outDir = resolveRoot('dist');

@@ -1,5 +1,5 @@
 import { parse } from 'node:path';
-import { omit, pick } from 'lodash-es';
+import { merge, omit, pick } from 'lodash-es';
 import { PageContext, PageData, Page as PageEssential, RouteMode } from '@landing-page-sdk/types';
 import { base62Hash, join, promiseResolver, resolveProj } from '@landing-page-sdk/utils-node';
 import { ALPHA_DASH_UNDERSCORE } from './regexp';
@@ -258,18 +258,9 @@ export class Page implements PageEssential {
   }
 
   getContext() {
-    const basic = pick(
-      this,
-      'name',
-      'filename',
-      'rootFilename',
-      'template',
-      'route',
-      'entry',
-      'siteScript'
-    );
-    const data = omit(this.data, '_data', '$cmp');
-
-    return { ...basic, data } as PageContext;
+    return merge(
+      pick(this, 'name', 'filename', 'rootFilename', 'route'),
+      omit(this.data, '_data', '$cmp', 'env', 'filename')
+    ) as PageContext;
   }
 }
