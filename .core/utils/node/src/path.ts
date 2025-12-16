@@ -33,6 +33,11 @@ export function resolveRoot(...paths: string[]) {
   return join(workspaceRoot, ...paths);
 }
 
+export function ensureLeadingSlash(path?: string) {
+  if (!path) return '/';
+  return path.startsWith('/') ? path : `/${path}`;
+}
+
 export function resolveProj(projPath: string): string {
   const slashIdx = projPath.indexOf(
     '/',
