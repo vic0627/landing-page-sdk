@@ -6,7 +6,7 @@ import {
   parseQueryParams as parseQueryParamsString,
   setQueryParam as setQueryParamString,
   updateQueryParams as updateQueryParamsString,
-} from '@landing-page-sdk/utils-node';
+} from '@landing-page-sdk/utils-node/src/query';
 import { $all } from './dom';
 
 export function getQueryString(url = window.location.href) {
