@@ -66,6 +66,12 @@ async function getAssetsList(outDir: string, site: string): Promise<Set<string>>
         traverseManifest(script);
       }
     }
+
+    if (chunk.dynamicImports) {
+      for (const script of chunk.dynamicImports) {
+        traverseManifest(script);
+      }
+    }
   };
 
   for (const path in manifest) {
