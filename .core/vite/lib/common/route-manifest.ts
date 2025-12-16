@@ -40,7 +40,7 @@ export function create(pagesInfo: PagesInfo, option: BuildPageOption) {
   const useSite = useSiteAsPath || cli.mode === 'dev';
 
   pages.forEach((from) => {
-    const { site: fromSite, lang: fromLang } = from.data ?? {};
+    const { site: fromSite, lang: fromLang } = from;
 
     const fromRoute = from.route!;
     const isRedirect = REDIRECT.test(from.name);
@@ -53,12 +53,12 @@ export function create(pagesInfo: PagesInfo, option: BuildPageOption) {
     }
 
     pages.forEach((to) => {
-      const { site: toSite, lang: toLang } = to.data ?? {};
+      const { site: toSite, lang: toLang } = to;
 
       const toRoute = to.route;
       const diffSite = fromSite !== toSite;
       const fromRedirectToDeep = isRedirect && toRoute && toRoute !== '/';
-      const fromStubToDiff = isStub && from._stubFor !== toRoute;
+      const fromStubToDiff = isStub && from.stubFor !== toRoute;
 
       if (!toRoute || diffSite || fromRedirectToDeep || fromStubToDiff) {
         return;

@@ -100,9 +100,11 @@ export interface Page {
    * EJS 可用資料
    */
   data?: PageData;
+  site?: string;
+  lang?: string;
 
   getContext(): PageContext;
-  _stubFor?: string;
+  stubFor?: string;
 }
 
 export interface PagesInfo {

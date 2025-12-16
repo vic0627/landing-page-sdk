@@ -105,6 +105,16 @@ export class Page implements PageEssential {
     return this._siteScript;
   }
 
+  private _site?: string | undefined;
+  get site() {
+    return this._site;
+  }
+
+  private _lang?: string | undefined;
+  get lang() {
+    return this._lang;
+  }
+
   private _data?: PageData | undefined;
   get data() {
     return this._data;
@@ -114,7 +124,7 @@ export class Page implements PageEssential {
     this._data._data = this._data;
   }
 
-  _stubFor?: string;
+  stubFor?: string;
 
   // internal
   private resolve: () => void;
@@ -191,7 +201,7 @@ export class Page implements PageEssential {
       resolveProj('@landing-page-sdk/assets/redirect/stub.ts') +
       '?' +
       base62Hash(Math.random().toString(), 6); // add id to let this page appears in manifest.json
-    this._stubFor = join('/', name.replace(NAME_DELIMITER, '/'));
+    this.stubFor = join('/', name.replace(NAME_DELIMITER, '/'));
     this.resolve();
   }
 
@@ -206,6 +216,7 @@ export class Page implements PageEssential {
     const isMultiLang = langs.length > 1;
 
     this._name = isMultiLang ? `${lang}:${this._name}` : this._name;
+    this._lang = lang;
 
     if (this.initOptions.routeMode === 'tree') {
       this._filename = isMultiLang ? join(lang, this._rootFilename) : this._filename;
@@ -233,6 +244,7 @@ export class Page implements PageEssential {
 
     this._filename = `${name}/${this._filename}`;
     this._name = `${name}${NAME_DELIMITER}${this._name}`;
+    this._site = name;
 
     const redirectPage = this._name.endsWith('redirect');
     const stubPage = this._name.endsWith('stub');
@@ -252,7 +264,7 @@ export class Page implements PageEssential {
 
   getContext() {
     return merge(
-      pick(this, 'name', 'filename', 'rootFilename', 'route'),
+      pick(this, 'name', 'filename', 'rootFilename', 'route', 'lang', 'site'),
       omit(this.data, '_data', '$cmp', 'env', 'filename')
     ) as PageContext;
   }

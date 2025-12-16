@@ -75,7 +75,7 @@ export default (({ pagesInfo, cliOption, siteConfig }) => {
         case 'html':
           render = join(
             '/',
-            siteConfig.route.useSiteAsPath && page?.data?.site ? page?.data?.site : '',
+            siteConfig.route.useSiteAsPath && page?.site ? page?.site : '',
             render
           );
           break;
