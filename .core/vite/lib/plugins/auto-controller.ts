@@ -12,7 +12,7 @@ import {
   ScriptSourceType,
   SDKPlugin,
 } from '@landing-page-sdk/types';
-import { getImportStatement, Logger, namedLogger } from '../common';
+import { getImportStatement, Logger, namedLogger, REDIRECT } from '../common';
 import chalk from 'chalk';
 
 const name = 'vite-plugin-auto-controller';
@@ -152,7 +152,7 @@ function findEntryById(pages: Page[], id: string) {
     entryInfo = pages.find((p) => p.filename === id);
   }
 
-  if (entryInfo?.name.includes('redirect')) {
+  if (REDIRECT.test(entryInfo?.name!)) {
     entryInfo = undefined;
   }
 

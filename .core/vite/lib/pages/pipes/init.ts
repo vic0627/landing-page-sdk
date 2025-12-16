@@ -1,7 +1,14 @@
 import fsp from 'node:fs/promises';
 import fg from 'fast-glob';
 import { BuildPageOption } from '@landing-page-sdk/types';
-import { resolve, resolveProj, join, relative, dirname } from '@landing-page-sdk/utils-node';
+import {
+  resolve,
+  resolveProj,
+  join,
+  relative,
+  dirname,
+  ensureLeadingSlash,
+} from '@landing-page-sdk/utils-node';
 import { createPage, Page } from '../../common';
 
 export default async function (buildPageOption: BuildPageOption): Promise<Page[]> {
@@ -42,13 +49,7 @@ export default async function (buildPageOption: BuildPageOption): Promise<Page[]
       $cmp: (_path: string) => {
         if (_path.startsWith('@')) {
           const projPath = resolveProj(_path);
-          let relPath = relative(resolve(), projPath);
-
-          if (!relPath.startsWith('/')) {
-            relPath = '/' + relPath;
-          }
-
-          return relPath;
+          return ensureLeadingSlash(relative(resolve(), projPath));
         }
 
         return join('/', sourcePath.components, _path);
