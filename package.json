@@ -45,7 +45,7 @@
     ".core/types",
     ".core/utils/*",
     ".core/vite",
-    "example"
+    "examples/*"
   ],
   "nx": {},
   "executors": "./executors.json",
