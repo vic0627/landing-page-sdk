@@ -36,8 +36,8 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
   for (const { path: filePath, name } of sites) {
     for (const _page of originalPages) {
       const page = await _page.clone();
-      const lang = _page?.lang
-      const langs = _page?.data?.langs
+      const lang = _page?.lang;
+      const langs = _page?.data?.langs;
 
       if (lang && langs && !page.isStub()) {
         page.localize(lang, langs);

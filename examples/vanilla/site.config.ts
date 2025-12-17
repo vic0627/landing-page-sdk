@@ -2,6 +2,6 @@ import type { SiteConfig } from '@landing-page-sdk/types';
 
 export default {
   output: {
-    assetsResolution: 'rel'
-  }
+    assetsResolution: 'rel',
+  },
 } satisfies SiteConfig;

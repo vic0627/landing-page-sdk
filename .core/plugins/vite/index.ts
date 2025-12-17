@@ -123,11 +123,11 @@ async function getConfigFile(config?: string): Promise<string> {
   const found = await fg(['site.config.ts', 'site.config.js']);
 
   if (!found.length) {
-    throw new Error('can not find site config file')
+    throw new Error('can not find site config file');
   }
 
   if (found.length > 1) {
-    throw new Error('duplicate site config files detected')
+    throw new Error('duplicate site config files detected');
   }
 
   return found[0];

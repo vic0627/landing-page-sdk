@@ -195,7 +195,7 @@ export class Page implements PageEssential {
     this._filename = 'index.html';
     this._rootFilename = '/index.html';
     this._template = resolveProj('@landing-page-sdk/assets/redirect/index.html');
-     // add id to let this page appears in manifest.json
+    // add id to let this page appears in manifest.json
     this._entry = this.hashPath(
       resolveProj(`@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`)
     );
@@ -209,7 +209,7 @@ export class Page implements PageEssential {
     this._filename = filename;
     this._rootFilename = ensureLeadingSlash(filename);
     this._template = resolveProj('@landing-page-sdk/assets/redirect/stub.html');
-     // add id to let this page appears in manifest.json
+    // add id to let this page appears in manifest.json
     this._entry = this.hashPath(resolveProj('@landing-page-sdk/assets/redirect/stub.ts'));
     this.stubFor = ensureLeadingSlash(name.replace(NAME_DELIMITER, '/'));
     this.resolve();

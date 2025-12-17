@@ -32,7 +32,7 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
 
       if (id.includes('virtual-entry')) {
         const pagesDir = siteConfig.sourcePath.pages;
-        const entry = await fg(resolve(pagesDir, 'main.{js,ts,jsx,tsx}'))
+        const entry = await fg(resolve(pagesDir, 'main.{js,ts,jsx,tsx}'));
 
         if (!entry.length) {
           throw new Error('root entry file must exist while using virtual entry');

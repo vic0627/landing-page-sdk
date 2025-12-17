@@ -61,7 +61,9 @@ export interface PageDataSite {
 
 export type PageData = PageDataCommon & PageDataI18n & PageDataSite & Record<string, any>;
 
-export type PageContext = Omit<Page, 'getContext' | 'data' | 'siteScript' | 'entry' | 'template'> & PageDataI18n & PageDataSite;
+export type PageContext = Omit<Page, 'getContext' | 'data' | 'siteScript' | 'entry' | 'template'> &
+  PageDataI18n &
+  PageDataSite;
 
 declare global {
   // global vars

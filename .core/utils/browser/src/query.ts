@@ -21,7 +21,11 @@ export function getQueryParam(
   return queryParams[paramName] ?? null;
 }
 
-export function setQueryParam(paramName: string, paramValue: string, url: string = window.location.href) {
+export function setQueryParam(
+  paramName: string,
+  paramValue: string,
+  url: string = window.location.href
+) {
   return setQueryParamString(paramName, paramValue, url);
 }
 
@@ -37,7 +41,10 @@ export function buildQueryString(params: Record<string, string>): string {
   return buildQueryStringString(params);
 }
 
-export function updateQueryParams(params: Record<string, string>, url: string = window.location.href): string {
+export function updateQueryParams(
+  params: Record<string, string>,
+  url: string = window.location.href
+): string {
   return updateQueryParamsString(params, url);
 }
 

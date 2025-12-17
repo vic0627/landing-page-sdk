@@ -39,13 +39,13 @@ export async function teardown() {
       await devServer.close();
       devServer = null;
     }
-  } catch { }
+  } catch {}
   try {
     if (previewServer) {
       await previewServer.close();
       previewServer = null;
     }
-  } catch { }
+  } catch {}
 }
 
 export async function main(options: {
@@ -64,7 +64,9 @@ export async function main(options: {
   // configs
   const config: InlineConfig = {};
 
-  const define = parseEnv(merge(siteConfig.env, { SDK_CONFIG: omit(siteConfig, 'plugins', 'env', 'sourcePath') }));
+  const define = parseEnv(
+    merge(siteConfig.env, { SDK_CONFIG: omit(siteConfig, 'plugins', 'env', 'sourcePath') })
+  );
   const cacheDir = resolveRoot('node_modules/.vite-cache');
   const alias = { '@': resolve('src') };
   const outDir = resolveRoot('dist');

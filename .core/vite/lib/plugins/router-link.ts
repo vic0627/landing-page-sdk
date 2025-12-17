@@ -79,9 +79,7 @@ function getLinks(window: DOMWindow, path: string, pages: Page[], page?: Page): 
     }
 
     const locale = link.getAttribute(LINK_ATTRS.LOCALE) ?? lang;
-    const destPage = pages.find(
-      (p) => p.route === to && p?.lang === locale && p?.site === site
-    );
+    const destPage = pages.find((p) => p.route === to && p?.lang === locale && p?.site === site);
 
     if (!destPage) {
       log(`unidentified route destination ${chalk.redBright(to)} from ${chalk.green(path)}`);

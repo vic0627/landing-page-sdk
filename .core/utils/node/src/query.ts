@@ -48,11 +48,7 @@ export function clearQueryParams(url: string): string {
   return base + hash;
 }
 
-export function setQueryParam(
-  paramName: string,
-  paramValue: QueryValue,
-  url: string
-): string {
+export function setQueryParam(paramName: string, paramValue: QueryValue, url: string): string {
   const queryParams = parseQueryParams(url);
   queryParams[paramName] = String(paramValue);
 
@@ -74,10 +70,7 @@ export function deleteQueryParam(paramName: string, url: string): string {
   return queryString ? `${base}?${queryString}${hash}` : base;
 }
 
-export function updateQueryParams(
-  params: Record<string, QueryValue>,
-  url: string
-): string {
+export function updateQueryParams(params: Record<string, QueryValue>, url: string): string {
   const queryParams = parseQueryParams(url);
 
   for (const key in params) {
