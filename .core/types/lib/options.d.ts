@@ -137,38 +137,40 @@ export interface RedirectOption {
 
 export interface OutputOption {
   /**
-   * 是否壓縮輸出的檔案
-   * - `true`：壓縮所有類型（HTML、JS、CSS）。
-   * - `false`：不壓縮。
-   * - 指定字串：只壓縮該類型，例如 `'js'`。
-   * - 陣列：壓縮多個類型，例如 `['html', 'css']`。
+   * Whether to minify output files.
+   * - `true`: minify all (HTML, JS, CSS).
+   * - `false`: do not minify.
+   * - string: minify only that target, e.g. `'js'`.
+   * - array: minify multiple targets, e.g. `['html', 'css']`.
    * @default true
    */
   minify?: boolean | MinifyTargets | MinifyTargets[];
   /**
-   * 輸出檔案的版本化方式
-   * - `'hard'`：檔名帶雜湊，例如 `[name].[hash].[ext]`。
-   * - `'soft'`：檔名不變，透過查詢參數附加雜湊，例如 `[name].[ext]?v=[hash]`。
+   * Output file versioning strategy.
+   * - `'hard'`: hashed filenames, e.g. `[name].[hash].[ext]`.
+   * - `'soft'`: stable filenames with query hash, e.g. `[name].[ext]?v=[hash]`.
    * @default 'hard'
    */
   versioning?: Versioning;
   /**
-   * 輸出資源的路徑型態
-   * - `'abs'`：使用絕對路徑，例如 `/__ASSETS__/main.hash.js`。
-   * - `'rel'`：使用相對路徑，例如在 `/en/about/me/index.html` 會轉換成
-   *   `../../../__ASSETS__/main.hash.js`。
-   *
-   * 注意：僅在 html 生效
-   *
+   * Path strategy for emitted assets.
+   * - `'abs'`: absolute paths, e.g. `/__ASSETS__/main.hash.js`.
+   * - `'rel'`: relative paths; e.g. on `/en/about/me/index.html` -> `../../../__ASSETS__/main.hash.js`.
+   * 
+   * Note: HTML only.
+   * 
    * @default 'abs'
    */
   assetsResolution?: Resolution;
   /**
-   * 多媒體資產大小警示閥值 (單位：Byte)
-   *
-   * 在 build 時檢查資產大小，若超過此值會輸出警告訊息。
+   * Size warning threshold for media assets (bytes).
    */
   threshold?: number;
+  /**
+   * Output directory for build artifacts.
+   * @default '{workspaceRoot}/dist'
+   */
+  dist?: string;
 }
 
 export interface RouteHiddenRule {

@@ -20,6 +20,7 @@ export interface NormalizedOutputOption {
   versioning: Versioning;
   assetsResolution: Resolution;
   threshold: number;
+  dist: string;
 }
 
 export type NormalizedRedirectOption = Required<RedirectOption>;

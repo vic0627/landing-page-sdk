@@ -30,5 +30,9 @@ export default (function (opt, cfg) {
     if (isNumber(output.threshold)) {
       opt.output.threshold = output.threshold;
     }
+
+    if (isString(output.dist)) {
+      opt.output.dist = output.dist;
+    }
   }
 } satisfies OptionNormalizer);

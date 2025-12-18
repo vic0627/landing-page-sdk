@@ -69,7 +69,7 @@ export async function main(options: {
   );
   const cacheDir = resolveRoot('node_modules/.vite-cache');
   const alias = { '@': resolve('src') };
-  const outDir = resolveRoot('dist');
+  const outDir = siteConfig.output.dist;
 
   // shared
   set(config, 'mode', cliOption.mode);

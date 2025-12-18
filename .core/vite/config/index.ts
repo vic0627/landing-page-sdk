@@ -1,7 +1,7 @@
 import { statSync } from 'fs';
 import { isArray, isPlainObject, isString } from 'lodash-es';
 import { SiteConfig, NormalizedSiteConfig, SiteConfigNormalizer } from '@landing-page-sdk/types';
-import { loadHMR, resolve } from '@landing-page-sdk/utils-node';
+import { loadHMR, resolve, resolveRoot } from '@landing-page-sdk/utils-node';
 import controllerNormalizer from './normalizers/controller';
 import outputNormalizer from './normalizers/output';
 import redirectNormalizer from './normalizers/redirect';
@@ -27,6 +27,7 @@ const normalize: SiteConfigNormalizer = (cfg) => {
       versioning: 'hard',
       assetsResolution: 'abs',
       threshold: 0,
+      dist: resolveRoot('dist')
     },
     redirect: {
       enable: true,
