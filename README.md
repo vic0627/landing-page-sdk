@@ -32,12 +32,14 @@ This repository is managed via an Nx monorepo.
 
 ```
 .
-├── .core/         # Core SDK logic, Vite plugins, and utilities
-├── .nx/           # Nx cache directory
-├── dist/          # Build output directory
-├── docs/          # Documentation directory
-├── nx.json        # Nx workspace configuration
-└── package.json   # Package configuration file
+|- .core/             # Core SDK logic, Vite plugins, utilities, assets, templates
+|- docs/              # Documentation (client/dev/share)
+|- example/           # Example site to try the SDK
+|- dist/              # Build output
+|- executors.json     # Nx executor registration
+|- generators.json    # Nx generator registration
+|- nx.json            # Nx workspace configuration
+|- package.json       # Root package configuration
 ```
 
 ## Getting Started
@@ -104,6 +106,16 @@ npx nx build my-new-site
 ```
 
 Optimized and bundled resources will be placed in the `dist` directory.
+
+### Preview Production
+
+After building, you can preview the production output locally:
+
+```bash
+npx nx preview my-new-site
+```
+
+By default it will serve the built files from `dist` on the configured port; use `--port` to override. This is useful to validate routing/redirects/assets before deploying to your static host.
 
 ## License
 
