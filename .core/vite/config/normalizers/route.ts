@@ -1,5 +1,5 @@
-import { OptionNormalizer, RouteOption } from '@landing-page-sdk/types';
-import { isFunction, isPlainObject } from 'lodash-es';
+import { OptionNormalizer, RouteHiddenRule, RouteOption } from '@landing-page-sdk/types';
+import { isArray, isFunction, isPlainObject } from 'lodash-es';
 
 export default (function (opt, cfg) {
   if (cfg.route === 'flat') {
@@ -21,6 +21,12 @@ export default (function (opt, cfg) {
 
     if (route.useSiteAsPath === true) {
       opt.route.useSiteAsPath = true;
+    }
+
+    if (isPlainObject(route.hidden)) {
+      opt.route.hidden = [route.hidden as RouteHiddenRule]
+    } else if (isArray(route.hidden)) {
+      opt.route.hidden = route.hidden
     }
   }
 } satisfies OptionNormalizer);

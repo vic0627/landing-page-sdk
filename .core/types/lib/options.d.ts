@@ -171,6 +171,26 @@ export interface OutputOption {
   threshold?: number;
 }
 
+export interface RouteHiddenRule {
+  /**
+   * Route matcher(s). Accepts exact path or RegExp; arrays are ORed.
+   * Matched against `page.route` (or `stubFor` if stub page).
+   */
+  route: string | RegExp | (string | RegExp)[];
+  /**
+   * Limit hiding to specific site(s); omit to apply to all sites.
+   */
+  site?: string | string[];
+  /**
+   * Limit hiding to specific language(s); omit to apply to all languages.
+   */
+  lang?: string | string[];
+  /**
+   * Optional human-readable reason for logging.
+   */
+  reason?: string;
+}
+
 export interface RouteOption {
   /**
    * 路由結構
@@ -198,6 +218,10 @@ export interface RouteOption {
    * @default false
    */
   useSiteAsPath?: boolean;
+  /**
+   * Rules to hide routes by path/site/lang.
+   */
+  hidden?: RouteHiddenRule | RouteHiddenRule[];
 }
 
 export interface SourcePathOption {

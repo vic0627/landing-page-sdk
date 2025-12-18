@@ -16,6 +16,7 @@ const normalize: SiteConfigNormalizer = (cfg) => {
       resolution: 'rel',
       orientation: 'dir',
       useSiteAsPath: false,
+      hidden: [],
     },
     output: {
       minify: {
