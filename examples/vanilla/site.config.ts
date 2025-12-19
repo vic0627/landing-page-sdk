@@ -7,11 +7,12 @@ export default {
         route: '/about',
         site: 'bar',
         lang: 'en',
-        reason: '因為愛'
+        // reason: 'test'
       }
     ]
   },
   output: {
     assetsResolution: 'rel',
   },
+  sitemap: 'https://my.domain.com'
 } satisfies SiteConfig;
