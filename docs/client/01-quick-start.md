@@ -44,11 +44,11 @@ The server starts with HMR and prints a preview URL.
 
 **Options:**
 
--   `--host`: bind host (e.g. `--host`).
--   `--port`: port (e.g. `--port=8080`).
--   `--sites`: develop specific site variants, comma-separated (e.g. `--sites=site-a,site-b`).
--   `--config`: custom `site.config.js` path.
--   `--verbose`: verbose logging.
+- `--host`: bind host (e.g. `--host`).
+- `--port`: port (e.g. `--port=8080`).
+- `--sites`: develop specific site variants, comma-separated (e.g. `--sites=site-a,site-b`).
+- `--config`: custom `site.config.js` path.
+- `--verbose`: verbose logging.
 
 #### Build
 
@@ -62,9 +62,9 @@ Outputs go to `dist/`.
 
 **Options:**
 
--   `--sites`: select site variants.
--   `--config`: custom config path.
--   `--verbose`: verbose logging.
+- `--sites`: select site variants.
+- `--config`: custom config path.
+- `--verbose`: verbose logging.
 
 #### Preview
 
@@ -76,8 +76,8 @@ npx nx preview your-site-name
 
 **Options:**
 
--   `--host`: bind host.
--   `--port`: port.
--   `--sites`: select site variants.
--   `--config`: custom config path.
--   `--verbose`: verbose logging.
+- `--host`: bind host.
+- `--port`: port.
+- `--sites`: select site variants.
+- `--config`: custom config path.
+- `--verbose`: verbose logging.

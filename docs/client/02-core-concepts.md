@@ -20,8 +20,8 @@ This mapping is referenced by later stages: localization clones per lang (prefix
 
 Pages use convention-based routing (similar to Nuxt/Next). They live in `src/pages/`. Each page is a directory containing:
 
--   `index.{html,ejs}`: HTML/template.
--   `main.{js,ts,jsx,tsx}`: JS entry.
+- `index.{html,ejs}`: HTML/template.
+- `main.{js,ts,jsx,tsx}`: JS entry.
 
 Directory structure maps to routes (e.g., `src/pages/about/me/` -> `/about/me`) before mode/lang/site adjustments. If a page lacks `main.*`, the SDK falls back to `src/pages/main.{js,ts,jsx,tsx}` so multiple pages can share one entry (e.g., SPA-style).
 
@@ -29,18 +29,18 @@ Directory structure maps to routes (e.g., `src/pages/about/me/` -> `/about/me`) 
 
 Add JSON files under `src/i18n/` to enable languages. SDK detects them and builds per-language pages. For example, `src/i18n/en.json` will produce `/en/**/index.html` (tree mode) or `/*_en.html` (flat mode). Access current/default lang and packs via:
 
--   In templates, use `lang`, `defaultLang` or `i18n`:
-    ```html
-    <% if (lang === defaultLang) { %>
-        <h1><%= i18n.title %></h1> <!-- render only on default lang -->
-    <% } %>
-    ```
--   In JS, use `getPageContext` which supplied by `@landing-page-sdk/utils-browser`:
-    ```js
-    import { getPageContext } from '@landing-page-sdk/utils-browser';
-    const { lang, defaultLang, i18n } = getPageContext();
-    console.log(lang, i18n.title);
-    ```
+- In templates, use `lang`, `defaultLang` or `i18n`:
+  ```html
+  <% if (lang === defaultLang) { %>
+    <h1><%= i18n.title %></h1> <!-- render only on default lang -->
+  <% } %>
+  ```
+- In JS, use `getPageContext` which supplied by `@landing-page-sdk/utils-browser`:
+  ```js
+  import { getPageContext } from '@landing-page-sdk/utils-browser';
+  const { lang, defaultLang, i18n } = getPageContext();
+  console.log(lang, i18n.title);
+  ```
 
 To set a default language, name a file `*.default.json` (only one default file is allowed).
 
@@ -52,18 +52,18 @@ Example: with `/about/me` and `src/sites/site-a.ts`, dev URL becomes `/site-a/ab
 
 Once a site script exists, the SDK injects it for that site and you can read the site name via:
 
--   In templates, use `site`:
-    ```html
-    <% if (site === 'site-a') { %>
-        <h1><%= i18n.title %></h1> <!-- only when site-a -->
-    <% } %>
-    ```
--   In JS, use `getPageContext` which supplied by `@landing-page-sdk/utils-browser`:
-    ```js
-    import { getPageContext } from '@landing-page-sdk/utils-browser';
-    const { site } = getPageContext();
-    console.log(site);
-    ```
+- In templates, use `site`:
+  ```html
+  <% if (site === 'site-a') { %>
+    <h1><%= i18n.title %></h1> <!-- only when site-a -->
+  <% } %>
+  ```
+- In JS, use `getPageContext` which supplied by `@landing-page-sdk/utils-browser`:
+  ```js
+  import { getPageContext } from '@landing-page-sdk/utils-browser';
+  const { site } = getPageContext();
+  console.log(site);
+  ```
 
 Unlike i18n, site variants produce independent sites with no implied overlap. They can be deployed separately—good for variants, A/B tests, and parallel dev.
 
