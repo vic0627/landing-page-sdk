@@ -19,6 +19,7 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
   const ext = options.useTs ? 'ts' : 'js';
   const depthRel = offsetFromRoot(projectRoot);
   const rootPkg = readJson(tree, 'package.json');
+  const sdkVersion = rootPkg.version;
 
   if (getProjects(tree).has(options.name)) {
     throw new Error(`${options.name} already exists`);
@@ -35,7 +36,7 @@ export async function templateGenerator(tree: Tree, options: TemplateGeneratorSc
     throw new Error(`Invalid path: ${projectRoot}`);
   }
 
-  generateFiles(tree, source, projectRoot, { ...options, depthRel, ext });
+  generateFiles(tree, source, projectRoot, { ...options, depthRel, ext, sdkVersion });
 
   if (!options.useTs) {
     toJS(tree, {

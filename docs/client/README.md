@@ -1,13 +1,14 @@
-# 平台使用者文件
+# Client Documentation
 
-這份文件旨在引導使用者（平台開發者）如何使用本 SDK 來建構、設定並部署高效能的登陸頁面。
+This guide walks platform users through building, configuring, and deploying landing pages with the SDK.
 
 ---
 
-### 目錄
+### Table of Contents
 
-- [1. 快速上手](./01-quick-start.md)
-- [2. 核心概念](./02-core-concepts.md)
-- [3. 頁面模板](./03-templating.md)
-- [4. 路由與連結](./04-routing-and-linking.md)
-- [5. 進階設定](./05-advanced-configuration.md)
+- [1. Quick Start](./01-quick-start.md)
+- [2. Core Concepts](./02-core-concepts.md)
+- [3. Templating](./03-templating.md)
+- [4. Routing & Linking](./04-routing-and-linking.md)
+- [5. Automatic Controller Injection](./05-controller-injection.md)
+- [6. Advanced Configuration](./06-advanced-configuration.md)

@@ -21,7 +21,7 @@ export interface ControllerTarget {
 
 export interface ControllerInjection {
   /**
-   * 注入至 html 或打包進 js
+   * Inject inline into HTML or bundle into JS.
    * @default 'bundle'
    */
   type?: ScriptSourceType;
@@ -30,18 +30,14 @@ export interface ControllerInjection {
    */
   placement?: Phase;
   /**
-   * html 注入位置
-   *
-   * 注意：僅在 `type: 'inline'` 時生效
-   *
+   * Where to append inline script in HTML.
+   * Note: only effective when `type: 'inline'`.
    * @default 'head'
    */
   appendTo?: HTMLAppendTarget;
   /**
-   * 注入 html 前是否先進行腳本打包
-   *
-   * 注意：僅在 `type: 'inline'` 時生效
-   *
+   * Whether to bundle before injecting inline.
+   * Note: only effective when `type: 'inline'`.
    * @default true
    */
   bundle?: boolean;
@@ -50,22 +46,22 @@ export interface ControllerInjection {
 
 export interface ControllerOption {
   /**
-   * 控制器名稱
-   * - 參考 `.core/assets/controller/*`
+   * Controller name
+   * - see `.core/assets/controller/*`
    */
   name: string;
   /**
-   * 控制器注入目標
-   * - `string`: 指定單一個要注入的路徑，不分站點、語系
-   * - `string[]`: 指定多個要注入的路徑，不分站點、語系
-   * - `ControllerTarget`: 特定站點、語系、路由，取各項設定交集
+   * Injection targets
+   * - `string`: single route (all sites/langs)
+   * - `string[]`: multiple routes (all sites/langs)
+   * - `ControllerTarget`: scoped by site/lang/routes (intersection)
    * @default '/'
    */
   targets?: string | string[] | ControllerTarget;
   /**
-   * 控制器注入方式
-   * - `inline`: 以內連腳本直接注入 html 中，預設注入 `<head>` 末尾
-   * - `bundle`: 隨其他程式進 vite 打包流程，預設注入該頁 main.js
+   * Injection mode
+   * - `inline`: inject script directly into HTML (`<head>` end by default)
+   * - `bundle`: include in Vite bundle, inject into page main.js by default
    * @default 'bundle'
    */
   injection?: ScriptSourceType | ControllerInjection;
@@ -78,25 +74,25 @@ export interface SitemapDefaults {
 
 export interface SitemapOption {
   /**
-   * 每個 site 的 baseUrl
+   * Base URL per site
    */
   baseUrl: string | Record<string, string>;
   /**
-   * 是否輸出 sitemap
+   * Enable sitemap output
    * @default false
    */
   enable?: boolean;
   /**
-   * 控制 sitemap 內連結是要用「檔名顯式」還是「目錄式」的 URL 格式
+   * URL orientation for sitemap entries
    * @default 'file'
    */
   orientation?: DestOrientation;
   /**
-   * 排除規則（route 匹配）
+   * Exclusion rules (route match)
    */
   exclude?: (string | RegExp)[];
   /**
-   * 預設欄位（可被 page.data.sitemap 覆寫）
+   * Default fields (overridable by page.data.sitemap)
    */
   defaults?: SitemapDefaults;
   /**
@@ -107,90 +103,106 @@ export interface SitemapOption {
 
 export interface RedirectOption {
   /**
-   * 在根目錄自動生成一個空白頁，
-   * 用來偵測使用者語系並立即轉向到對應的語系首頁。
+   * Generate a root redirect page to detect language and forward to the locale home.
    * @default true
    */
   enable?: boolean;
   /**
-   * 在沒有語系前綴的路由 (例如 `/about/me`) 自動生成一個空白頁，
-   * 用來偵測使用者語系並立即轉向到對應的語系路由 (例如 `/en/about/me`)。
+   * Generate per-route stubs for non-prefixed routes (e.g., `/about/me` -> `/en/about/me`).
    * @default false
    */
   stub?: boolean;
   /**
-   * 預設的跳轉語系
+   * Default language for redirect
    * @deprecated
    */
   defaultLang?: string;
   /**
-   * 用來操作轉向頁的 DOM
+   * Hook to mutate redirect page DOM (logic is fixed; structure can be adjusted).
    *
-   * 注意：轉向邏輯本身不可修改，只能針對頁面結構做調整，
-   * 例如新增 `<meta>` 標籤、修改 `<title>`、插入其他元素等。
-   *
-   * @param page 當前處理的頁面資訊
-   * @this DOMWindow JSDOM 的 window 物件，可用來直接操作頁面 DOM
+   * @param page current page info
+   * @this DOMWindow JSDOM window object
    */
   transform?(this: DOMWindow, page: readonly Page): void | Promise<void>;
 }
 
 export interface OutputOption {
   /**
-   * 是否壓縮輸出的檔案
-   * - `true`：壓縮所有類型（HTML、JS、CSS）。
-   * - `false`：不壓縮。
-   * - 指定字串：只壓縮該類型，例如 `'js'`。
-   * - 陣列：壓縮多個類型，例如 `['html', 'css']`。
+   * Whether to minify output files.
+   * - `true`: minify all (HTML, JS, CSS).
+   * - `false`: do not minify.
+   * - string: minify only that target, e.g. `'js'`.
+   * - array: minify multiple targets, e.g. `['html', 'css']`.
    * @default true
    */
   minify?: boolean | MinifyTargets | MinifyTargets[];
   /**
-   * 輸出檔案的版本化方式
-   * - `'hard'`：檔名帶雜湊，例如 `[name].[hash].[ext]`。
-   * - `'soft'`：檔名不變，透過查詢參數附加雜湊，例如 `[name].[ext]?v=[hash]`。
+   * Output file versioning strategy.
+   * - `'hard'`: hashed filenames, e.g. `[name].[hash].[ext]`.
+   * - `'soft'`: stable filenames with query hash, e.g. `[name].[ext]?v=[hash]`.
    * @default 'hard'
    */
   versioning?: Versioning;
   /**
-   * 輸出資源的路徑型態
-   * - `'abs'`：使用絕對路徑，例如 `/__ASSETS__/main.hash.js`。
-   * - `'rel'`：使用相對路徑，例如在 `/en/about/me/index.html` 會轉換成
-   *   `../../../__ASSETS__/main.hash.js`。
-   *
-   * 注意：僅在 html 生效
-   *
+   * Path strategy for emitted assets.
+   * - `'abs'`: absolute paths, e.g. `/__ASSETS__/main.hash.js`.
+   * - `'rel'`: relative paths; e.g. on `/en/about/me/index.html` -> `../../../__ASSETS__/main.hash.js`.
+   * 
+   * Note: HTML only.
+   * 
    * @default 'abs'
    */
   assetsResolution?: Resolution;
   /**
-   * 多媒體資產大小警示閥值 (單位：Byte)
-   *
-   * 在 build 時檢查資產大小，若超過此值會輸出警告訊息。
+   * Size warning threshold for media assets (bytes).
    */
   threshold?: number;
+  /**
+   * Output directory for build artifacts.
+   * @default '{workspaceRoot}/dist'
+   */
+  dist?: string;
+}
+
+export interface RouteHiddenRule {
+  /**
+   * Route matcher(s). Accepts exact path or RegExp; arrays are ORed.
+   * Matched against `page.route` (or `stubFor` if stub page).
+   */
+  route: string | RegExp | (string | RegExp)[];
+  /**
+   * Limit hiding to specific site(s); omit to apply to all sites.
+   */
+  site?: string | string[];
+  /**
+   * Limit hiding to specific language(s); omit to apply to all languages.
+   */
+  lang?: string | string[];
+  /**
+   * Optional human-readable reason for logging.
+   */
+  reason?: string;
 }
 
 export interface RouteOption {
   /**
-   * 路由結構
-   * - `tree`: 樹狀結構，語系在前，頁面結構同 `src/pages`。
-   * - `flat`: 平坦結構，所有輸出頁面都在根目錄，頁面名稱預設以 `路徑_語系.html` 轉換。例如英文語系的 `src/pages/about/me/index.html` 將會輸出為 `about_me_en.html`。
+   * Route structure
+   * - `tree`: folder-like, lang prefix, mirrors `src/pages`.
+   * - `flat`: all outputs at root, filenames include path/lang (e.g., `about_me_en.html`).
    * @default 'tree'
    */
   mode?: RouteMode;
   /**
-   * `data-to` 站內跳轉連結渲染後的路徑型態
+   * Rendered path style for `data-to` internal links
    * @default 'rel'
    */
   resolution?: Resolution;
   /**
-   * `data-to` 站內跳轉連結為 dir-based 還是 file-based
-   * - dir-based: 斜線結尾。例如 `/about/me/`
-   * - file-based: 明確指向 html。例如 `/about_me_zh.html`
+   * Internal link orientation (dir vs file) for `data-to`
+   * - dir-based: trailing slash, e.g., `/about/me/`
+   * - file-based: explicit html, e.g., `/about_me_zh.html`
    *
-   * 注意：`dir` 僅在 `mode: 'tree'` 時生效
-   *
+   * Note: `dir` only effective when `mode: 'tree'`.
    * @default 'dir'
    */
   orientation?: DestOrientation;
@@ -198,31 +210,35 @@ export interface RouteOption {
    * @default false
    */
   useSiteAsPath?: boolean;
+  /**
+   * Rules to hide routes by path/site/lang.
+   */
+  hidden?: RouteHiddenRule | RouteHiddenRule[];
 }
 
 export interface SourcePathOption {
   /**
-   * 頁面檔案路徑
+   * Pages path
    * @default './src/pages'
    */
   pages?: string;
   /**
-   * 元件檔案路徑
+   * Components path
    * @default './src/components'
    */
   components?: string;
   /**
-   * 多語資源檔案路徑
+   * I18n resources path
    * @default './src/i18n'
    */
   i18n?: string;
   /**
-   * 多站點腳本路徑
+   * Site scripts path
    * @default './src/sites'
    */
   sites?: string;
   /**
-   * 靜態資源路徑
+   * Public assets path
    * @default './public'
    */
   public?: string;
@@ -230,42 +246,42 @@ export interface SourcePathOption {
 
 export interface SiteConfig {
   /**
-   * 路由設定
+   * Route config
    * @default 'tree'
    */
   route?: RouteMode | RouteOption;
   /**
-   * 輸出設定
+   * Output config
    */
   output?: OutputOption;
   /**
-   * 語系導向頁設定
+   * Redirect config
    */
   redirect?: boolean | RedirectOption;
   /**
-   * 資源來源路徑設定
+   * Source path config
    */
   sourcePath?: SourcePathOption;
   /**
-   * vite 插件
+   * vite plugins
    */
   plugins?: PluginOption[];
   /**
-   * 環境變數設定
+   * Environment variables
    */
   env?: Record<string, any>;
   /**
-   * 控制器注入設定
+   * Controller injection config
    */
   controller?: ControllerOption | ControllerOption[];
   /**
-   * sitemap 輸出設定
+   * Sitemap output config
    */
   sitemap?: string | SitemapOption;
   /**
-   * API 模擬設定
-   * - 為 `false` 時關閉模擬功能
-   * - 為字串時可指定 handlers 存放路徑
+   * API mock config
+   * - `false`: disable mocks
+   * - string: path to handlers
    * @default '@landing-page-sdk/assets/mock'
    */
   mock?: boolean | string;

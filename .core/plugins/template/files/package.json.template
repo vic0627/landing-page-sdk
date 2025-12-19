@@ -2,6 +2,7 @@
   "name": "<%= name %>",
   "private": true,
   "version": "0.0.0",
+  "sdkVersion": "<%= sdkVersion %>",
   "type": "module",
   "scripts": {},
   "dependencies": {

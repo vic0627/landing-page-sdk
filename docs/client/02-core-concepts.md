@@ -1,56 +1,78 @@
-# 2. 核心概念
+# 2. Core Concepts
 
-### 專案設定 (`site.config.{js,ts}`)
+### Project Config
 
-`site.config.{js,ts}` 是您專案的控制中心。幾乎所有的 SDK 功能都是透過這個檔案進行設定，包含路由模式、輸出行為、多國語系轉向、Sitemap 等。詳細的設定選項將在後續章節說明。
+`site.config.{js,ts}` is the control center. It drives route mode, output behavior, redirects, sitemap, and more. Details appear in later sections.
 
-### 頁面
+`route.mode` sets how paths map to output—out of the box with zero config:
+- `tree` (default): folder-like URLs, language prefix when i18n is on.
+  - `src/pages/about/me/index.html` -> `/about/me/index.html` (or `/about/me/`), with `en` -> `/en/about/me/index.html`
+- `flat`: everything at root, filename encodes path (and lang).
+  - `src/pages/about/me/index.html` -> `about_me.html`, with `en` -> `about_me_en.html`
 
-頁面是您網站的基礎。您可以在 `src/pages/` 目錄下建立頁面。每一個頁面由一個目錄構成，其中包含：
+Set in `site.config.{js,ts}`: `route: { mode: 'tree' | 'flat' }`.
 
--   `index.{html,ejs}`：頁面的 HTML 結構與模板。
--   `main.{js,ts,jsx,tsx}`：該頁面的主要 JavaScript 進入點。
+Why two modes? `tree` fits directory-like, SEO-friendly URLs (with language prefixes). `flat` fits hosts that prefer single-level outputs or simpler deployments without directory rewrites. Choose per hosting needs.
 
-目錄的結構會直接對應到網站的路由。例如，`src/pages/about/me/` 會對應到 `/about/me` 這個網址。
+This mapping is referenced by later stages: localization clones per lang (prefix or suffix), multi-site prefixes paths, and filtering/manifest respect the chosen mode.
 
-> **虛擬入口（Virtual Entry）：** 若某個頁面目錄下沒有 `main.{js,ts,jsx,tsx}`，SDK 會自動向上查找並使用 `src/pages/main.{js,ts,jsx,tsx}` 作為該頁面的入口。這讓您可以為所有頁面共用同一個進入點邏輯（例如 SPA 架構），而無需在每個頁面目錄重複建立檔案。
+### Pages
 
-### 多站點
+Pages use convention-based routing (similar to Nuxt/Next). They live in `src/pages/`. Each page is a directory containing:
 
-本 SDK 支援在一個程式碼庫中管理多個站點。您可以在 `src/sites/` 目錄下建立不同的站點腳本，例如 `site-a.js`，SDK 將會以檔案名稱（`site-a`）作為站點名稱，並在開發環境時作為衍伸的 URL 路徑。
+- `index.{html,ejs}`: HTML/template.
+- `main.{js,ts,jsx,tsx}`: JS entry.
 
-假設有 `/about/me` 這個頁面，若在 `src/sites/` 目錄下建立了 `site-a.js`，則該頁面在開發環境時的 URL 將會是 `/site-a/about/me`。
+Directory structure maps to routes (e.g., `src/pages/about/me/` -> `/about/me`) before mode/lang/site adjustments. If a page lacks `main.*`, the SDK falls back to `src/pages/main.{js,ts,jsx,tsx}` so multiple pages can share one entry (e.g., SPA-style).
 
-當站點腳本被建立後，將會啟用以下幾種機制：
+### Internationalization
 
--   當您訪問了特定站點，對應的站點腳本將會被自動注入，讓您可以執行該站點特有的邏輯。
--   可以在模板中透過 `site` 來存取站點名稱。
-    ```html
-    <% if (site === 'site-a') { %>
-    <h1>Site A</h1>
-    <% } %>
-    ```
--   可以在 JavaScript 中透過全域變數 `__SDK_PAGE_CTX__.data.site` 來存取站點名稱。
-    ```js
-    const { site } = __SDK_PAGE_CTX__.data;
-    console.log(site);
-    ```
+Add JSON files under `src/i18n/` to enable languages. SDK detects them and builds per-language pages. For example, `src/i18n/en.json` will produce `/en/**/index.html` (tree mode) or `/*_en.html` (flat mode). Access current/default lang and packs via:
 
-透過以上機制，您可以在同一網站下進行多版本的平行開發。
+- In templates, use `lang`, `defaultLang` or `i18n`:
+  ```html
+  <% if (lang === defaultLang) { %>
+    <h1><%= i18n.title %></h1> <!-- render only on default lang -->
+  <% } %>
+  ```
+- In JS, use `getPageContext` which supplied by `@landing-page-sdk/utils-browser`:
+  ```js
+  import { getPageContext } from '@landing-page-sdk/utils-browser';
+  const { lang, defaultLang, i18n } = getPageContext();
+  console.log(lang, i18n.title);
+  ```
 
-### 國際化
+To set a default language, name a file `*.default.json` (only one default file is allowed).
 
-若要啟用多國語系功能，只需在 `src/i18n/` 目錄下新增對應的語言 JSON 檔即可。
+### Multi-Site
 
--   SDK 會自動偵測這些語言檔，並在建置時為每個語言產生對應的頁面。
--   在模板中，您可以透過 `i18n` 物件來存取翻譯字串。
-    ```html
-    <h1><%= i18n.title %></h1>
-    ```
--   在 JavaScript 中，您也可以透過全域變數 `__SDK_PAGE_CTX__.data.i18n` 物件來存取完整的語言包。
-    ```js
-    const { i18n } = __SDK_PAGE_CTX__.data;
-    const lang = document.documentElement.lang;
-    const langPack = i18n[lang];
-    console.log(langPack);
-    ```
+Create site scripts under `src/sites/` (e.g., `site-a.ts`). The filename is the site name and becomes a URL prefix in dev.
+
+Example: with `/about/me` and `src/sites/site-a.ts`, dev URL becomes `/site-a/about/me/` (tree mode) or `/site-a/about_me.html` (flat mode).
+
+Once a site script exists, the SDK injects it for that site and you can read the site name via:
+
+- In templates, use `site`:
+  ```html
+  <% if (site === 'site-a') { %>
+    <h1><%= i18n.title %></h1> <!-- only when site-a -->
+  <% } %>
+  ```
+- In JS, use `getPageContext` which supplied by `@landing-page-sdk/utils-browser`:
+  ```js
+  import { getPageContext } from '@landing-page-sdk/utils-browser';
+  const { site } = getPageContext();
+  console.log(site);
+  ```
+
+Unlike i18n, site variants produce independent sites with no implied overlap. They can be deployed separately—good for variants, A/B tests, and parallel dev.
+
+### Page Context
+
+Page context exposes info for the current page—filename, lang, i18n pack, site, etc. You can read it anywhere in client code; it always reflects the current page, which helps reuse logic. Example: branch by lang to run logic only for EN:
+
+```js
+import { getPageContext } from '@landing-page-sdk/utils-browser';
+const { lang } = getPageContext();
+if (lang === 'en') doSomething();
+```

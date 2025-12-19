@@ -7,16 +7,20 @@ import {
   ControllerInjection,
   SitemapOption,
   SiteConfig,
+  RouteHiddenRule,
 } from './options';
 import { Resolution, MinifyTargets, Versioning } from './types';
 
-export type NormalizedRouteOption = Required<RouteOption>;
+export interface NormalizedRouteOption extends Required<RouteOption> {
+  hidden: RouteHiddenRule[];
+}
 
 export interface NormalizedOutputOption {
   minify: Record<MinifyTargets, boolean>;
   versioning: Versioning;
   assetsResolution: Resolution;
   threshold: number;
+  dist: string;
 }
 
 export type NormalizedRedirectOption = Required<RedirectOption>;

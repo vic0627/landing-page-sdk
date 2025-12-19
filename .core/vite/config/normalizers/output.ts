@@ -9,8 +9,9 @@ export default (function (opt, cfg) {
     if (output.minify === false) {
       opt.output.minify.html = opt.output.minify.js = opt.output.minify.css = false;
     } else if (isString(output.minify) && minifyTargets.includes(output.minify)) {
+      // turn off all, then enable the specified target only
       for (const target of minifyTargets) {
-        opt.output.minify[output.minify] = output.minify === target;
+        opt.output.minify[target] = output.minify === target;
       }
     } else if (isArray(output.minify)) {
       for (const target of minifyTargets) {
@@ -28,6 +29,10 @@ export default (function (opt, cfg) {
 
     if (isNumber(output.threshold)) {
       opt.output.threshold = output.threshold;
+    }
+
+    if (isString(output.dist)) {
+      opt.output.dist = output.dist;
     }
   }
 } satisfies OptionNormalizer);

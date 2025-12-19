@@ -2,8 +2,16 @@ import { parse } from 'node:path';
 import { merge, omit, pick } from 'lodash-es';
 import fg from 'fast-glob';
 import { PageContext, PageData, Page as PageEssential, RouteMode } from '@landing-page-sdk/types';
-import { base62Hash, join, promiseResolver, resolveProj } from '@landing-page-sdk/utils-node';
-import { ALPHA_DASH_UNDERSCORE } from './regexp';
+import {
+  base62Hash,
+  ensureLeadingSlash,
+  join,
+  promiseResolver,
+  resolve as resolveCwd,
+  resolveProj,
+  setQueryParam,
+} from '@landing-page-sdk/utils-node';
+import { ALPHA_DASH_UNDERSCORE, REDIRECT, STUB } from './regexp';
 
 type PageType = 'page' | 'redirect' | 'stub';
 
@@ -105,6 +113,16 @@ export class Page implements PageEssential {
     return this._siteScript;
   }
 
+  private _site?: string | undefined;
+  get site() {
+    return this._site;
+  }
+
+  private _lang?: string | undefined;
+  get lang() {
+    return this._lang;
+  }
+
   private _data?: PageData | undefined;
   get data() {
     return this._data;
@@ -114,7 +132,7 @@ export class Page implements PageEssential {
     this._data._data = this._data;
   }
 
-  _stubFor?: string;
+  stubFor?: string;
 
   // internal
   private resolve: () => void;
@@ -149,12 +167,12 @@ export class Page implements PageEssential {
     }
 
     this._name = relDir ? dirs.join(NAME_DELIMITER) : RESERVED_NAMES.INDEX;
-    this._route = relDir ? '/' + relDir : '/';
+    this._route = ensureLeadingSlash(relDir);
     this._filename =
       this.initOptions.routeMode === 'tree'
-        ? (relDir ? relDir + '/' : '') + 'index.html'
-        : (relDir ? relDir.replace(/\//g, '_') : 'index') + '.html';
-    this._rootFilename = join('/', this._filename);
+        ? `${relDir ? relDir + '/' : ''}index.html`
+        : `${relDir ? relDir.replace(/\//g, '_') : 'index'}.html`;
+    this._rootFilename = ensureLeadingSlash(this._filename);
     this._template = template;
     this._entry = await this.findEntry(currentDir);
 
@@ -162,10 +180,14 @@ export class Page implements PageEssential {
   }
 
   private async findEntry(currentDir: string) {
-    const found = await fg(join(currentDir, 'main.{js,ts,jsx,tsx}'))
-    const exist = found.length ? found[0] : join(currentDir, 'main.ts?virtual-entry')
+    const found = await fg(join(currentDir, 'main.{js,ts,jsx,tsx}'));
+    const exist = found.length ? found[0] : join(currentDir, 'main.ts?virtual-entry');
 
-    return join('/', exist);
+    return ensureLeadingSlash(exist);
+  }
+
+  private hashPath(path: string) {
+    return setQueryParam('id', base62Hash(Math.random().toString(), 6), path);
   }
 
   private initRedirectPage() {
@@ -173,10 +195,10 @@ export class Page implements PageEssential {
     this._filename = 'index.html';
     this._rootFilename = '/index.html';
     this._template = resolveProj('@landing-page-sdk/assets/redirect/index.html');
-    this._entry =
-      resolveProj(`@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`) +
-      '?' +
-      base62Hash(Math.random().toString(), 6); // add id to let this page appears in manifest.json
+    // add id to let this page appears in manifest.json
+    this._entry = this.hashPath(
+      resolveProj(`@landing-page-sdk/assets/redirect/${this.initOptions.routeMode}.ts`)
+    );
     this.resolve();
   }
 
@@ -185,13 +207,11 @@ export class Page implements PageEssential {
 
     this._name = `${name}${NAME_DELIMITER}${RESERVED_NAMES.STUB}`;
     this._filename = filename;
-    this._rootFilename = join('/', filename);
+    this._rootFilename = ensureLeadingSlash(filename);
     this._template = resolveProj('@landing-page-sdk/assets/redirect/stub.html');
-    this._entry =
-      resolveProj('@landing-page-sdk/assets/redirect/stub.ts') +
-      '?' +
-      base62Hash(Math.random().toString(), 6); // add id to let this page appears in manifest.json
-    this._stubFor = join('/', name.replace(NAME_DELIMITER, '/'));
+    // add id to let this page appears in manifest.json
+    this._entry = this.hashPath(resolveProj('@landing-page-sdk/assets/redirect/stub.ts'));
+    this.stubFor = ensureLeadingSlash(name.replace(NAME_DELIMITER, '/'));
     this.resolve();
   }
 
@@ -205,22 +225,24 @@ export class Page implements PageEssential {
   localize(lang: string, langs: string[]) {
     const isMultiLang = langs.length > 1;
 
-    this._name = isMultiLang ? `${lang}:${this._name}` : this._name;
+    this._name = isMultiLang ? `${lang}${NAME_DELIMITER}${this._name}` : this._name;
+    this._lang = lang;
 
     if (this.initOptions.routeMode === 'tree') {
-      this._filename = isMultiLang ? join(lang, this._rootFilename) : this._filename;
-      this._rootFilename = join('/', lang, this._rootFilename);
+      const multiLangFilename = join(lang, this._rootFilename);
+      this._filename = isMultiLang ? multiLangFilename : this._filename;
+      this._rootFilename = ensureLeadingSlash(multiLangFilename);
     } else {
       const { name, ext } = parse(this._filename);
       const newName = `${name}_${lang}`;
       this._filename = isMultiLang
         ? this._filename.replace(`${name}${ext}`, `${newName}${ext}`)
         : this._filename;
-      this._rootFilename = join('/', this._filename);
+      this._rootFilename = ensureLeadingSlash(this._filename);
     }
 
     if (this._entry) {
-      this._entry += `${this._entry.includes('?') ? '&' : '?'}lang=${lang}`;
+      this._entry = setQueryParam('lang', lang, this._entry);
     }
   }
 
@@ -233,15 +255,13 @@ export class Page implements PageEssential {
 
     this._filename = `${name}/${this._filename}`;
     this._name = `${name}${NAME_DELIMITER}${this._name}`;
+    this._site = name;
 
-    const redirectPage = this._name.endsWith('redirect');
-    const stubPage = this._name.endsWith('stub');
-
-    if (this._entry && !redirectPage && !stubPage) {
-      this._siteScript = join(process.cwd(), filePath);
+    if (this._entry && !REDIRECT.test(this._name) && !STUB.test(this._name)) {
+      this._siteScript = join(resolveCwd(), filePath);
 
       if (this._entry) {
-        this._entry += `${this._entry.includes('?') ? '&' : '?'}site=${name}`;
+        this._entry = setQueryParam('site', name, this._entry);
       }
     }
   }
@@ -252,7 +272,7 @@ export class Page implements PageEssential {
 
   getContext() {
     return merge(
-      pick(this, 'name', 'filename', 'rootFilename', 'route'),
+      pick(this, 'name', 'filename', 'rootFilename', 'route', 'lang', 'site'),
       omit(this.data, '_data', '$cmp', 'env', 'filename')
     ) as PageContext;
   }

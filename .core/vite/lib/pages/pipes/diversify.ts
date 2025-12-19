@@ -2,6 +2,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import { BuildPageOption } from '@landing-page-sdk/types';
 import { Page } from '../../common';
+import { ensureLeadingSlash } from '@landing-page-sdk/utils-node';
 
 export default async function (buildPageOption: BuildPageOption, pages: Page[]): Promise<string[]> {
   const { sites: _requiredSites } = buildPageOption.cli;
@@ -17,7 +18,7 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
   const requiredSites = _requiredSites?.split(',');
   const sites = files
     .map((p) => {
-      const _path = p.startsWith('/') ? p : `/${p}`;
+      const _path = ensureLeadingSlash(p);
       const name = path.parse(_path).name;
       const keep = requiredSites?.length ? requiredSites.includes(name) : true;
 
@@ -35,8 +36,9 @@ export default async function (buildPageOption: BuildPageOption, pages: Page[]):
   for (const { path: filePath, name } of sites) {
     for (const _page of originalPages) {
       const page = await _page.clone();
+      const lang = _page?.lang;
+      const langs = _page?.data?.langs;
 
-      const { lang, langs } = _page.data ?? {};
       if (lang && langs && !page.isStub()) {
         page.localize(lang, langs);
       }

@@ -19,7 +19,7 @@ export default (({ pagesInfo, cliOption }) => {
         return;
       }
 
-      const siteName = page.data?.site ?? page.siteScript;
+      const siteName = page?.site ?? page.siteScript;
       log(`Injected site-specific script ${chalk.green(siteName)}`);
 
       const importStatement = getImportStatement(page.siteScript);

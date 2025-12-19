@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -18,5 +18,5 @@
     }
   },
   "files": [],
-  "include": ["src/**/*.ts", "site.config.ts"]
+  "include": ["src/**/*.ts", "site.config.ts", "src/**/*.vue"]
 }

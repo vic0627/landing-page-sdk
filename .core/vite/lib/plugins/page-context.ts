@@ -18,14 +18,17 @@ export default (({ pagesInfo, siteConfig, cliOption }) => {
     transformIndexHtml(html, { filename }) {
       filename = filename.replace(resolve(), '').slice(1);
       const page = pages.find((p) => p.filename === filename);
-      
+
       if (!page) {
-        return
+        return;
       }
 
-      const ctx = JSON.stringify(page.getContext())
+      const ctx = JSON.stringify(page.getContext());
 
-      return html.replace(/<\/body>/, `<script id="${PAGE_CTX}" type="application/json">${ctx}</script></body>`)
+      return html.replace(
+        /<\/body>/,
+        `<script id="${PAGE_CTX}" type="application/json">${ctx}</script></body>`
+      );
     },
   };
 }) as SDKPlugin;

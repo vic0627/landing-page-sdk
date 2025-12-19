@@ -1,0 +1,40 @@
+{
+  "name": "@landing-page-sdk/examples-vanilla",
+  "private": true,
+  "version": "0.0.0",
+  "sdkVersion": "1.0.0-alpha.1",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "@landing-page-sdk/assets": "*",
+    "@landing-page-sdk/utils-browser": "*",
+    "@landing-page-sdk/utils-node": "*"
+  },
+  "nx": {
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "targets": {
+      "dev": {
+        "executor": "@landing-page-sdk/core:vite",
+        "options": {
+          "mode": "dev",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "build": {
+        "executor": "@landing-page-sdk/core:vite",
+        "options": {
+          "mode": "build",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "preview": {
+        "executor": "@landing-page-sdk/core:vite",
+        "options": {
+          "mode": "preview",
+          "cwd": "{projectRoot}"
+        }
+      }
+    }
+  }
+}

@@ -13,7 +13,7 @@ const LINK_ATTRS = {
 
 let log!: Logger;
 
-export default (({ siteConfig, cliOption, pagesInfo }) => {
+export default (({ cliOption, pagesInfo }) => {
   const { pages } = pagesInfo;
 
   log = namedLogger({
@@ -35,11 +35,11 @@ export default (({ siteConfig, cliOption, pagesInfo }) => {
       }
 
       const { route: fromRoute } = page;
-      const { lang: fromLocale, site: fromSite } = page.data ?? {};
+      const { lang: fromLocale, site: fromSite } = page;
 
       links.forEach((dest, e) => {
         const { route: toRoute } = dest;
-        const { site: toSite, lang: toLocale } = dest.data ?? {};
+        const { site: toSite, lang: toLocale } = dest;
 
         if (!fromRoute || !toRoute || fromSite !== toSite) {
           return;
@@ -66,8 +66,8 @@ export default (({ siteConfig, cliOption, pagesInfo }) => {
 
 function getLinks(window: DOMWindow, path: string, pages: Page[], page?: Page): Map<Element, Page> {
   const map = new Map<Element, Page>();
-  const lang = page?.data?.lang;
-  const site = page?.data?.site;
+  const lang = page?.lang;
+  const site = page?.site;
 
   window.document.querySelectorAll(`a[${LINK_ATTRS.TO}]`).forEach((link) => {
     const to = link.getAttribute(LINK_ATTRS.TO);
@@ -79,9 +79,7 @@ function getLinks(window: DOMWindow, path: string, pages: Page[], page?: Page): 
     }
 
     const locale = link.getAttribute(LINK_ATTRS.LOCALE) ?? lang;
-    const destPage = pages.find(
-      (p) => p.route === to && p.data?.lang === locale && p.data?.site === site
-    );
+    const destPage = pages.find((p) => p.route === to && p?.lang === locale && p?.site === site);
 
     if (!destPage) {
       log(`unidentified route destination ${chalk.redBright(to)} from ${chalk.green(path)}`);

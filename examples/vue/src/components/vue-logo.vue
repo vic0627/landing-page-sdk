@@ -1,0 +1,9 @@
+<template>
+  <a href="https://vuejs.org" target="_blank">
+    <img :src="vueLogo" class="logo vue" alt="Vue logo" />
+  </a>
+</template>
+
+<script setup lang="ts">
+import vueLogo from '/__ASSETS__/vue.svg';
+</script>

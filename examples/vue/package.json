@@ -1,16 +1,22 @@
 {
-  "name": "example",
+  "name": "@landing-page-sdk/examples-vue",
   "private": true,
   "version": "0.0.0",
+  "sdkVersion": "1.0.0-alpha.1",
   "type": "module",
   "scripts": {},
   "dependencies": {
     "@landing-page-sdk/assets": "*",
     "@landing-page-sdk/utils-browser": "*",
-    "@landing-page-sdk/utils-node": "*"
+    "@landing-page-sdk/utils-node": "*",
+    "vue": "^3.5.22",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "tailwindcss": "^4.1.17",
+    "@tailwindcss/vite": "^4.1.17",
+    "sass-embedded": "^1.93.2"
   },
   "nx": {
-    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "targets": {
       "dev": {
