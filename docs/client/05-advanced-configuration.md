@@ -1,12 +1,12 @@
-# 5. 進階設定
+# 5. Advanced Configuration
 
-`site.config.js` 提供了豐富的設定選項，讓您可以深度客製化建置行為。本章節將深入探討各項主要設定的使用方式與範例。
+`site.config.js` exposes rich options to customize build behavior. Key settings and examples below.
 
 ---
 
-### 輸出設定 (`output`)
+### Output (`output`)
 
-此選項控制建置產物的格式、壓縮行為和資源路徑。
+Controls format/minification/path of build artifacts.
 
 ```javascript
 // site.config.js
@@ -17,44 +17,43 @@ export default {
 };
 ```
 
-**屬性說明：**
+**Fields:**
 
--   `minify`: 控制程式碼壓縮。
-    -   `true` (預設): 壓縮所有資源 (HTML, JS, CSS)。
-    -   `false`: 不進行任何壓縮。
-    -   `'js'` 或 `['js', 'css']`: 只壓縮指定的資源類型。
+-   `minify`: control compression.
+    -   `true` (default): minify HTML/JS/CSS.
+    -   `false`: no minify.
+    -   `'js'` or `['js', 'css']`: minify selected targets.
 
--   `versioning`: 控制資源版本號的附加方式。
-    -   `'hard'` (預設): 將雜湊值直接寫入檔名，例如 `main-a1b2c3d4.js`。利於 CDN 長期快取。
-    -   `'soft'`: 檔名不變，將雜湊值作為查詢參數，例如 `main.js?v=a1b2c3d4`。
+-   `versioning`:
+    -   `'hard'` (default): hash in filename, e.g., `main-a1b2c3d4.js` (CDN-friendly).
+    -   `'soft'`: stable filename + query hash, e.g., `main.js?v=a1b2c3d4`.
 
--   `assetsResolution`: 控制 HTML 中資源 URL 的路徑解析方式。
-    -   `'abs'` (預設): 使用絕對路徑，例如 `/assets/image.png`。
-    -   `'rel'`: 使用相對路徑。對於深層頁面（如 `/about/me/`），路徑會被轉換為 `../../assets/image.png`。
+-   `assetsResolution`:
+    -   `'abs'` (default): absolute paths like `/__ASSETS__/img.png`.
+    -   `'rel'`: relative paths; deep pages rewrite to `../../__ASSETS__/img.png`.
 
--   `threshold`: 資源大小警告閾值（單位：Byte）。當建置過程中發現有資源超過此大小，會在主控台顯示警告，幫助您控管頁面效能。
+-   `threshold`: size warning threshold in bytes for media assets.
+
+-   `dist`: output directory (default `/dist`).
+
+**Assets and `__ASSETS__` convention**
+
+Place static assets under `public/__ASSETS__/` and reference as `/__ASSETS__/foo.png`. Plugins rewrite to abs/rel paths per `assetsResolution` and apply hard/soft versioning. Using `__ASSETS__` avoids conflicts and simplifies post-build moves/cache control.
 
 ---
 
-### 自動轉向 (`redirect`)
+### Redirect (`redirect`)
 
-此功能用於在多國語系網站中，自動偵測使用者語系並將其導向正確的頁面。
+Auto-detect browser language and redirect to the correct locale.
 
-**屬性說明：**
+**Fields:**
 
--   `enable`: `boolean` (預設 `true`)。
-    -   設為 `true` 時，若專案為多國語系，會在網站根目錄 `/` 產生一個轉向頁，自動將使用者導向其瀏覽器對應的語系首頁（例如 `/en/`）。
+-   `enable` (default `true`): add a root redirect page for multi-lang sites.
+-   `stub` (default `false`): add per-route stubs (e.g., `/about/me` -> `/en/about/me`).
+-   `defaultLang`: fallback when detection fails.
+-   `transform(page)`: hook to mutate redirect page DOM (JSDOM window).
 
--   `stub`: `boolean` (預設 `false`)。
-    -   設為 `true` 時，會為所有不帶語系前綴的頁面路徑（例如 `/about/me`）都產生一個轉向頁，確保使用者即使手動輸入無語系網址，也能被正確導向（例如 `/en/about/me`）。
-
--   `defaultLang`: `string`。
-    -   設定一個預設的轉向語系。當無法從瀏覽器設定中偵測到符合的語系時，將會使用此處設定的語言作為備案。
-
--   `transform`: `(this: DOMWindow, page: Page) => void`。
-    -   一個高階函式，允許您在轉向頁產生前，直接操作該頁面的 DOM。`this` 會是 JSDOM 的 `window` 物件。這對於插入追蹤碼、修改 `<meta>` 標籤等場景非常有用。
-
-**範例：**
+**Example:**
 ```javascript
 // site.config.js
 export default {
@@ -74,13 +73,11 @@ export default {
 
 ---
 
-### Sitemap 產生 (`sitemap`)
+### Sitemap (`sitemap`)
 
-自動產生 `sitemap.xml` 和 `sitemap_index.xml`（多語系時）。
+Generates `sitemap.xml` (and index for multi-lang).
 
-**基礎用法：**
-
-最簡單的啟用方式是直接提供網站的 `baseUrl`。
+**Basic:**
 
 ```javascript
 // site.config.js
@@ -89,9 +86,7 @@ export default {
 };
 ```
 
-**進階設定：**
-
-若需更精細的控制，可以傳入一個物件。
+**Advanced:**
 
 ```javascript
 // site.config.js
@@ -99,41 +94,39 @@ export default {
   sitemap: {
     enable: true,
     baseUrl: {
-      default: 'https://default-site.com', // 預設 baseUrl
-      'site-b': 'https://site-b.com', // 為名為 'site-b' 的站點指定 baseUrl
+      default: 'https://default-site.com',
+      'site-b': 'https://site-b.com',
     },
-    orientation: 'dir', // URL 使用目錄形式 (例如 /about/)，預設為 'file'
-    exclude: ['/private/**'], // 排除特定路徑
-    defaults: { // sitemap 條目的預設值
+    orientation: 'dir',
+    exclude: ['/private/**'],
+    defaults: {
       changefreq: 'daily',
       priority: 0.7,
     },
-    useAliasAsPath: false, // URL 路徑中不使用站點別名
+    useAliasAsPath: false,
   },
 };
 ```
 
 ---
 
-### 控制器 (`controller`)
+### Controller (`controller`)
 
-控制器是一個強大的功能，允許您將共用腳本邏輯注入到符合條件的特定頁面中。
+Inject shared scripts into targeted pages.
 
-**基礎用法：**
+**Basic:**
 
 ```javascript
 // site.config.js
 export default {
   controller: {
-    name: 'my-logic.ts', // 對應 @landing-page-sdk/assets/controller/my-logic.ts
-    targets: '/some-page', // 指定注入到 /some-page 這個路由
+    name: 'my-logic.ts', // maps to @landing-page-sdk/assets/controller/my-logic.ts
+    targets: '/some-page',
   },
 };
 ```
 
-**設定多個控制器**
-
-若您需要為不同頁面或在相同頁面注入多個不同的控制器，可以將 `controller` 設定為一個陣列：
+**Multiple controllers**
 
 ```javascript
 // site.config.js
@@ -141,20 +134,20 @@ export default {
   controller: [
     {
       name: 'google-analytics',
-      targets: [], // 注入到所有頁面
+      targets: [], // all pages
       injection: { type: 'inline', placement: 'pre' }
     },
     {
       name: 'product-page-logic',
-      targets: '/product', // 只注入到產品頁
+      targets: '/product',
     }
   ]
 };
 ```
 
-**進階目標設定 (`targets`)**
+**Advanced targets (`targets`)**
 
-`targets` 可以是一個物件，用來更精準地鎖定注入目標，系統會取各項設定的「交集」。
+`targets` can be an object; all conditions are ANDed.
 
 ```javascript
 // site.config.js
@@ -162,17 +155,17 @@ export default {
   controller: {
     name: 'my-logic.ts',
     targets: {
-      routes: ['/page1', '/page2'], // 注入到 /page1 和 /page2
-      lang: ['en'], // 且語系必須是 en
-      site: ['site-a'], // 且站點必須是 site-a
+      routes: ['/page1', '/page2'], // inject into /page1 and /page2
+      lang: ['en'],
+      site: ['site-a'],
     },
   },
 };
 ```
 
-**進階注入設定 (`injection`)**
+**Advanced injection (`injection`)**
 
-`injection` 控制腳本的注入方式。
+Controls how scripts are injected.
 
 ```javascript
 // site.config.js
@@ -181,10 +174,10 @@ export default {
     name: 'my-logic.ts',
     targets: '/some-page',
     injection: {
-      type: 'inline', // 'inline': 直接內嵌到 HTML; 'bundle': 打包進 JS (預設)
-      placement: 'pre', // 'pre': 在頁面原有腳本前注入; 'post': 在之後注入 (預設)
-      appendTo: 'body', // `type: 'inline'` 時生效，注入到 `<body>` (預設 'head')
-      bundle: false, // `type: 'inline'` 時生效，注入前不對腳本進行打包 (預設 true)
+      type: 'inline', // 'inline': inline into HTML; 'bundle': bundle into JS (default)
+      placement: 'pre', // inject before existing scripts; 'post' is default
+      appendTo: 'body', // when inline, target container (default 'head')
+      bundle: false, // when inline, skip bundling before inject (default true)
     },
   },
 };
@@ -192,29 +185,27 @@ export default {
 
 ---
 
-### API 模擬 (`mock`)
+### API Mock (`mock`)
 
-開發時，您可以啟用 API Mocking 功能，由 `vite-plugin-mock` 提供支援。
+Powered by `vite-plugin-mock`.
 
--   **預設行為**: 自動讀取 `@landing-page-sdk/assets/mock` 目錄下的 mock 檔案。
--   **停用功能**: `mock: false`。
--   **指定自訂目錄**: `mock: 'src/my-mocks'`。
+-   **Default**: reads `@landing-page-sdk/assets/mock`.
+-   **Disable**: `mock: false`.
+-   **Custom dir**: `mock: 'src/my-mocks'`.
 
 ```javascript
 // site.config.js
 export default {
-  // 使用自訂的 mock 檔案目錄
   mock: 'src/mocks',
-  // 使用別的專案的 mock 檔案目錄
   mock: '@sites/project-a/mocks',
 };
 ```
 
 ---
 
-### 環境變數 (`env`)
+### Environment Variables (`env`)
 
-您可以在 `env` 物件中定義的任何變數，都會被注入到前端環境中。
+Values under `env` are injected into the client.
 
 ```javascript
 // site.config.js
@@ -226,5 +217,24 @@ export default {
 };
 ```
 
--   **在 JavaScript 中存取**: `import.meta.env.API_ENDPOINT`
--   **在 EJS 模板中存取**: `<%%= env.API_ENDPOINT %>`
+-   **In JavaScript**: `import.meta.env.API_ENDPOINT`
+-   **In EJS**: `<%%= env.API_ENDPOINT %>`
+
+---
+
+### Post-build & Preview
+
+After build, SDK will:
+- Copy assets per site into site-specific dirs (site distributor).
+- Move `public` resources (public porter).
+- Generate sitemap when enabled.
+
+Use `npx nx preview <site>` to serve `dist/<site>` locally. Static hosting works without extra server config (no fallback/rewrites by default).
+
+---
+
+### DX (Mock / HMR / Page Context)
+
+- **Mock**: default `@landing-page-sdk/assets/mock`; set to `false` or custom path.
+- **HMR/Watcher**: edits to `site.config`, i18n, pages, sites trigger reload; `--verbose` for logs.
+- **Page Context**: access lang/site/env/i18n via `__SDK_PAGE_CTX__.data`; `_data` available in templates.***

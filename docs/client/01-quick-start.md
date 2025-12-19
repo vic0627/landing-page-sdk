@@ -1,84 +1,83 @@
-# 1. 快速上手
+# 1. Quick Start
 
-### 建立新站點
+### Create a New Site
 
-開始一個新專案最快的方式是使用內建的程式碼產生器：
+The fastest way to start is with the built-in generator:
 
 ```bash
 npx nx generate @landing-page-sdk/core:template
 ```
 
-執行後，系統會引導您輸入專案名稱、路徑等資訊，然後在您輸入的路徑下建立一個包含完整基礎結構的新站點。
+The CLI will prompt for name/path/etc. and scaffold a site with the full structure.
 
-### 目錄結構
+### Directory Layout
 
-一個站點通常包含以下結構：
+A typical site looks like:
 
 ```
-your-site-name/
-|-- package.json       # 專案的基本資訊
-|-- site.config.js     # 專案的核心設定檔
-|-- public/
-|   |-- __ASSETS__/    # 靜態資源 (圖片、favicon 等)
-|-- src/
-    |-- components/    # 元件
-    |-- i18n/          # 多國語系 JSON 檔案
-    |-- pages/         # 頁面模板與邏輯
-    |-- sites/         # 站點變體腳本
-    |-- styles/        # 樣式
+.
+|- public/
+|  |- __ASSETS__/       # static assets (images, favicon, etc.)
+|- src/
+|  |- i18n/             # locale JSON files
+|  |- pages/            # page templates & logic
+|  |- sites/            # site variant scripts
+|- package.json         # site package info
+|- site.config.ts       # site config
+|- tsconfig.json
 ```
 
-### 常用指令
+### Common Commands
 
-專案範本內建了 `dev`、`build` 和 `preview` 三個指令，可透過 Nx 執行。
+The template ships with `dev`, `build`, and `preview` via Nx.
 
-#### 開發
+#### Develop
 
-執行以下指令來啟動開發伺服器：
+Start the dev server:
 
 ```bash
-# 將 your-site-name 替換成您的站點名稱
+# replace your-site-name with your project name
 npx nx dev your-site-name
 ```
 
-伺服器將會啟動，並提供一個可供預覽的網址，支援熱模組更換 (HMR)。
+The server starts with HMR and prints a preview URL.
 
-**可用選項：**
+**Options:**
 
--   `--host`: 指定伺服器綁定的網路介面 (例如: `--host`)。
--   `--port`: 指定伺服器埠號 (例如: `--port=8080`)。
--   `--sites`: 指定要同時開發或建置的站點變體，以逗號分隔 (例如: `--sites=site-a,site-b`)。
--   `--config`: 指定 `site.config.js` 的替代路徑。
--   `--verbose`: 啟用詳細日誌輸出。
+-   `--host`: bind host (e.g. `--host`).
+-   `--port`: port (e.g. `--port=8080`).
+-   `--sites`: develop specific site variants, comma-separated (e.g. `--sites=site-a,site-b`).
+-   `--config`: custom `site.config.js` path.
+-   `--verbose`: verbose logging.
 
-#### 建置
+#### Build
 
-執行以下指令來為生產環境建置站點：
+Build for production:
 
 ```bash
 npx nx build your-site-name
 ```
 
-建置完成的檔案會輸出到 `dist/` 目錄。
+Outputs go to `dist/`.
 
-**可用選項：**
+**Options:**
 
--   `--sites`: 指定要建置的站點變體。
--   `--config`: 指定 `site.config.js` 的替代路徑。
--   `--verbose`: 啟用詳細日誌輸出。
+-   `--sites`: select site variants.
+-   `--config`: custom config path.
+-   `--verbose`: verbose logging.
 
-#### 預覽
+#### Preview
 
-在本地預覽生產環境建置後的結果：
+Preview the production build locally:
 
 ```bash
 npx nx preview your-site-name
 ```
 
-**可用選項：**
+**Options:**
 
--   `--host`: 指定伺服器綁定的網路介面。
--   `--port`: 指定伺服器埠號。
--   `--sites`: 指定要預覽的站點變體。
--   `--config`: 指定 `site.config.js` 的替代路徑。
--   `--verbose`: 啟用詳細日誌輸出。
+-   `--host`: bind host.
+-   `--port`: port.
+-   `--sites`: select site variants.
+-   `--config`: custom config path.
+-   `--verbose`: verbose logging.
