@@ -4,7 +4,10 @@ import { RewriteRule } from 'vite-plugin-virtual-mpa';
 import { ViteMockOptions } from 'vite-plugin-mock';
 import { isString } from 'lodash-es';
 import { NormalizedSiteConfig, Page, SiteContext } from '@landing-page-sdk/types';
-import { resolveProj, isDir, join, resolve } from '@landing-page-sdk/utils-node';
+import { resolveProj, isDir, join, resolve, resolveRoot } from '@landing-page-sdk/utils-node';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { readJsonFile } from '@nx/devkit';
 
 export * from './page';
 export * from './regexp';
@@ -104,6 +107,32 @@ export function namedLogger(options: NamedLoggerOptions) {
 }
 
 export type Logger = ReturnType<typeof namedLogger>;
+
+export function checkVersion(verbose?: boolean) {
+  const log = namedLogger({ name: 'version-check', verbose });
+
+  try {
+    const rootPkg = readJsonFile(resolveRoot('package.json'));
+    const projPkgPath = resolve('package.json');
+    const projPkg = readJsonFile(projPkgPath);
+    const rootVersion = rootPkg?.version;
+    const sdkVersion = projPkg?.sdkVersion;
+
+    if (!sdkVersion) {
+      log(chalk.yellow(`missing "sdkVersion" in ${projPkgPath}`));
+      return;
+    }
+
+    if (rootVersion !== sdkVersion) {
+      log(chalk.yellow(`project sdk version (${sdkVersion}) differs from root (${rootVersion})`));
+      return;
+    }
+
+    log(`sdk version OK (${sdkVersion})`);
+  } catch (error) {
+    log(chalk.yellow(`failed to read package.json (${error})`));
+  }
+}
 
 export async function mockOptions(ctx: SiteContext): Promise<ViteMockOptions> {
   const { cliOption, siteConfig } = ctx;

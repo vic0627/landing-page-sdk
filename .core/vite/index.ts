@@ -12,7 +12,7 @@ import chalk from 'chalk';
 import { merge, omit, pick, set } from 'lodash-es';
 import { resolve, resolveRoot } from '@landing-page-sdk/utils-node';
 import { NormalizedSiteConfig, SiteContext, ViteExecutorSchema } from '@landing-page-sdk/types';
-import { rewrites, parseEnv, mockOptions } from './lib/common';
+import { rewrites, parseEnv, mockOptions, checkVersion } from './lib/common';
 import createPages from './lib/pages';
 // post build
 import siteDistributor from './lib/post-build/site-distributor';
@@ -57,6 +57,8 @@ export async function main(options: {
   const { siteConfig, cliOption, context, isFirstProcess } = options;
   // initialize project graph in each processes, or otherwise `readCachedProjectGraph()` could cause error
   await createProjectGraphAsync();
+  // sdk version check
+  checkVersion(cliOption.verbose);
   // create site context
   const pagesInfo = await createPages({ cli: cliOption, cfg: siteConfig });
   const siteContext: SiteContext = { pagesInfo, cliOption, siteConfig };
