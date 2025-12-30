@@ -1,0 +1,17 @@
+{
+  "title": "exemple",
+  "greeting": "Bonjour",
+  "about": "À propos",
+  "viteLogoAlt": "Logo Vite",
+  "jsLogoAlt": "Logo JavaScript",
+  "learnMore": "Cliquez sur le logo Vite pour en savoir plus",
+  "aboutLink": "Aller à la page À propos",
+  "languageLabel": "Changement de langue",
+  "langNames": {
+    "en": "EN",
+    "zh": "中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "fr": "FR"
+  }
+}

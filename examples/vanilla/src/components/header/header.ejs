@@ -1,0 +1,29 @@
+<% 
+  const routePath = typeof route === 'string' ? route : route?.path || '/';
+  const langNames = i18n.langNames || {};
+  const currentLangName = langNames[lang] || lang.toUpperCase();
+%>
+<header class="site-header" aria-label="<%= i18n.languageLabel %>">
+  <div class="site-header__inner">
+    <div class="site-title">
+      <a data-to="/" data-locale="<%= lang %>">Landing Page SDK - Vanilla Example</a>
+    </div>
+    <details class="dropdown" role="listbox" aria-label="<%= i18n.languageLabel %>">
+      <summary class="dropdown-trigger">
+        <span><%= currentLangName %></span>
+      </summary>
+      <div class="dropdown-menu" role="listbox">
+        <% langs.forEach((locale) => { %>
+          <a
+            class="dropdown-item<%= locale === lang ? ' is-active' : '' %>"
+            role="option"
+            data-to="<%= routePath %>"
+            data-locale="<%= locale %>"
+          >
+            <%= langNames[locale] || locale.toUpperCase() %>
+          </a>
+        <% }) %>
+      </div>
+    </details>
+  </div>
+</header>

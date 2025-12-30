@@ -7,18 +7,19 @@
     <title><%= i18n.title %></title>
   </head>
   <body>
+    <%- include($cmp('header/header.ejs'), _data) %>
     <div id="app">
-      <a href="https://vite.dev" target="_blank">
-        <img src="/__ASSETS__/vite.svg" class="logo" alt="Vite logo" />
-      </a>
-      <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-        <img src="/__ASSETS__/javascript.svg" class="logo vanilla" alt="JavaScript logo" />
-      </a>
-      <h1>Hello <%= i18n.title %>!</h1>
+      <%- include($cmp('logo-row.ejs'), _data) %>
+      <h1><%= i18n.greeting %> <%= i18n.title %>!</h1>
       <div class="card">
         <button id="counter" type="button"></button>
       </div>
-      <p class="read-the-docs">Click on the Vite logo to learn more</p>
+      <p class="read-the-docs"><%= i18n.learnMore %></p>
+      <% if (!(site === 'bar' && lang === 'en')) { %>
+        <p class="about-link">
+          <a data-to="/about"><%= i18n.aboutLink %></a>
+        </p>
+      <% } %>
     </div>
   </body>
 </html>

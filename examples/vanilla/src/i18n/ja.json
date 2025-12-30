@@ -1,0 +1,17 @@
+{
+  "title": "サンプル",
+  "greeting": "こんにちは",
+  "about": "概要",
+  "viteLogoAlt": "Vite ロゴ",
+  "jsLogoAlt": "JavaScript ロゴ",
+  "learnMore": "Vite のロゴをクリックして詳しく見る",
+  "aboutLink": "About へ移動",
+  "languageLabel": "言語切り替え",
+  "langNames": {
+    "en": "EN",
+    "zh": "中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "fr": "FR"
+  }
+}

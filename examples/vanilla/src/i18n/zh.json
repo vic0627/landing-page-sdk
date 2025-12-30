@@ -1,3 +1,17 @@
 {
-  "title": "範例"
+  "title": "範例",
+  "greeting": "哈囉",
+  "about": "關於",
+  "viteLogoAlt": "Vite 標誌",
+  "jsLogoAlt": "JavaScript 標誌",
+  "learnMore": "點擊 Vite 標誌了解更多",
+  "aboutLink": "前往關於頁",
+  "languageLabel": "語系切換",
+  "langNames": {
+    "en": "EN",
+    "zh": "中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "fr": "FR"
+  }
 }

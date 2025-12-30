@@ -2,6 +2,7 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  --header-height: 64px;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -26,7 +27,7 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  align-items: flex-start;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -38,9 +39,109 @@ h1 {
 
 #app {
   max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  min-height: calc(100vh - var(--header-height));
+  padding: calc(var(--header-height) + 1rem) 2rem 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  height: var(--header-height);
+  text-align: left;
+  background: rgba(36, 36, 36, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.site-header__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.site-title a {
+  color: inherit;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown[open] .dropdown-trigger {
+  border-color: #646cff;
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
+.dropdown-trigger {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(26, 26, 26, 0.9);
+  color: inherit;
+  font-weight: 500;
+}
+
+.dropdown-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.6rem);
+  min-width: 160px;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1a1a1a;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.dropdown-item {
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  text-align: left;
+  font-weight: 500;
+  color: inherit;
+}
+
+.dropdown-item:hover {
+  border-color: rgba(100, 108, 255, 0.65);
+  background: rgba(100, 108, 255, 0.12);
+}
+
+.dropdown-item.is-active {
+  border-color: rgba(100, 108, 255, 0.9);
+  background: rgba(100, 108, 255, 0.18);
 }
 
 .logo {
@@ -48,6 +149,12 @@ h1 {
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo:hover {
@@ -64,6 +171,14 @@ h1 {
 
 .read-the-docs {
   color: #888;
+}
+
+.about-link {
+  margin-top: 0.5rem;
+}
+
+.about-link a {
+  cursor: pointer;
 }
 
 button {

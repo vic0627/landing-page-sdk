@@ -1,3 +1,17 @@
 {
-  "title": "example"
+  "title": "example",
+  "greeting": "Hello",
+  "about": "About",
+  "viteLogoAlt": "Vite logo",
+  "jsLogoAlt": "JavaScript logo",
+  "learnMore": "Click on the Vite logo to learn more",
+  "aboutLink": "Go to About",
+  "languageLabel": "Language switcher",
+  "langNames": {
+    "en": "EN",
+    "zh": "中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "fr": "FR"
+  }
 }
