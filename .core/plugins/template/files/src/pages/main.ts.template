@@ -10,7 +10,7 @@ import '@/styles/main.scss';
 import '@/styles/main.css';
 
 <% if (framework === 'none') { %>
-setupCounter(document.querySelector('#counter'));
+setupCounter(document.querySelector('#counter')!);
 <% } else if (framework === 'vue') { %>
 createApp(App).mount('#app');
 <% } %>
