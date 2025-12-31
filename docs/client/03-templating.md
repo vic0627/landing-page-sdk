@@ -65,6 +65,31 @@ When including, pass `_data`:
 
 It avoids variable shadowing. `_data` references the root template data; even if a component defines `lang`, you can still read `_data.lang` reliably.
 
+### Component Generator
+
+Use the component generator to scaffold component templates. Output varies by `framework`.
+
+```bash
+npx nx g @landing-page-sdk/core:component
+```
+
+**Options:**
+- `name` (required): component name. Must start with a letter, and can include letters, numbers, and `-`.
+- `framework`: `none` (default), `vue`, or `react` to pick the component template set.
+- `useTs`: when false, generated files are converted to JS/JSX.
+- `project`: target Nx project (must be an application). When set, the generator resolves the component folder from the project's `site.config.{js,ts}` `sourcePath.components`.
+- `path`: explicit output path. Overrides the project path if provided.
+
+**What gets generated:**
+- `framework: none`: `index.ejs` + `index.ts` (or `index.js` when `useTs: false`).
+- `framework: vue`: single-file component `*.vue`.
+- `framework: react`: `*.tsx` (or `*.jsx` when `useTs: false`).
+
+**Default output location:**
+- If `project` is set: `${projectRoot}/${sourcePath.components}` (from `site.config`).
+- Else if `path` is set: `path`.
+- Else: `@landing-page-sdk/assets` project's `components/` folder.
+
 ### Static Assets
 
 Place static assets under `public/__ASSETS__` and reference them with the `/__ASSETS__` prefix. The SDK will rewrite paths at build time based on your route/output settings:
