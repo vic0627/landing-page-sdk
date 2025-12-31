@@ -1,5 +1,6 @@
 import { statSync } from 'fs';
 import { isArray, isPlainObject, isString } from 'lodash-es';
+import fg from 'fast-glob';
 import { SiteConfig, NormalizedSiteConfig, SiteConfigNormalizer } from '@landing-page-sdk/types';
 import { loadHMR, resolve, resolveRoot } from '@landing-page-sdk/utils-node';
 import controllerNormalizer from './normalizers/controller';
@@ -27,7 +28,7 @@ const normalize: SiteConfigNormalizer = (cfg) => {
       versioning: 'hard',
       assetsResolution: 'abs',
       threshold: 0,
-      dist: resolveRoot('dist')
+      dist: resolveRoot('dist'),
     },
     redirect: {
       enable: true,
@@ -94,4 +95,22 @@ function readRaw(filePath: string): SiteConfig {
   }
 }
 
-export { normalize, readRaw };
+async function getConfigFile(config?: string): Promise<string> {
+  if (config) {
+    return config;
+  }
+
+  const found = await fg(['site.config.ts', 'site.config.js']);
+
+  if (!found.length) {
+    throw new Error('can not find site config file');
+  }
+
+  if (found.length > 1) {
+    throw new Error('duplicate site config files detected');
+  }
+
+  return found[0];
+}
+
+export { normalize, getConfigFile, readRaw };
