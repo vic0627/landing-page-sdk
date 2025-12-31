@@ -4,6 +4,11 @@
       "factory": "./.core/plugins/template/index",
       "schema": "./.core/plugins/template/schema.json",
       "description": "template generator"
+    },
+    "component": {
+      "factory": "./.core/plugins/component/index",
+      "schema": "./.core/plugins/component/schema.json",
+      "description": "component generator"
     }
   }
 }

@@ -27,3 +27,11 @@ export interface TemplateGeneratorSchema {
   framework: Framework;
   style: Style[];
 }
+
+export interface ComponentGeneratorSchema {
+  name: string;
+  project?: string;
+  path?: string;
+  useTs: boolean;
+  framework: Framework;
+}

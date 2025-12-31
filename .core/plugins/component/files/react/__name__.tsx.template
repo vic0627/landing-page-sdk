@@ -1,0 +1,9 @@
+import { useState } from 'react';
+
+export default function <%= componentNames.className %>() {
+  const [name, setName] = useState('<%= name %>');
+
+  return (
+    <p>{name}</p>
+  );
+}
