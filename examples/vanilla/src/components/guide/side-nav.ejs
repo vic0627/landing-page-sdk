@@ -1,0 +1,44 @@
+<%
+  const guideLabels = {
+    overview: i18n.guideOverviewTitleShort,
+    'quick-start': i18n.navQuickStart,
+    'core-concepts': i18n.navConcepts,
+    templating: i18n.navTemplating,
+    routing: i18n.navRouting,
+    controller: i18n.navAutomation,
+    advanced: i18n.navConfig,
+  };
+  const currentGuideLabel = guideLabels[active] || i18n.navGuide;
+%>
+
+<details class="group rounded-[24px] border border-slate-800/80 bg-[#0f172a]/90 p-4 shadow-[0_18px_30px_-24px_rgba(8,12,22,0.6)] lg:hidden">
+  <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-slate-200 [&::-webkit-details-marker]:hidden">
+    <span class="text-xs uppercase tracking-[0.28em] text-slate-500"><%= i18n.navGuide %></span>
+    <span class="text-sm text-slate-200"><%= currentGuideLabel %></span>
+    <svg class="h-4 w-4 text-slate-400 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+    </svg>
+  </summary>
+  <div class="mt-3 grid gap-2 text-sm">
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'overview' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide"><%= i18n.guideOverviewTitleShort %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'quick-start' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/quick-start"><%= i18n.navQuickStart %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'core-concepts' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/core-concepts"><%= i18n.navConcepts %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'templating' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/templating"><%= i18n.navTemplating %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'routing' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/routing"><%= i18n.navRouting %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'controller' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/controller-injection"><%= i18n.navAutomation %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'advanced' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/advanced"><%= i18n.navConfig %></a>
+  </div>
+</details>
+
+<nav class="hidden rounded-[24px] border border-slate-800/80 bg-[#0f172a]/90 p-5 shadow-[0_18px_30px_-24px_rgba(8,12,22,0.6)] lg:block">
+  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500"><%= i18n.navGuide %></p>
+  <div class="mt-4 grid gap-2 text-sm">
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'overview' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide"><%= i18n.guideOverviewTitleShort %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'quick-start' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/quick-start"><%= i18n.navQuickStart %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'core-concepts' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/core-concepts"><%= i18n.navConcepts %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'templating' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/templating"><%= i18n.navTemplating %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'routing' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/routing"><%= i18n.navRouting %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'controller' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/controller-injection"><%= i18n.navAutomation %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'advanced' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/advanced"><%= i18n.navConfig %></a>
+  </div>
+</nav>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/__ASSETS__/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= i18n.siteTitle %> - <%= i18n.navTemplating %></title>
+  </head>
+  <body class="min-h-screen bg-[#0b0f1a] font-['Archivo'] text-slate-100 antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(900px_600px_at_90%_20%,rgba(168,85,247,0.2),transparent_70%)]"></div>
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[length:140px_140px] opacity-40"></div>
+
+    <%- include($cmp('header/header.ejs'), _data) %>
+
+    <main class="mx-auto w-full max-w-6xl px-6 pb-16 pt-6 sm:pt-8 md:pt-10 lg:pt-16">
+      <section class="grid gap-10 lg:grid-cols-[240px_minmax(0,1fr)]">
+        <aside class="reveal opacity-0 translate-y-4 transition duration-700 ease-out lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)] lg:self-start lg:overflow-auto">
+          <%- include($cmp('guide/side-nav.ejs'), Object.assign({}, _data, { active: 'templating' })) %>
+        </aside>
+        <article class="guide-content min-w-0">
+          <header class="doc-hero reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <p class="doc-eyebrow"><%= i18n.navTemplating %></p>
+            <h1 class="mt-3"><%= i18n.templatingTitle %></h1>
+            <p class="mt-3 text-lg text-slate-200"><%= i18n.templatingLead %></p>
+          </header>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.templatingVarsTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.templatingVarsDesc %></p>
+              <p class="text-sm text-slate-400"><%= i18n.templatingVarsWhat %></p>
+              <p class="text-sm text-slate-400"><%= i18n.templatingVarsWhy %></p>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.templatingVarsUseTitle %></p>
+              <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
+                <% (i18n.templatingVarsUse || []).forEach((item) => { %>
+                  <li><%= item %></li>
+                <% }) %>
+              </ul>
+              <div class="mt-4 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                <span class="rounded-xl border border-slate-800/70 bg-[#0b1220] px-3 py-2">i18n / i18nPack</span>
+                <span class="rounded-xl border border-slate-800/70 bg-[#0b1220] px-3 py-2">lang / defaultLang / langs</span>
+                <span class="rounded-xl border border-slate-800/70 bg-[#0b1220] px-3 py-2">site / route / filename</span>
+                <span class="rounded-xl border border-slate-800/70 bg-[#0b1220] px-3 py-2">env / $cmp / _data</span>
+              </div>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="text-fuchsia-300">&lt;h1&gt;</code><code class="text-emerald-300">&lt;%= i18n.title %&gt;</code><code class="text-fuchsia-300">&lt;/h1&gt;</code></pre>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="grid gap-6 md:grid-cols-2">
+              <article class="doc-panel">
+                <h2><%= i18n.templatingComponentsTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.templatingComponentsDesc %></p>
+                <p class="text-sm text-slate-400"><%= i18n.templatingComponentsWhat %></p>
+                <p class="text-sm text-slate-400"><%= i18n.templatingComponentsWhy %></p>
+                <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.templatingComponentsUseTitle %></p>
+                <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
+                  <% (i18n.templatingComponentsUse || []).forEach((item) => { %>
+                    <li><%= item %></li>
+                  <% }) %>
+                </ul>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="text-fuchsia-300">&lt;%-</code> include($cmp('header.ejs'), _data) <code class="text-fuchsia-300">%&gt;</code></pre>
+              </article>
+              <article class="doc-panel">
+                <h2><%= i18n.templatingCrossTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.templatingCrossDesc %></p>
+                <p class="text-sm text-slate-400"><%= i18n.templatingCrossWhat %></p>
+                <p class="text-sm text-slate-400"><%= i18n.templatingCrossWhy %></p>
+                <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.templatingCrossUseTitle %></p>
+                <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
+                  <% (i18n.templatingCrossUse || []).forEach((item) => { %>
+                    <li><%= item %></li>
+                  <% }) %>
+                </ul>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="text-fuchsia-300">&lt;%-</code> include($cmp(<code class="text-emerald-300">'@landing-page-sdk/assets/components/hero.ejs'</code>)) <code class="text-fuchsia-300">%&gt;</code></pre>
+              </article>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.templatingGeneratorTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.templatingGeneratorDesc %></p>
+              <p class="text-sm text-slate-400"><%= i18n.templatingGeneratorWhat %></p>
+              <p class="text-sm text-slate-400"><%= i18n.templatingGeneratorWhy %></p>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.templatingGeneratorUseTitle %></p>
+              <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
+                <% (i18n.templatingGeneratorUse || []).forEach((item) => { %>
+                  <li><%= item %></li>
+                <% }) %>
+              </ul>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code><span class="text-cyan-300">$</span> npx nx g @landing-page-sdk/core:component
+<span class="text-slate-500"># framework: none | vue | react</span></code></pre>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.templatingNextTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.templatingNextDesc %></p>
+              <a class="mt-4 inline-flex text-sm font-semibold text-cyan-300" data-to="/guide/routing"><%= i18n.templatingNextCta %></a>
+            </div>
+          </section>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

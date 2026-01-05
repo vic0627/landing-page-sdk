@@ -1,29 +1,60 @@
-<% 
+<%
   const routePath = typeof route === 'string' ? route : route?.path || '/';
+  const isHome = routePath === '/';
+  const isGuideHome = routePath === '/guide';
+  const isGuideQuickStart = routePath === '/guide/quick-start';
+  const isGuideConcepts = routePath === '/guide/core-concepts';
   const langNames = i18n.langNames || {};
   const currentLangName = langNames[lang] || lang.toUpperCase();
 %>
-<header class="site-header" aria-label="<%= i18n.languageLabel %>">
-  <div class="site-header__inner">
-    <div class="site-title">
-      <a data-to="/" data-locale="<%= lang %>">Landing Page SDK - Vanilla Example</a>
+<header class="fixed left-0 top-0 z-30 w-full border-b border-slate-800/70 bg-[#0b1220]/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-3">
+    <a class="flex flex-col font-semibold text-slate-100" data-to="/" data-locale="<%= lang %>">
+      <span class="font-['Space_Grotesk'] text-lg tracking-tight"><%= i18n.siteTitle %></span>
+      <span class="text-[0.68rem] uppercase tracking-[0.32em] text-slate-400"><%= i18n.siteTagline %></span>
+    </a>
+    <nav class="hidden items-center gap-4 text-sm text-slate-400 lg:flex lg:justify-center">
+      <a class="border-b-2 pb-1 transition <%= isHome ? 'border-cyan-400 text-slate-100' : 'border-transparent hover:text-slate-100' %>" data-to="/"><%= i18n.navOverview %></a>
+      <a class="border-b-2 pb-1 transition <%= isGuideHome ? 'border-cyan-400 text-slate-100' : 'border-transparent hover:text-slate-100' %>" data-to="/guide"><%= i18n.navGuide %></a>
+      <% if (isHome) { %>
+        <a class="border-b-2 border-transparent pb-1 transition hover:text-slate-100" href="#quick-start"><%= i18n.navQuickStart %></a>
+        <a class="border-b-2 border-transparent pb-1 transition hover:text-slate-100" href="#concepts"><%= i18n.navConcepts %></a>
+      <% } else { %>
+        <a class="border-b-2 pb-1 transition <%= isGuideQuickStart ? 'border-cyan-400 text-slate-100' : 'border-transparent hover:text-slate-100' %>" data-to="/guide/quick-start"><%= i18n.navQuickStart %></a>
+        <a class="border-b-2 pb-1 transition <%= isGuideConcepts ? 'border-cyan-400 text-slate-100' : 'border-transparent hover:text-slate-100' %>" data-to="/guide/core-concepts"><%= i18n.navConcepts %></a>
+      <% } %>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a class="hidden items-center justify-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-[#0b0f1a] shadow-[0_16px_30px_-22px_rgba(34,211,238,0.6)] transition hover:-translate-y-0.5 hover:bg-cyan-300 md:inline-flex" data-to="/guide"><%= i18n.ctaPrimary %></a>
+      <details class="dropdown group relative" role="listbox" aria-label="<%= i18n.languageLabel %>">
+        <summary class="cursor-pointer list-none rounded-full border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-sm font-medium text-slate-200 transition group-open:border-cyan-400/60 group-open:shadow-[0_0_0_2px_rgba(34,211,238,0.2)] [&::-webkit-details-marker]:hidden">
+          <span><%= currentLangName %></span>
+        </summary>
+        <div class="absolute right-0 mt-2 grid min-w-[160px] gap-1 rounded-2xl border border-slate-700 bg-[#0f172a] p-2 shadow-[0_24px_60px_-40px_rgba(8,12,22,0.8)]">
+          <% langs.forEach((locale) => { %>
+            <a
+              class="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-400/40 hover:bg-cyan-400/10 <%= locale === lang ? 'border-fuchsia-400/60 bg-fuchsia-400/10 text-slate-100' : '' %>"
+              role="option"
+              data-to="<%= routePath %>"
+              data-locale="<%= locale %>"
+            >
+              <%= langNames[locale] || locale.toUpperCase() %>
+            </a>
+          <% }) %>
+        </div>
+      </details>
+      <a
+        class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-700/70 bg-slate-900/80 text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-200"
+        href="https://github.com/vic0627/landing-page-sdk"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="GitHub"
+      >
+        <svg aria-hidden="true" viewBox="0 0 16 16" class="h-4 w-4 fill-current">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+      </a>
     </div>
-    <details class="dropdown" role="listbox" aria-label="<%= i18n.languageLabel %>">
-      <summary class="dropdown-trigger">
-        <span><%= currentLangName %></span>
-      </summary>
-      <div class="dropdown-menu" role="listbox">
-        <% langs.forEach((locale) => { %>
-          <a
-            class="dropdown-item<%= locale === lang ? ' is-active' : '' %>"
-            role="option"
-            data-to="<%= routePath %>"
-            data-locale="<%= locale %>"
-          >
-            <%= langNames[locale] || locale.toUpperCase() %>
-          </a>
-        <% }) %>
-      </div>
-    </details>
   </div>
 </header>
+<div aria-hidden="true" class="h-20 md:h-[72px]"></div>

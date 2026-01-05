@@ -1,18 +1,9 @@
 import type { SiteConfig } from '@landing-page-sdk/types';
+import tailwindcss from '@tailwindcss/vite';
 
 export default {
-  route: {
-    hidden: [
-      {
-        route: '/about',
-        site: 'bar',
-        lang: 'en',
-        // reason: 'test'
-      }
-    ]
-  },
+  plugins: [tailwindcss()],
   output: {
     assetsResolution: 'rel',
   },
-  sitemap: 'https://my.domain.com'
 } satisfies SiteConfig;

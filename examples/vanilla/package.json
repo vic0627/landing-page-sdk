@@ -8,7 +8,9 @@
   "dependencies": {
     "@landing-page-sdk/assets": "*",
     "@landing-page-sdk/utils-browser": "*",
-    "@landing-page-sdk/utils-node": "*"
+    "@landing-page-sdk/utils-node": "*",
+    "@tailwindcss/vite": "^4.1.18",
+    "tailwindcss": "^4.1.18"
   },
   "nx": {
     "$schema": "../node_modules/nx/schemas/project-schema.json",
