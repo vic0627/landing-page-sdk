@@ -1,12 +1,12 @@
-# 5. Advanced Configuration
+# 6. Advanced Configuration
 
-`site.config.js` exposes rich options to customize build behavior. Key settings and examples below.
+`site.config.js` exposes rich options to customize build behavior. The sections below focus on the configuration you’ll reach for most often.
 
 ---
 
 ### Output (`output`)
 
-Controls format/minification/path of build artifacts.
+Controls format, minification, and output location for build artifacts.
 
 ```javascript
 // site.config.js
@@ -38,7 +38,7 @@ export default {
 
 **Assets and `__ASSETS__` convention**
 
-Place static assets under `public/__ASSETS__/` and reference as `/__ASSETS__/foo.png`. Plugins rewrite to abs/rel paths per `assetsResolution` and apply hard/soft versioning. Using `__ASSETS__` avoids conflicts and simplifies post-build moves/cache control.
+Place static assets under `public/__ASSETS__/` and reference them as `/__ASSETS__/foo.png`. Plugins rewrite to absolute or relative paths according to `assetsResolution` and apply hard/soft versioning. Using `__ASSETS__` avoids conflicts and simplifies post-build moves and cache control.
 
 ---
 
@@ -73,7 +73,7 @@ export default {
 
 ### Sitemap (`sitemap`)
 
-Generates `sitemap.xml` (and index for multi-lang).
+Generates `sitemap.xml` (and an index for multi-lang).
 
 **Basic:**
 
@@ -110,19 +110,16 @@ export default {
 
 ### API Mock (`mock`)
 
-Powered by `vite-plugin-mock`.
-
-- **Default**: reads `@landing-page-sdk/assets/mock`.
-- **Disable**: `mock: false`.
-- **Custom dir**: `mock: 'src/my-mocks'`.
+Powered by `vite-plugin-mock`. By default it reads from `@landing-page-sdk/assets/mock`. Set `mock: false` to disable, or point to a custom directory such as `mock: 'src/my-mocks'`.
 
 ```javascript
 // site.config.js
 export default {
   mock: 'src/mocks',
-  mock: '@sites/project-a/mocks',
 };
 ```
+
+You can also point to a workspace path such as `mock: '@sites/project-a/mocks'`.
 
 ---
 
@@ -140,5 +137,4 @@ export default {
 };
 ```
 
-- **In JavaScript**: `import.meta.env.API_ENDPOINT`
-- **In EJS**: `<%= env.API_ENDPOINT %>`
+Use it in JavaScript via `import.meta.env.API_ENDPOINT` and in EJS via `<%= env.API_ENDPOINT %>`.

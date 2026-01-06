@@ -1,6 +1,6 @@
 # 3. Templating
 
-All `.html` and `.ejs` files are treated as EJS templates so you can embed data/logic.
+All `.html` and `.ejs` files are treated as EJS templates, which means you can embed data and logic directly in markup without switching formats.
 
 ### Template Variables
 
@@ -29,25 +29,21 @@ Available in templates:
 
 ### Components (`$cmp`)
 
-Create reusable fragments (e.g., `header.ejs`, `footer.ejs`).
+Create reusable fragments such as `header.ejs` or `footer.ejs`, then include them through `$cmp()` so paths resolve consistently. For local components, use a path without `@` and it will resolve to `src/components/`:
 
-#### Include components
+```html
+<%- include($cmp('header.ejs')) %>
+```
 
-Use `$cmp()` to resolve component paths with EJS `include`. `$cmp()` resolves:
+For cross-project usage, prefix the path with `@` to resolve through the monorepo (shared component libraries):
 
-1. **Local components**: paths not starting with `@` resolve to `src/components/`.
-  ```html
-  <%- include($cmp('header.ejs')) %>
-  ```
-
-2. **Cross-project**: paths starting with `@` resolve as monorepo project paths (shared component libs).
-  ```html
-  <%- include($cmp('@landing-page-sdk/assets/components/my-component.ejs')) %>
-  ```
+```html
+<%- include($cmp('@landing-page-sdk/assets/components/my-component.ejs')) %>
+```
 
 #### Pass data (`_data`)
 
-When including, pass `_data`:
+When including components, pass `_data` to preserve the full root context:
 
 ```html
 <body>
@@ -63,11 +59,11 @@ When including, pass `_data`:
 
 **Why `_data`?**
 
-It avoids variable shadowing. `_data` references the root template data; even if a component defines `lang`, you can still read `_data.lang` reliably.
+It avoids variable shadowing. `_data` always points at the root template data, so even if a component defines `lang`, you can still access `_data.lang` reliably.
 
 ### Component Generator
 
-Use the component generator to scaffold component templates. Output varies by `framework`.
+Use the component generator to scaffold component templates. Output varies by `framework`, but the generator keeps the structure consistent across sites.
 
 ```bash
 npx nx g @landing-page-sdk/core:component
@@ -81,18 +77,16 @@ npx nx g @landing-page-sdk/core:component
 - `path`: explicit output path. Overrides the project path if provided.
 
 **What gets generated:**
-- `framework: none`: `index.ejs` + `index.ts` (or `index.js` when `useTs: false`).
-- `framework: vue`: single-file component `*.vue`.
-- `framework: react`: `*.tsx` (or `*.jsx` when `useTs: false`).
+
+For `framework: none`, you get `index.ejs` with `index.ts` (or `index.js` when `useTs: false`). For `framework: vue`, you get a single-file `*.vue`. For `framework: react`, you get `*.tsx` (or `*.jsx` when `useTs: false`).
 
 **Default output location:**
-- If `project` is set: `${projectRoot}/${sourcePath.components}` (from `site.config`).
-- Else if `path` is set: `path`.
-- Else: `@landing-page-sdk/assets` project's `components/` folder.
+
+If `project` is set, output goes to `${projectRoot}/${sourcePath.components}` from `site.config`. If `path` is set, it uses that directly. Otherwise, it falls back to the `@landing-page-sdk/assets` project's `components/` folder.
 
 ### Static Assets
 
-Place static assets under `public/__ASSETS__` and reference them with the `/__ASSETS__` prefix. The SDK will rewrite paths at build time based on your route/output settings:
+Place static assets under `public/__ASSETS__` and reference them with the `/__ASSETS__` prefix. The SDK rewrites paths at build time based on your route/output settings, so the same markup works across different modes:
 
 ```html
 <img src="/__ASSETS__/images/logo.png" alt="logo">

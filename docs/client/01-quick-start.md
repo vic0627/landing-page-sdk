@@ -1,18 +1,16 @@
 # 1. Quick Start
 
-### Create a New Site
-
-The fastest way to start is with the built-in generator:
+Start by creating a new site. The generator gives you a complete structure and a working example in one go, so you can focus on content instead of scaffolding.
 
 ```bash
 npx nx generate @landing-page-sdk/core:template
 ```
 
-The CLI will prompt for name/path/etc. and scaffold a site with the full structure.
+The CLI will ask for a name, path, and a few defaults, then scaffold the site for you.
 
 ### Directory Layout
 
-A typical site looks like:
+A typical site looks like this. `src/pages` holds page templates and logic, `src/sites` defines site variants, and `public/__ASSETS__` is the shared entry for static assets.
 
 ```
 .
@@ -29,55 +27,36 @@ A typical site looks like:
 
 ### Common Commands
 
-The template ships with `dev`, `build`, and `preview` via Nx.
+Day-to-day work centers around `dev`, `build`, and `preview`. They all run through Nx for consistent behavior across projects.
 
 #### Develop
 
-Start the dev server:
+Start the dev server with HMR enabled. It prints a preview URL so you can iterate quickly.
+
 
 ```bash
 # replace your-site-name with your project name
 npx nx dev your-site-name
 ```
 
-The server starts with HMR and prints a preview URL.
-
-**Options:**
-
-- `--host`: bind host (e.g. `--host`).
-- `--port`: port (e.g. `--port=8080`).
-- `--sites`: develop specific site variants, comma-separated (e.g. `--sites=site-a,site-b`).
-- `--config`: custom `site.config.js` path.
-- `--verbose`: verbose logging.
+See [CLI / Nx Reference](./09-cli-nx-reference.md) for full option details.
 
 #### Build
 
-Build for production:
+Use `build` when you want a deployable output. Artifacts land in `dist/` with minification and versioning applied based on your configuration.
 
 ```bash
 npx nx build your-site-name
 ```
 
-Outputs go to `dist/`.
-
-**Options:**
-
-- `--sites`: select site variants.
-- `--config`: custom config path.
-- `--verbose`: verbose logging.
+See [CLI / Nx Reference](./09-cli-nx-reference.md) for full option details.
 
 #### Preview
 
-Preview the production build locally:
+`preview` serves the built output from `dist/` to simulate production locally. It is especially useful for validating routes, asset paths, and redirects.
 
 ```bash
 npx nx preview your-site-name
 ```
 
-**Options:**
-
-- `--host`: bind host.
-- `--port`: port.
-- `--sites`: select site variants.
-- `--config`: custom config path.
-- `--verbose`: verbose logging.
+See [CLI / Nx Reference](./09-cli-nx-reference.md) for full option details.

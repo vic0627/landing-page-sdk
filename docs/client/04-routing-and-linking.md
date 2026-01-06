@@ -2,14 +2,16 @@
 
 ### Route Config (`route`)
 
-As covered in [Core Concepts](./02-core-concepts.md), adjust routing via `route` in `site.config` to match hosting/SEO needs. Tree for directory-like URLs with language prefixes; flat for single-level outputs or hosts that prefer explicit filenames.
+As covered in [Core Concepts](./02-core-concepts.md), adjust routing via `route` in `site.config` to match hosting and SEO needs. `tree` produces directory-like URLs with language prefixes (e.g., `/en/about/me/`), while `flat` emits everything at the root with filenames that include the language (e.g., `about_me_en.html`).
 
-- `mode: 'tree'` (default): folder-like URLs with lang prefix (e.g., `/en/about/me/`).
-- `mode: 'flat'`: all pages at root, filename includes lang (e.g., `about_me_en.html`).
+- `mode: 'tree'` (default): folder-like URLs with lang prefix.
+- `mode: 'flat'`: all pages at root, filename includes lang.
 
 ### Internal Links (`data-to`)
 
-Always use `data-to` for internal links so URLs render correctly under both modes. It keeps templates mode-agnostic and prevents broken links when switching `tree/flat`.
+Always use `data-to` for internal links so URLs render correctly under both modes. This keeps templates mode-agnostic and avoids broken links when switching between `tree` and `flat`.
+
+`data-to` expects a route reference that mirrors the `src/pages` folder structure, not a final URL. That means you should pass values like `/about/me` rather than concrete paths such as `/about/index.html`, `../about`, or `./about_en.html`. The SDK resolves the final URL for you based on `route.mode`, Internationalization, and Multi-Site.
 
 ```html
 <!-- Basic -->
@@ -23,7 +25,7 @@ SDK rewrites `data-to` to the correct `href` at build time.
 
 ### Resolve links programmatically
 
-If you need to navigate via code, use the virtual route manifest plus browser utils. `getPageContext` reads current route/site/lang; `manifestResolver` resolves the correct target URL based on mode/lang/site:
+If you need to navigate via code, use the virtual route manifest and browser utils. `getPageContext` reads the current route/site/lang, and `manifestResolver` resolves the correct target URL based on mode, language, and site:
 
 ```js
 import manifest from 'virtual:route-manifest';
@@ -53,7 +55,7 @@ Controls whether rendered internal links are relative or absolute (example from 
 
 ### Link Orientation (`route.orientation`)
 
-Effective only when `route.mode: 'tree'`; controls dir-based vs file-based links. `flat` always uses file-based. Choose `dir` for cleaner folders or `file` when a static host requires explicit filenames.
+Effective only when `route.mode: 'tree'`. It controls dir-based vs file-based links, while `flat` always uses file-based. Choose `dir` for cleaner folders, or `file` when a static host requires explicit filenames.
 
 - `dir` (default): trailing slash, directory-style
   ```html
@@ -66,7 +68,7 @@ Effective only when `route.mode: 'tree'`; controls dir-based vs file-based links
 
 ### Base (`route.useSiteAsPath`)
 
-Boolean flag to prepend site name into paths (affects links and assets). Only meaningful with absolute paths; relative links are already site-local. Useful when hosting multiple sites under one domain/root. For example, with `src/sites/site-a.ts` and `route.useSiteAsPath: true`:
+A boolean flag that prepends the site name into paths (affects links and assets). It only matters for absolute paths; relative links are already site-local. This is useful when hosting multiple sites under one domain/root. For example, with `src/sites/site-a.ts` and `route.useSiteAsPath: true`:
 
 ```html
 <a href="/site-a/member/info/">To Member Info</a>
@@ -93,4 +95,4 @@ export default {
 };
 ```
 
-Supports string/RegExp/array (OR) and optional site/lang scoping. Hide routes to disable variants by audience or rollout stage; hidden pages are excluded from output, manifests, and sitemap (if enabled).
+Supports string/RegExp/array (OR) and optional site/lang scoping. Use this to disable variants by audience or rollout stage; hidden pages are excluded from output, manifests, and sitemap (if enabled).
