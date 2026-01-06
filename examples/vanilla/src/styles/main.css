@@ -12,6 +12,10 @@
   pre {
     @apply max-w-full whitespace-pre-wrap break-words;
   }
+
+  pre code {
+    @apply text-slate-200;
+  }
 }
 
 @layer components {

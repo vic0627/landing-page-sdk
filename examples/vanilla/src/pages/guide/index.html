@@ -1,10 +1,24 @@
+<%
+  const pageTitle = `${i18n.siteTitle} - ${i18n.navGuide}`;
+  const pageDescription = i18n.guideOverviewLead;
+  const ogLocale = lang === 'zh' ? 'zh_TW' : 'en_US';
+%>
 <!DOCTYPE html>
 <html lang="<%= lang %>">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/__ASSETS__/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= i18n.siteTitle %> - <%= i18n.navGuide %></title>
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>" />
+    <meta property="og:title" content="<%= pageTitle %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= i18n.siteTitle %>" />
+    <meta property="og:locale" content="<%= ogLocale %>" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= pageTitle %>" />
+    <meta name="twitter:description" content="<%= pageDescription %>" />
   </head>
   <body class="min-h-screen bg-[#0b0f1a] font-['Archivo'] text-slate-100 antialiased">
     <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(900px_600px_at_90%_20%,rgba(168,85,247,0.2),transparent_70%)]"></div>
@@ -24,10 +38,10 @@
             <p class="mt-3 text-lg text-slate-200"><%= i18n.guideOverviewLead %></p>
             <p class="mt-4 text-sm text-slate-400"><%= i18n.guideOverviewIntro %></p>
             <div class="mt-5 flex flex-wrap gap-2">
-              <span class="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300">MPA</span>
-              <span class="rounded-full bg-fuchsia-400/10 px-3 py-1 text-xs font-semibold text-fuchsia-300">Routing</span>
-              <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">i18n</span>
-              <span class="rounded-full bg-orange-400/10 px-3 py-1 text-xs font-semibold text-orange-300">Variants</span>
+              <span class="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300">MPA
+              <span class="rounded-full bg-fuchsia-400/10 px-3 py-1 text-xs font-semibold text-fuchsia-300">Routing
+              <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">i18n
+              <span class="rounded-full bg-orange-400/10 px-3 py-1 text-xs font-semibold text-orange-300">Variants
             </div>
           </header>
 
@@ -65,25 +79,38 @@
                 <h3 class="mt-3"><%= i18n.navConfig %></h3>
                 <p class="text-sm text-slate-400"><%= i18n.guideAdvancedCard %></p>
               </a>
+              <a class="doc-panel transition hover:-translate-y-0.5" data-to="/guide/spa-frameworks">
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">07</p>
+                <h3 class="mt-3"><%= i18n.navSpa %></h3>
+                <p class="text-sm text-slate-400"><%= i18n.guideSpaCard %></p>
+              </a>
+              <a class="doc-panel transition hover:-translate-y-0.5" data-to="/guide/config-reference">
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">08</p>
+                <h3 class="mt-3"><%= i18n.navConfigRef %></h3>
+                <p class="text-sm text-slate-400"><%= i18n.guideConfigRefCard %></p>
+              </a>
+              <a class="doc-panel transition hover:-translate-y-0.5" data-to="/guide/cli-nx">
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">09</p>
+                <h3 class="mt-3"><%= i18n.navCli %></h3>
+                <p class="text-sm text-slate-400"><%= i18n.guideCliCard %></p>
+              </a>
+              <a class="doc-panel transition hover:-translate-y-0.5" data-to="/guide/deployment">
+                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">10</p>
+                <h3 class="mt-3"><%= i18n.navDeploy %></h3>
+                <p class="text-sm text-slate-400"><%= i18n.guideDeployCard %></p>
+              </a>
             </div>
           </section>
 
           <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
-            <div class="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
-              <div class="doc-panel">
-                <h3><%= i18n.guideStructureTitle %></h3>
-                <p class="text-sm text-slate-400"><%= i18n.guideStructureDesc %></p>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code><%= i18n.architectureTree %></code></pre>
-              </div>
-              <div class="doc-panel">
-                <h3><%= i18n.guideFlowTitle %></h3>
-                <ul class="mt-3 space-y-3 text-sm text-slate-400">
-                  <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><%= i18n.guideFlowItem1 %></li>
-                  <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><%= i18n.guideFlowItem2 %></li>
-                  <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><%= i18n.guideFlowItem3 %></li>
-                </ul>
-                <a class="mt-4 inline-flex text-sm font-semibold text-cyan-300" data-to="/guide/quick-start"><%= i18n.guideFlowCta %></a>
-              </div>
+            <div class="doc-panel w-full">
+              <h3><%= i18n.guideFlowTitle %></h3>
+              <ul class="mt-3 space-y-3 text-sm text-slate-400">
+                <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><%= i18n.guideFlowItem1 %></li>
+                <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><%= i18n.guideFlowItem2 %></li>
+                <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><%= i18n.guideFlowItem3 %></li>
+              </ul>
+              <a class="mt-4 inline-flex text-sm font-semibold text-cyan-300" data-to="/guide/quick-start"><%= i18n.guideFlowCta %></a>
             </div>
           </section>
         </article>

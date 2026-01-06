@@ -1,10 +1,24 @@
+<%
+  const pageTitle = `${i18n.siteTitle} - ${i18n.navAutomation}`;
+  const pageDescription = i18n.controllerLead;
+  const ogLocale = lang === 'zh' ? 'zh_TW' : 'en_US';
+%>
 <!DOCTYPE html>
 <html lang="<%= lang %>">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/__ASSETS__/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= i18n.siteTitle %> - <%= i18n.navAutomation %></title>
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>" />
+    <meta property="og:title" content="<%= pageTitle %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= i18n.siteTitle %>" />
+    <meta property="og:locale" content="<%= ogLocale %>" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= pageTitle %>" />
+    <meta name="twitter:description" content="<%= pageDescription %>" />
   </head>
   <body class="min-h-screen bg-[#0b0f1a] font-['Archivo'] text-slate-100 antialiased">
     <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(900px_600px_at_90%_20%,rgba(168,85,247,0.2),transparent_70%)]"></div>
@@ -25,35 +39,64 @@
           </header>
 
           <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.controllerTargetModelTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.controllerTargetModelDesc %></p>
+              <p class="text-sm text-slate-400"><%= i18n.controllerTargetModelNote %></p>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: {
+  name: 'tracking.ts',
+  targets: ['/product', '/checkout']
+}</code></pre>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
             <div class="grid gap-4 md:grid-cols-2">
               <article class="doc-panel">
-                <h2><%= i18n.controllerBasicTitle %></h2>
-                <p class="text-sm text-slate-400"><%= i18n.controllerBasicDesc %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerBasicWhat %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerBasicWhy %></p>
-                <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.controllerBasicUseTitle %></p>
-                <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
-                  <% (i18n.controllerBasicUse || []).forEach((item) => { %>
-                    <li><%= item %></li>
-                  <% }) %>
-                </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>controller: {
+                <h2><%= i18n.controllerOneToOneTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.controllerOneToOneDesc %></p>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: {
+  name: 'tracking.ts',
+  targets: '/checkout'
+}</code></pre>
+              </article>
+              <article class="doc-panel">
+                <h2><%= i18n.controllerOneToManyTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.controllerOneToManyDesc %></p>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: {
   name: 'tracking.ts',
   targets: ['/product', '/checkout']
 }</code></pre>
               </article>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="grid gap-4 md:grid-cols-2">
               <article class="doc-panel">
-                <h2><%= i18n.controllerTargetingTitle %></h2>
-                <p class="text-sm text-slate-400"><%= i18n.controllerTargetingDesc %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerTargetingWhat %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerTargetingWhy %></p>
-                <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.controllerTargetingUseTitle %></p>
-                <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
-                  <% (i18n.controllerTargetingUse || []).forEach((item) => { %>
-                    <li><%= item %></li>
-                  <% }) %>
-                </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>controller: {
+                <h2><%= i18n.controllerManyToOneTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.controllerManyToOneDesc %></p>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: [
+  { name: 'tracking.ts', targets: '/checkout' },
+  { name: 'analytics.js', targets: '/checkout' }
+]</code></pre>
+              </article>
+              <article class="doc-panel">
+                <h2><%= i18n.controllerManyToManyTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.controllerManyToManyDesc %></p>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: [
+  { name: 'tracking.ts', targets: ['/product', '/checkout'] },
+  { name: 'ab-test.js', targets: ['/product', '/promo'] }
+]</code></pre>
+              </article>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.controllerTargetConditionsTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.controllerTargetConditionsDesc %></p>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: {
   name: 'analytics.js',
   targets: {
     routes: ['/product'],
@@ -61,44 +104,30 @@
     site: ['main']
   }
 }</code></pre>
-              </article>
             </div>
           </section>
 
           <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
             <div class="grid gap-4 md:grid-cols-2">
               <article class="doc-panel">
-                <h2><%= i18n.controllerInlineTitle %></h2>
-                <p class="text-sm text-slate-400"><%= i18n.controllerInlineDesc %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerInlineWhat %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerInlineWhy %></p>
-                <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.controllerInlineUseTitle %></p>
-                <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
-                  <% (i18n.controllerInlineUse || []).forEach((item) => { %>
-                    <li><%= item %></li>
-                  <% }) %>
-                </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>controller: {
-  name: 'pixel.ts',
-  targets: [],
-  injection: { type: 'inline', appendTo: 'body' }
+                <h2><%= i18n.controllerBundleTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.controllerBundleDesc %></p>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: {
+  name: 'tracking.ts',
+  injection: { type: 'bundle', placement: 'pre' }
 }</code></pre>
               </article>
               <article class="doc-panel">
-                <h2><%= i18n.controllerPlacementTitle %></h2>
-                <p class="text-sm text-slate-400"><%= i18n.controllerPlacementDesc %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerPlacementWhat %></p>
-                <p class="text-sm text-slate-400"><%= i18n.controllerPlacementWhy %></p>
-                <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.controllerPlacementUseTitle %></p>
-                <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
-                  <% (i18n.controllerPlacementUse || []).forEach((item) => { %>
-                    <li><%= item %></li>
-                  <% }) %>
-                </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>controller: {
-  name: 'verification.js',
-  targets: ['/register'],
-  injection: { placement: 'pre' }
+                <h2><%= i18n.controllerInlineTitle %></h2>
+                <p class="text-sm text-slate-400"><%= i18n.controllerInlineDesc %></p>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: {
+  name: 'pixel.ts',
+  targets: { routes: [] },
+  injection: {
+    type: 'inline',
+    appendTo: 'body',
+    placement: 'post'
+  }
 }</code></pre>
               </article>
             </div>
@@ -106,17 +135,9 @@
 
           <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
             <div class="doc-panel">
-              <h2><%= i18n.controllerBundleTitle %></h2>
-              <p class="text-sm text-slate-400"><%= i18n.controllerBundleDesc %></p>
-              <p class="text-sm text-slate-400"><%= i18n.controllerBundleWhat %></p>
-              <p class="text-sm text-slate-400"><%= i18n.controllerBundleWhy %></p>
-              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.controllerBundleUseTitle %></p>
-              <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
-                <% (i18n.controllerBundleUse || []).forEach((item) => { %>
-                  <li><%= item %></li>
-                <% }) %>
-              </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>controller: [
+              <h2><%= i18n.controllerInlineBundleTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.controllerInlineBundleDesc %></p>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">controller: [
   { name: 'shared-logic.ts', injection: 'bundle' },
   {
     name: 'critical-inline.js',

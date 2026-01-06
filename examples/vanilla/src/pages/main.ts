@@ -28,3 +28,10 @@ if (prefersReducedMotion) {
     observer.observe(element);
   });
 }
+
+document.querySelectorAll<HTMLElement>('pre code').forEach((block) => {
+  const text = block.textContent ?? '';
+  if (block.innerHTML !== text) {
+    block.textContent = text;
+  }
+});

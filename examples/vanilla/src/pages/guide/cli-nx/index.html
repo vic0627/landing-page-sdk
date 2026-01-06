@@ -1,0 +1,72 @@
+<%
+  const pageTitle = `${i18n.siteTitle} - ${i18n.navCli}`;
+  const pageDescription = i18n.cliLead;
+  const ogLocale = lang === 'zh' ? 'zh_TW' : 'en_US';
+%>
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/__ASSETS__/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>" />
+    <meta property="og:title" content="<%= pageTitle %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= i18n.siteTitle %>" />
+    <meta property="og:locale" content="<%= ogLocale %>" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= pageTitle %>" />
+    <meta name="twitter:description" content="<%= pageDescription %>" />
+  </head>
+  <body class="min-h-screen bg-[#0b0f1a] font-['Archivo'] text-slate-100 antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(900px_600px_at_90%_20%,rgba(168,85,247,0.2),transparent_70%)]"></div>
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-[length:140px_140px] opacity-40"></div>
+
+    <%- include($cmp('header/header.ejs'), _data) %>
+
+    <main class="mx-auto w-full max-w-6xl px-6 pb-16 pt-6 sm:pt-8 md:pt-10 lg:pt-16">
+      <section class="grid gap-10 lg:grid-cols-[240px_minmax(0,1fr)]">
+        <aside class="reveal opacity-0 translate-y-4 transition duration-700 ease-out lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)] lg:self-start lg:overflow-auto">
+          <%- include($cmp('guide/side-nav.ejs'), Object.assign({}, _data, { active: 'cli-nx' })) %>
+        </aside>
+        <article class="guide-content min-w-0">
+          <header class="doc-hero reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <p class="doc-eyebrow"><%= i18n.navCli %></p>
+            <h1 class="mt-3"><%= i18n.cliTitle %></h1>
+            <p class="mt-3 text-lg text-slate-200"><%= i18n.cliLead %></p>
+          </header>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.cliTargetsTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.cliTargetsDesc %></p>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-bash">npx nx dev @landing-page-sdk/examples-vue
+npx nx build @landing-page-sdk/examples-vue
+npx nx preview @landing-page-sdk/examples-vue</code></pre>
+              <p class="mt-4 text-sm text-slate-400"><%= i18n.cliTargetsAlt %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-bash">npx nx run @landing-page-sdk/examples-vue:dev</code></pre>
+            </div>
+          </section>
+
+          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
+            <div class="doc-panel">
+              <h2><%= i18n.cliOptionsTitle %></h2>
+              <p class="text-sm text-slate-400"><%= i18n.cliOptionsDesc %></p>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-bash">npx nx dev @landing-page-sdk/examples-vue --host --port=8080 --sites=site-a,site-b</code></pre>
+              <ul class="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-400">
+                <li><code class="language-bash">--host</code>: <%= i18n.cliOptionHost %></li>
+                <li><code class="language-bash">--port</code>: <%= i18n.cliOptionPort %></li>
+                <li><code class="language-bash">--sites</code>: <%= i18n.cliOptionSites %></li>
+                <li><code class="language-bash">--config</code>: <%= i18n.cliOptionConfig %></li>
+                <li><code class="language-bash">--verbose</code>: <%= i18n.cliOptionVerbose %></li>
+              </ul>
+              <p class="mt-4 text-sm text-slate-400"><%= i18n.cliOptionsNote %></p>
+            </div>
+          </section>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

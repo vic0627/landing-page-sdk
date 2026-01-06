@@ -1,10 +1,24 @@
+<%
+  const pageTitle = `${i18n.siteTitle} - ${i18n.navConcepts}`;
+  const pageDescription = i18n.conceptsLead;
+  const ogLocale = lang === 'zh' ? 'zh_TW' : 'en_US';
+%>
 <!DOCTYPE html>
 <html lang="<%= lang %>">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/__ASSETS__/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= i18n.siteTitle %> - <%= i18n.navConcepts %></title>
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>" />
+    <meta property="og:title" content="<%= pageTitle %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= i18n.siteTitle %>" />
+    <meta property="og:locale" content="<%= ogLocale %>" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= pageTitle %>" />
+    <meta name="twitter:description" content="<%= pageDescription %>" />
   </head>
   <body class="min-h-screen bg-[#0b0f1a] font-['Archivo'] text-slate-100 antialiased">
     <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(900px_600px_at_90%_20%,rgba(168,85,247,0.2),transparent_70%)]"></div>
@@ -30,13 +44,16 @@
               <p class="text-sm text-slate-400"><%= i18n.conceptRouteDesc %></p>
               <p class="text-sm text-slate-400"><%= i18n.conceptRouteWhat %></p>
               <p class="text-sm text-slate-400"><%= i18n.conceptRouteWhy %></p>
+              <p class="text-sm text-slate-400"><%= i18n.conceptRouteReferenceNote %></p>
               <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptRouteUseTitle %></p>
               <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
                 <% (i18n.conceptRouteUse || []).forEach((item) => { %>
                   <li><%= item %></li>
                 <% }) %>
               </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>route: { mode: 'tree' | 'flat' }</code></pre>
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">route: { mode: 'tree' | 'flat' }</code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptRouteExampleTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-plaintext"><%= i18n.conceptRouteExampleMap %></code></pre>
             </div>
           </section>
 
@@ -46,14 +63,25 @@
               <p class="text-sm text-slate-400"><%= i18n.conceptPagesDesc %></p>
               <p class="text-sm text-slate-400"><%= i18n.conceptPagesWhat %></p>
               <p class="text-sm text-slate-400"><%= i18n.conceptPagesWhy %></p>
+              <p class="text-sm text-slate-400"><%= i18n.conceptPagesPairNote %></p>
               <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptPagesUseTitle %></p>
               <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
                 <% (i18n.conceptPagesUse || []).forEach((item) => { %>
                   <li><%= item %></li>
                 <% }) %>
               </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>src/pages/guide/index.html
-src/pages/main.ts</code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptPagesExampleTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-plaintext"><%= i18n.conceptPagesExampleTree %></code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptPagesExampleUrlsTitle %></p>
+              <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
+                <% (i18n.conceptPagesExampleUrls || []).forEach((item) => { %>
+                  <li><%= item %></li>
+                <% }) %>
+              </ul>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptPagesHoistTitle %></p>
+              <p class="text-sm text-slate-400"><%= i18n.conceptPagesHoistDesc %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-plaintext"><%= i18n.conceptPagesHoistTree %></code></pre>
+              <p class="mt-3 text-sm text-slate-400"><%= i18n.conceptPagesHoistNote %></p>
             </div>
           </section>
 
@@ -69,8 +97,13 @@ src/pages/main.ts</code></pre>
                   <li><%= item %></li>
                 <% }) %>
               </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>src/i18n/en.json
-src/i18n/zh.json</code></pre>
+              <p class="mt-4 text-sm text-slate-400"><%= i18n.conceptI18nDefaultNote %></p>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptI18nFilesTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-plaintext"><%= i18n.conceptI18nFilesTree %></code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptI18nTemplateTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-html"><%= i18n.conceptI18nTemplateSnippet %></code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptI18nJsTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts"><%= i18n.conceptI18nJsSnippet %></code></pre>
             </div>
           </section>
 
@@ -80,14 +113,19 @@ src/i18n/zh.json</code></pre>
               <p class="text-sm text-slate-400"><%= i18n.conceptSitesDesc %></p>
               <p class="text-sm text-slate-400"><%= i18n.conceptSitesWhat %></p>
               <p class="text-sm text-slate-400"><%= i18n.conceptSitesWhy %></p>
+              <p class="text-sm text-slate-400"><%= i18n.conceptSitesDevNote %></p>
               <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptSitesUseTitle %></p>
               <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
                 <% (i18n.conceptSitesUse || []).forEach((item) => { %>
                   <li><%= item %></li>
                 <% }) %>
               </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>src/sites/site-a.ts
-src/sites/site-b.ts</code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptSitesFilesTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-plaintext"><%= i18n.conceptSitesFilesTree %></code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptSitesTemplateTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-html"><%= i18n.conceptSitesTemplateSnippet %></code></pre>
+              <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.conceptSitesJsTitle %></p>
+              <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts"><%= i18n.conceptSitesJsSnippet %></code></pre>
             </div>
           </section>
 
@@ -103,70 +141,8 @@ src/sites/site-b.ts</code></pre>
                   <li><%= item %></li>
                 <% }) %>
               </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>import { getPageContext } from '@landing-page-sdk/utils-browser';
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">import { getPageContext } from '@landing-page-sdk/utils-browser';
 const { site, lang, route } = getPageContext();</code></pre>
-            </div>
-          </section>
-
-          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
-            <div class="doc-panel">
-              <h2><%= i18n.conceptFlowTitle %></h2>
-              <p class="text-sm text-slate-400"><%= i18n.conceptFlowLead %></p>
-              <ol class="mt-4 space-y-3 text-sm text-slate-400">
-                <% (i18n.conceptFlowSteps || []).forEach((item, idx) => { %>
-                  <li class="rounded-2xl border border-slate-800/70 bg-[#0b1220] px-3 py-2"><span class="mr-2 text-xs font-semibold text-cyan-300"><%= String(idx + 1).padStart(2, '0') %></span><%= item %></li>
-                <% }) %>
-              </ol>
-            </div>
-          </section>
-
-          <section class="doc-section reveal opacity-0 translate-y-4 transition duration-700 ease-out">
-            <div class="doc-panel">
-              <h2><%= i18n.conceptProgressTitle %></h2>
-              <p class="text-sm text-slate-400"><%= i18n.conceptProgressLead %></p>
-              <div class="mt-4 space-y-4">
-                <div class="rounded-2xl border border-slate-800/70 bg-[#0b1220] p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300"><%= i18n.conceptProgressStep1Title %></p>
-                  <p class="mt-2 text-sm text-slate-400"><%= i18n.conceptProgressStep1Desc %></p>
-                  <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>src/pages/
-  about/
-    team/
-      index.html
-  pricing/
-    index.html</code></pre>
-                  <ul class="mt-3 space-y-2 text-sm text-slate-300">
-                    <% (i18n.conceptProgressStep1Items || []).forEach((item) => { %>
-                      <li><%= item %></li>
-                    <% }) %>
-                  </ul>
-                </div>
-                <div class="rounded-2xl border border-slate-800/70 bg-[#0b1220] p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-300"><%= i18n.conceptProgressStep2Title %></p>
-                  <p class="mt-2 text-sm text-slate-400"><%= i18n.conceptProgressStep2Desc %></p>
-                  <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>src/i18n/
-  en.json
-  zh.default.json</code></pre>
-                  <ul class="mt-3 space-y-2 text-sm text-slate-300">
-                    <% (i18n.conceptProgressStep2Items || []).forEach((item) => { %>
-                      <li><%= item %></li>
-                    <% }) %>
-                  </ul>
-                </div>
-                <div class="rounded-2xl border border-slate-800/70 bg-[#0b1220] p-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300"><%= i18n.conceptProgressStep3Title %></p>
-                  <p class="mt-2 text-sm text-slate-400"><%= i18n.conceptProgressStep3Desc %></p>
-                  <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>src/sites/
-  brand-a.ts
-  brand-b.ts</code></pre>
-                  <ul class="mt-3 space-y-2 text-sm text-slate-300">
-                    <% (i18n.conceptProgressStep3Items || []).forEach((item) => { %>
-                      <li><%= item %></li>
-                    <% }) %>
-                  </ul>
-                  <p class="mt-3 text-sm text-slate-400"><%= i18n.conceptProgressSiteNote %></p>
-                </div>
-              </div>
-              <p class="mt-4 text-sm text-slate-400"><%= i18n.conceptExampleLinkNote %></p>
             </div>
           </section>
 

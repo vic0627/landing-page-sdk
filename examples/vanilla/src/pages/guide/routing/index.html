@@ -1,10 +1,24 @@
+<%
+  const pageTitle = `${i18n.siteTitle} - ${i18n.navRouting}`;
+  const pageDescription = i18n.routingLead;
+  const ogLocale = lang === 'zh' ? 'zh_TW' : 'en_US';
+%>
 <!DOCTYPE html>
 <html lang="<%= lang %>">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/__ASSETS__/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= i18n.siteTitle %> - <%= i18n.navRouting %></title>
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>" />
+    <meta property="og:title" content="<%= pageTitle %>" />
+    <meta property="og:description" content="<%= pageDescription %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= i18n.siteTitle %>" />
+    <meta property="og:locale" content="<%= ogLocale %>" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= pageTitle %>" />
+    <meta name="twitter:description" content="<%= pageDescription %>" />
   </head>
   <body class="min-h-screen bg-[#0b0f1a] font-['Archivo'] text-slate-100 antialiased">
     <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(900px_600px_at_90%_20%,rgba(168,85,247,0.2),transparent_70%)]"></div>
@@ -37,7 +51,7 @@
                     <li><%= item %></li>
                   <% }) %>
                 </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>route: { mode: 'tree' } // default
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">route: { mode: 'tree' } // default
 route: { mode: 'flat' }</code></pre>
               </article>
               <article class="doc-panel">
@@ -45,13 +59,14 @@ route: { mode: 'flat' }</code></pre>
                 <p class="text-sm text-slate-400"><%= i18n.routingDataToDesc %></p>
                 <p class="text-sm text-slate-400"><%= i18n.routingDataToWhat %></p>
                 <p class="text-sm text-slate-400"><%= i18n.routingDataToWhy %></p>
+                <p class="text-sm text-slate-400"><%= i18n.routingDataToNote %></p>
                 <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.routingDataToUseTitle %></p>
                 <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
                   <% (i18n.routingDataToUse || []).forEach((item) => { %>
                     <li><%= item %></li>
                   <% }) %>
                 </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>&lt;a data-to="/guide"&gt;Guide&lt;/a&gt;
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-html">&lt;a data-to="/guide"&gt;Guide&lt;/a&gt;
 &lt;a data-to="/guide" data-locale="ja"&gt;JA&lt;/a&gt;</code></pre>
               </article>
             </div>
@@ -69,7 +84,7 @@ route: { mode: 'flat' }</code></pre>
                   <li><%= item %></li>
                 <% }) %>
               </ul>
-              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>import manifest from 'virtual:route-manifest';
+              <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">import manifest from 'virtual:route-manifest';
 import { manifestResolver, getPageContext } from '@landing-page-sdk/utils-browser';
 const { site, route, lang } = getPageContext();
 location.href = manifestResolver(manifest, {
@@ -77,6 +92,7 @@ location.href = manifestResolver(manifest, {
   fromRoute: route,
   fromLocale: lang,
   toRoute: '/guide',
+  toLocale: lang,
 });</code></pre>
             </div>
           </section>
@@ -94,7 +110,7 @@ location.href = manifestResolver(manifest, {
                     <li><%= item %></li>
                   <% }) %>
                 </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>route: { resolution: 'rel' }
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">route: { resolution: 'rel' }
 route: { resolution: 'abs' }</code></pre>
               </article>
               <article class="doc-panel">
@@ -102,13 +118,14 @@ route: { resolution: 'abs' }</code></pre>
                 <p class="text-sm text-slate-400"><%= i18n.routingOrientationDesc %></p>
                 <p class="text-sm text-slate-400"><%= i18n.routingOrientationWhat %></p>
                 <p class="text-sm text-slate-400"><%= i18n.routingOrientationWhy %></p>
+                <p class="text-sm text-slate-400"><%= i18n.routingOrientationNote %></p>
                 <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.routingOrientationUseTitle %></p>
                 <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
                   <% (i18n.routingOrientationUse || []).forEach((item) => { %>
                     <li><%= item %></li>
                   <% }) %>
                 </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>route: { orientation: 'dir' }
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">route: { orientation: 'dir' }
 route: { orientation: 'file' }</code></pre>
               </article>
             </div>
@@ -121,13 +138,16 @@ route: { orientation: 'file' }</code></pre>
                 <p class="text-sm text-slate-400"><%= i18n.routingSitePathDesc %></p>
                 <p class="text-sm text-slate-400"><%= i18n.routingSitePathWhat %></p>
                 <p class="text-sm text-slate-400"><%= i18n.routingSitePathWhy %></p>
+                <p class="text-sm text-slate-400"><%= i18n.routingSitePathNote %></p>
                 <p class="mt-4 text-sm font-semibold text-slate-200"><%= i18n.routingSitePathUseTitle %></p>
                 <ul class="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-400">
                   <% (i18n.routingSitePathUse || []).forEach((item) => { %>
                     <li><%= item %></li>
                   <% }) %>
                 </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>route: { useSiteAsPath: true }</code></pre>
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">route: { useSiteAsPath: true }</code></pre>
+                <p class="mt-4 text-sm text-slate-400"><%= i18n.routingSitePathAssetNote %></p>
+                <pre class="mt-3 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-html">&lt;img src=\"/site-a/__ASSETS__/images/logo.png\" alt=\"logo\"&gt;</code></pre>
               </article>
               <article class="doc-panel">
                 <h2><%= i18n.routingHiddenTitle %></h2>
@@ -140,7 +160,7 @@ route: { orientation: 'file' }</code></pre>
                     <li><%= item %></li>
                   <% }) %>
                 </ul>
-                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code>route: {
+                <pre class="mt-4 rounded-2xl bg-[#0b0f1a] px-4 py-3 text-xs font-mono text-slate-200"><code class="language-ts">route: {
   hidden: [{ route: '/beta', site: ['site-a'] }]
 }</code></pre>
               </article>

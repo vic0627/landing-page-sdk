@@ -11,7 +11,7 @@ import {
   RouteMode,
   DestOrientation,
 } from './types';
-import { Page } from './langs';
+import { Page } from './page';
 
 export interface ControllerTarget {
   routes: string | string[];

@@ -7,6 +7,10 @@
     routing: i18n.navRouting,
     controller: i18n.navAutomation,
     advanced: i18n.navConfig,
+    'spa-frameworks': i18n.navSpa,
+    'config-reference': i18n.navConfigRef,
+    'cli-nx': i18n.navCli,
+    deployment: i18n.navDeploy,
   };
   const currentGuideLabel = guideLabels[active] || i18n.navGuide;
 %>
@@ -27,6 +31,10 @@
     <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'routing' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/routing"><%= i18n.navRouting %></a>
     <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'controller' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/controller-injection"><%= i18n.navAutomation %></a>
     <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'advanced' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/advanced"><%= i18n.navConfig %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'spa-frameworks' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/spa-frameworks"><%= i18n.navSpa %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'config-reference' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/config-reference"><%= i18n.navConfigRef %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'cli-nx' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/cli-nx"><%= i18n.navCli %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'deployment' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/deployment"><%= i18n.navDeploy %></a>
   </div>
 </details>
 
@@ -40,5 +48,9 @@
     <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'routing' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/routing"><%= i18n.navRouting %></a>
     <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'controller' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/controller-injection"><%= i18n.navAutomation %></a>
     <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'advanced' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/advanced"><%= i18n.navConfig %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'spa-frameworks' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/spa-frameworks"><%= i18n.navSpa %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'config-reference' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/config-reference"><%= i18n.navConfigRef %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'cli-nx' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/cli-nx"><%= i18n.navCli %></a>
+    <a class="rounded-xl border px-3 py-2 font-medium transition <%= active === 'deployment' ? 'border-cyan-400/70 bg-cyan-400/10 text-slate-100' : 'border-transparent text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-400/10' %>" data-to="/guide/deployment"><%= i18n.navDeploy %></a>
   </div>
 </nav>
